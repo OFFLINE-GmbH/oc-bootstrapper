@@ -1,0 +1,10 @@
+app:
+    url: http://localhost/october
+    locale: en
+
+database:
+    connection: mysql
+    username: homestead
+    password: secret
+    hostname: homestead
+    database: bootstrapper

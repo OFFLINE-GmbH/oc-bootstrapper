@@ -1,0 +1,5 @@
+database:
+    username: homestead
+    password: secret
+    hostname: localhost
+    database: bootstrapper

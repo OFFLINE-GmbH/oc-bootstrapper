@@ -1,0 +1,30 @@
+{
+  "name": "offline/oc-bootstrapper",
+  "description": "Easily bootstrap a new October CMS project",
+  "minimum-stability": "dev",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Tobias Kündig",
+      "email": "tobias.kuendig@offlinegmbh.ch"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "OFFLINE\\Bootstrapper\\October\\": "src/"
+    }
+  },
+  "require": {
+    "guzzlehttp/guzzle": "~6.0",
+    "symfony/console": "~3.0",
+    "symfony/process": "~3.0",
+    "nwidart/laravel-config-writer": "dev-master",
+    "symfony/yaml": "^3.0"
+  },
+  "bin": [
+    "oc-bootstrapper"
+  ],
+  "require-dev": {
+    "symfony/var-dumper": "^3.0"
+  }
+}
