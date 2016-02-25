@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fb82065953572af573b8c399c18eb58b",
-    "content-hash": "2bb67717d850ac5e26c50eca04817483",
+    "hash": "21555eb91e606eed5cb2e4bb8336bdeb",
+    "content-hash": "7e07c3a9fe2c2f338eb3f1ee5d0bfb75",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -296,12 +296,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "12209a968de18e05abbead5e8b9fc8ce2a9727de"
+                "reference": "14837fd94c1a58fe804da8a1b89b990e82858e39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/12209a968de18e05abbead5e8b9fc8ce2a9727de",
-                "reference": "12209a968de18e05abbead5e8b9fc8ce2a9727de",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/14837fd94c1a58fe804da8a1b89b990e82858e39",
+                "reference": "14837fd94c1a58fe804da8a1b89b990e82858e39",
                 "shasum": ""
             },
             "require": {
@@ -330,7 +330,7 @@
             ],
             "description": "The Illuminate Contracts package.",
             "homepage": "http://laravel.com",
-            "time": "2016-02-16 14:18:43"
+            "time": "2016-02-24 15:14:32"
         },
         {
             "name": "illuminate/filesystem",
@@ -537,26 +537,26 @@
         },
         {
             "name": "symfony/console",
-            "version": "dev-master",
+            "version": "2.8.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "50c745b4f1047632f7e46a70ba010789c4a9e385"
+                "reference": "fa1df6d8b7dea4a86b5297ba68fbbbb67343d2cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/50c745b4f1047632f7e46a70ba010789c4a9e385",
-                "reference": "50c745b4f1047632f7e46a70ba010789c4a9e385",
+                "url": "https://api.github.com/repos/symfony/console/zipball/fa1df6d8b7dea4a86b5297ba68fbbbb67343d2cc",
+                "reference": "fa1df6d8b7dea4a86b5297ba68fbbbb67343d2cc",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9",
+                "php": ">=5.3.9",
                 "symfony/polyfill-mbstring": "~1.0"
             },
             "require-dev": {
                 "psr/log": "~1.0",
-                "symfony/event-dispatcher": "~2.8|~3.0",
-                "symfony/process": "~2.8|~3.0"
+                "symfony/event-dispatcher": "~2.1|~3.0.0",
+                "symfony/process": "~2.1|~3.0.0"
             },
             "suggest": {
                 "psr/log": "For using the console logger",
@@ -566,7 +566,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "2.8-dev"
                 }
             },
             "autoload": {
@@ -593,7 +593,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-02-23 16:17:05"
+            "time": "2016-02-22 15:02:30"
         },
         {
             "name": "symfony/finder",
@@ -705,25 +705,25 @@
         },
         {
             "name": "symfony/process",
-            "version": "dev-master",
+            "version": "2.8.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "650a91315648fe433824e454b2c7107926f9876b"
+                "reference": "7dedd5b60550f33dca16dd7e94ef8aca8b67bbfe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/650a91315648fe433824e454b2c7107926f9876b",
-                "reference": "650a91315648fe433824e454b2c7107926f9876b",
+                "url": "https://api.github.com/repos/symfony/process/zipball/7dedd5b60550f33dca16dd7e94ef8aca8b67bbfe",
+                "reference": "7dedd5b60550f33dca16dd7e94ef8aca8b67bbfe",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9"
+                "php": ">=5.3.9"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "2.8-dev"
                 }
             },
             "autoload": {
@@ -750,29 +750,29 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2016-02-04 12:57:09"
+            "time": "2016-02-02 13:33:15"
         },
         {
             "name": "symfony/yaml",
-            "version": "dev-master",
+            "version": "2.8.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "13797a2598154e4663f31360733434e56924e20a"
+                "reference": "2a4ee40acb880c56f29fb1b8886e7ffe94f3b995"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/13797a2598154e4663f31360733434e56924e20a",
-                "reference": "13797a2598154e4663f31360733434e56924e20a",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/2a4ee40acb880c56f29fb1b8886e7ffe94f3b995",
+                "reference": "2a4ee40acb880c56f29fb1b8886e7ffe94f3b995",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9"
+                "php": ">=5.3.9"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "2.8-dev"
                 }
             },
             "autoload": {
@@ -799,26 +799,26 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-02-18 10:31:35"
+            "time": "2016-02-23 07:41:20"
         }
     ],
     "packages-dev": [
         {
             "name": "symfony/var-dumper",
-            "version": "dev-master",
+            "version": "2.8.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "3c2f3b6d45a3098450bd1a10376d1d50918006b5"
+                "reference": "19b697abe08833ddf38c3ab0cb1bfad236b13bde"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/3c2f3b6d45a3098450bd1a10376d1d50918006b5",
-                "reference": "3c2f3b6d45a3098450bd1a10376d1d50918006b5",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/19b697abe08833ddf38c3ab0cb1bfad236b13bde",
+                "reference": "19b697abe08833ddf38c3ab0cb1bfad236b13bde",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9",
+                "php": ">=5.3.9",
                 "symfony/polyfill-mbstring": "~1.0"
             },
             "require-dev": {
@@ -830,7 +830,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "2.8-dev"
                 }
             },
             "autoload": {
@@ -864,7 +864,7 @@
                 "debug",
                 "dump"
             ],
-            "time": "2016-02-13 09:24:02"
+            "time": "2016-02-13 09:21:29"
         }
     ],
     "aliases": [],

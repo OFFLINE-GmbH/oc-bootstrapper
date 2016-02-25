@@ -3,8 +3,6 @@
 namespace OFFLINE\Bootstrapper\October\Console;
 
 use OFFLINE\Bootstrapper\October\Config\Yaml;
-use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
-use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\ConfigWriter;
 use OFFLINE\Bootstrapper\October\Util\KeyGenerator;
 use Symfony\Component\Console\Command\Command;
@@ -13,6 +11,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Process;
 use ZipArchive;
 
 class InstallCommand extends Command
@@ -48,21 +47,21 @@ class InstallCommand extends Command
         }
 
         $configFile = getcwd() . '/october.yaml';
-        if ( ! file_exists($configFile)) {
-            return $output->writeln('<comment>october.yaml not found. Run october init first.</comment>');
-        }
-
-        $output->writeln('<info>Downloading latest October CMS...</info>');
-        (new OctoberCms())->download();
-
-        $output->writeln('<info>Installing composer dependencies...</info>');
-        (new Composer())->install();
+//        if ( ! file_exists($configFile)) {
+//            return $output->writeln('<comment>october.yaml not found. Run october init first.</comment>');
+//        }
+//
+//        $output->writeln('<info>Downloading latest October CMS...</info>');
+//        (new OctoberCms())->download();
+//
+//        $output->writeln('<info>Installing composer dependencies...</info>');
+//        (new Composer())->install();
 
         $output->writeln('<info>Setting up config files...</info>');
         $this->writeConfig($configFile);
 
         $output->writeln('<info>Migrating Database...</info>');
-        // php artisan october:up
+        (new Process('php artisan october:up'))->run();
 
         $output->writeln('<comment>Application ready! Build something amazing.</comment>');
     }
@@ -78,14 +77,15 @@ class InstallCommand extends Command
         $config->setEnvironment('dev')
                ->setAppKey((new KeyGenerator())->generate());
 
-        $dbDefault = $yaml->database['connection'];
-        $config->write('database', [
-            'default'                           => $yaml->database['connection'],
-            "connections.{$dbDefault}.database" => $yaml->database['database'],
-            "connections.{$dbDefault}.username" => $yaml->database['username'],
-            "connections.{$dbDefault}.password" => $yaml->database['password'],
-            "connections.{$dbDefault}.host"     => $yaml->database['hostname'],
-        ]);
+        // DB CONFIG
+        $dbConnection = $yaml->database['connection'];
+        $values       = ['default' => $dbConnection];
+
+        foreach ($yaml->database as $setting) {
+            $values["connections.{$dbConnection}.database"] = $setting;
+        }
+
+        $config->write('database', $values);
     }
 
 }

@@ -16,15 +16,15 @@
   },
   "require": {
     "guzzlehttp/guzzle": "~6.0",
-    "symfony/console": "~3.0",
-    "symfony/process": "~3.0",
+    "symfony/console": "~2.6",
+    "symfony/process": "~2.6",
     "nwidart/laravel-config-writer": "dev-master",
-    "symfony/yaml": "^3.0"
+    "symfony/yaml": "^2.6"
   },
   "bin": [
     "oc-bootstrapper"
   ],
   "require-dev": {
-    "symfony/var-dumper": "^3.0"
+    "symfony/var-dumper": "^2.6"
   }
 }
