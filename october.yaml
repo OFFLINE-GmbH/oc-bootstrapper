@@ -9,12 +9,14 @@ database:
     database: bootstrapper
     host: 192.168.10.10
 
-theme: git://
+theme:
+    name: demo
+    remote: git://
 
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
-    - git://xxx
+    - OFFLINE.Contact (git@xy.com)
 
 mail:
     name: User Name

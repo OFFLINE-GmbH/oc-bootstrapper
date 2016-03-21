@@ -25,6 +25,7 @@ class Setup
             ->setAppKey((new KeyGenerator())->generate());
 
         $this->setupDatabase();
+        $this->setupTheme();
         $this->setupApp('dev');
         $this->setupMail('dev');
 
@@ -36,7 +37,7 @@ class Setup
         $this->writer->env = 'prod';
 
         $this->setupCms();
-
+        $this->setupTheme();
         $this->setupApp('prod');
 
         return $this;
@@ -93,6 +94,14 @@ class Setup
             'enableRoutesCache'    => true,
             'enableAssetCache'     => true,
             'enableCsrfProtection' => true,
+        ];
+        $this->writer->write('cms', $values);
+    }
+
+    private function setupTheme()
+    {
+        $values = [
+            'activeTheme' => $this->config->theme['name'],
         ];
         $this->writer->write('cms', $values);
     }

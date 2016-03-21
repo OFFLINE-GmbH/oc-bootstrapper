@@ -19,7 +19,8 @@
     "symfony/console": "~2.6",
     "symfony/process": "~2.6",
     "nwidart/laravel-config-writer": "dev-master",
-    "symfony/yaml": "^2.6"
+    "symfony/yaml": "^2.6",
+    "cypresslab/gitelephant": "^1.1"
   },
   "bin": [
     "oc-bootstrapper"

@@ -4,6 +4,8 @@ namespace OFFLINE\Bootstrapper\October\Console;
 
 use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Config\Yaml;
+use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
+use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -15,6 +17,8 @@ use ZipArchive;
 
 class InstallCommand extends Command
 {
+    public $config;
+
     /**
      * Configure the command options.
      *
@@ -50,6 +54,8 @@ class InstallCommand extends Command
             return $output->writeln('<comment>october.yaml not found. Run october init first.</comment>');
         }
 
+        $this->config = new Yaml($configFile);
+
 //        $output->writeln('<info>Downloading latest October CMS...</info>');
 //        (new OctoberCms())->download();
 //
@@ -57,24 +63,37 @@ class InstallCommand extends Command
 //        (new Composer())->install();
 
         $output->writeln('<info>Setting up config files...</info>');
-        $this->writeConfig($configFile);
+        $this->writeConfig();
 
         $output->writeln('<info>Migrating Database...</info>');
         (new Process('php artisan october:up'))->run();
 
+        $output->writeln('<info>Removing demo data...</info>');
+        (new Process('php artisan october:fresh'))->run();
+
+        // $output->writeln('<info>Installing Theme...</info>');
+        // try {
+        //     (new ThemeInstaller($this->config))->install();
+        // } catch (\RuntimeException $e) {
+        //     $output->writeln("<error>${e}</error>");
+        // }
+
+        $output->writeln('<info>Installing Plugins...</info>');
+        try {
+            (new PluginInstaller($this->config))->install();
+        } catch (\RuntimeException $e) {
+            $output->writeln("<error>${e}</error>");
+        }
+
         $output->writeln('<comment>Application ready! Build something amazing.</comment>');
     }
 
-    /**
-     * @param $configFile
-     */
-    protected function writeConfig($configFile)
+    protected function writeConfig()
     {
-        $setup = new Setup(new Yaml($configFile));
+        $setup = new Setup($this->config);
 
         $setup
             ->devEnvironment()
             ->prodEnvironment();
     }
-
 }

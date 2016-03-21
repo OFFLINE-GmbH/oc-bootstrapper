@@ -4,9 +4,57 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "21555eb91e606eed5cb2e4bb8336bdeb",
-    "content-hash": "7e07c3a9fe2c2f338eb3f1ee5d0bfb75",
+    "hash": "bdf407caeb79ebb8c4b4d62d8098d1d8",
+    "content-hash": "c7751c743be3c0ed4982eda53b83e8f6",
     "packages": [
+        {
+            "name": "cypresslab/gitelephant",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/matteosister/GitElephant.git",
+                "reference": "a6409cc8da28b1f7a117e1499bfca60c1769949a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/matteosister/GitElephant/zipball/a6409cc8da28b1f7a117e1499bfca60c1769949a",
+                "reference": "a6409cc8da28b1f7a117e1499bfca60c1769949a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "phpcollection/phpcollection": "~0.4",
+                "symfony/filesystem": "~2.0|~3.0",
+                "symfony/finder": "~2.0|~3.0",
+                "symfony/process": "~2.0|~3.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "GitElephant": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Matteo Giachino",
+                    "email": "matteog@gmail.com"
+                }
+            ],
+            "description": "An abstraction layer for git written in PHP 5.3",
+            "homepage": "http://gitelephant.cypresslab.net/",
+            "keywords": [
+                "git"
+            ],
+            "time": "2016-01-26 22:31:30"
+        },
         {
             "name": "doctrine/inflector",
             "version": "dev-master",
@@ -84,7 +132,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/739b9c8378c462943c42fee5353453ab4164ed8e",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/6a173ddae1a8e58be871f6d010e88c029eaf5cae",
                 "reference": "739b9c8378c462943c42fee5353453ab4164ed8e",
                 "shasum": ""
             },
@@ -146,7 +194,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/dc03e97371e37172ff94547980f898659de76ffc",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/bb9024c526b22f3fe6ae55a561fd70653d470aa8",
                 "reference": "dc03e97371e37172ff94547980f898659de76ffc",
                 "shasum": ""
             },
@@ -300,7 +348,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/14837fd94c1a58fe804da8a1b89b990e82858e39",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/54ae17b98cdd1016d2c578d2f36c562ae764a433",
                 "reference": "14837fd94c1a58fe804da8a1b89b990e82858e39",
                 "shasum": ""
             },
@@ -342,7 +390,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/filesystem/zipball/0cb6b1b787f2be797b0631f0109e78ab926ce2f8",
+                "url": "https://api.github.com/repos/illuminate/filesystem/zipball/7149e6fb8a751a4790d4a726024ff51850d1f890",
                 "reference": "0cb6b1b787f2be797b0631f0109e78ab926ce2f8",
                 "shasum": ""
             },
@@ -392,7 +440,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/82e6fb9010f5bf6c9159020364db856c5261ca72",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/7f4cad5f7ebe095540a92a1c4394cd1c9db7bcc0",
                 "reference": "82e6fb9010f5bf6c9159020364db856c5261ca72",
                 "shasum": ""
             },
@@ -487,6 +535,104 @@
             "time": "2015-04-11 12:11:52"
         },
         {
+            "name": "phpcollection/phpcollection",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/schmittjoh/php-collection.git",
+                "reference": "f2bcff45c0da7c27991bbc1f90f47c4b7fb434a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/schmittjoh/php-collection/zipball/f2bcff45c0da7c27991bbc1f90f47c4b7fb434a6",
+                "reference": "f2bcff45c0da7c27991bbc1f90f47c4b7fb434a6",
+                "shasum": ""
+            },
+            "require": {
+                "phpoption/phpoption": "1.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "PhpCollection": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache2"
+            ],
+            "authors": [
+                {
+                    "name": "Johannes M. Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "General-Purpose Collection Library for PHP",
+            "keywords": [
+                "collection",
+                "list",
+                "map",
+                "sequence",
+                "set"
+            ],
+            "time": "2015-05-17 12:39:23"
+        },
+        {
+            "name": "phpoption/phpoption",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/schmittjoh/php-option.git",
+                "reference": "94e644f7d2051a5f0fcf77d81605f152eecff0ed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/94e644f7d2051a5f0fcf77d81605f152eecff0ed",
+                "reference": "94e644f7d2051a5f0fcf77d81605f152eecff0ed",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.7.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "PhpOption\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache2"
+            ],
+            "authors": [
+                {
+                    "name": "Johannes M. Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Option Type for PHP",
+            "keywords": [
+                "language",
+                "option",
+                "php",
+                "type"
+            ],
+            "time": "2015-07-25 16:39:46"
+        },
+        {
             "name": "psr/http-message",
             "version": "dev-master",
             "source": {
@@ -545,7 +691,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/fa1df6d8b7dea4a86b5297ba68fbbbb67343d2cc",
+                "url": "https://api.github.com/repos/symfony/console/zipball/9a5aef5fc0d4eff86853d44202b02be8d5a20154",
                 "reference": "fa1df6d8b7dea4a86b5297ba68fbbbb67343d2cc",
                 "shasum": ""
             },
@@ -596,6 +742,55 @@
             "time": "2016-02-22 15:02:30"
         },
         {
+            "name": "symfony/filesystem",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/filesystem.git",
+                "reference": "d46a5ec18b78bdd0ab04798d6710ca91c3588837"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/d46a5ec18b78bdd0ab04798d6710ca91c3588837",
+                "reference": "d46a5ec18b78bdd0ab04798d6710ca91c3588837",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Filesystem\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Filesystem Component",
+            "homepage": "https://symfony.com",
+            "time": "2016-03-16 16:22:05"
+        },
+        {
             "name": "symfony/finder",
             "version": "dev-master",
             "source": {
@@ -605,7 +800,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/43a0bde21f9f390131917b6202eb02b3fea1f799",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/c3e7b8a86d3044a3dff2cc5a89f2c523ccf0e0fb",
                 "reference": "43a0bde21f9f390131917b6202eb02b3fea1f799",
                 "shasum": ""
             },
@@ -713,7 +908,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/7dedd5b60550f33dca16dd7e94ef8aca8b67bbfe",
+                "url": "https://api.github.com/repos/symfony/process/zipball/899382810fc8fddc741cd60c3757b98cc6ef5113",
                 "reference": "7dedd5b60550f33dca16dd7e94ef8aca8b67bbfe",
                 "shasum": ""
             },
@@ -762,7 +957,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/2a4ee40acb880c56f29fb1b8886e7ffe94f3b995",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/584e52cb8f788a887553ba82db6caacb1d6260bb",
                 "reference": "2a4ee40acb880c56f29fb1b8886e7ffe94f3b995",
                 "shasum": ""
             },
@@ -813,7 +1008,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/19b697abe08833ddf38c3ab0cb1bfad236b13bde",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/1f840df081f59cbe25140742bbe94a0dfac0222a",
                 "reference": "19b697abe08833ddf38c3ab0cb1bfad236b13bde",
                 "shasum": ""
             },
