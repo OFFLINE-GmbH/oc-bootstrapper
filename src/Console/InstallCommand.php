@@ -2,11 +2,8 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
+use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Config\Yaml;
-use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
-use OFFLINE\Bootstrapper\October\Util\Composer;
-use OFFLINE\Bootstrapper\October\Util\ConfigWriter;
-use OFFLINE\Bootstrapper\October\Util\KeyGenerator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -53,11 +50,11 @@ class InstallCommand extends Command
             return $output->writeln('<comment>october.yaml not found. Run october init first.</comment>');
         }
 
-        $output->writeln('<info>Downloading latest October CMS...</info>');
-        (new OctoberCms())->download();
-
-        $output->writeln('<info>Installing composer dependencies...</info>');
-        (new Composer())->install();
+//        $output->writeln('<info>Downloading latest October CMS...</info>');
+//        (new OctoberCms())->download();
+//
+//        $output->writeln('<info>Installing composer dependencies...</info>');
+//        (new Composer())->install();
 
         $output->writeln('<info>Setting up config files...</info>');
         $this->writeConfig($configFile);
@@ -73,21 +70,11 @@ class InstallCommand extends Command
      */
     protected function writeConfig($configFile)
     {
-        $yaml = new Yaml($configFile);
+        $setup = new Setup(new Yaml($configFile));
 
-        $config = new ConfigWriter();
-        $config->setEnvironment('dev')
-               ->setAppKey((new KeyGenerator())->generate());
-
-        // DB CONFIG
-        $dbConnection = $yaml->database['connection'];
-        $values       = ['default' => $dbConnection];
-
-        foreach ($yaml->database as $setting) {
-            $values["connections.{$dbConnection}.database"] = $setting;
-        }
-
-        $config->write('database', $values);
+        $setup
+            ->devEnvironment()
+            ->prodEnvironment();
     }
 
 }

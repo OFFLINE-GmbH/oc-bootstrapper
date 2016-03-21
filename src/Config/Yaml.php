@@ -3,9 +3,10 @@
 namespace OFFLINE\Bootstrapper\October\Config;
 
 
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
-class Yaml
+class Yaml implements ConfigInterface
 {
     protected $config;
 
