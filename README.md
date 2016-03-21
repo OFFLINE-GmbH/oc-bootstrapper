@@ -18,13 +18,13 @@
 
 ## Todo
 
-[] Prod / Dev Environment Config in yaml
-[] Mail Config mail.from.address mail.from.name mail.driver
-[] Copy cms and app config into dev environment
-[] php artisan october:fresh
-[] Install plugins (php artisan plugin:install Rainlab.Pages)
-[] Clear compiled / cache
-[] Create .gitignore
+- [X] Prod / Dev Environment Config in yaml
+- [X] Mail Config mail.from.address mail.from.name mail.driver
+- [ ] Copy cms and app config into dev environment
+- [ ] php artisan october:fresh
+- [ ] Install plugins (php artisan plugin:install Rainlab.Pages)
+- [ ] Clear compiled / cache
+- [ ] Create .gitignore
 
 ```
 .DS_Store

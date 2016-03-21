@@ -21,11 +21,12 @@ class Setup
     {
         $this->writer
             ->setAppEnv('dev')
-            ->copyConfigFileToEnv(['cms', 'app', 'database'])
+            ->copyConfigFileToEnv(['cms', 'app', 'database', 'mail'])
             ->setAppKey((new KeyGenerator())->generate());
 
         $this->setupDatabase();
-        $this->setupAppEnv();
+        $this->setupApp('dev');
+        $this->setupMail('dev');
 
         return $this;
     }
@@ -36,9 +37,21 @@ class Setup
 
         $this->setupCms();
 
-        $this->setupAppProd();
+        $this->setupApp('prod');
 
         return $this;
+    }
+
+    private function setupMail($env = 'prod')
+    {
+        $values = [
+            'from.address' => $this->config->mail['address'],
+            'from.name'    => $this->config->mail['name'],
+        ];
+        if ($env === 'dev') {
+            $values['driver'] = $this->config->mail['driver'];
+        }
+        $this->writer->write('mail', $values);
     }
 
     private function setupDatabase()
@@ -57,22 +70,20 @@ class Setup
         $this->writer->write('database', $values);
     }
 
-    private function setupAppProd()
+    private function setupApp($env = 'prod')
     {
-        $values = [
-            'debug'  => 'false',
-            'locale' => $this->config->app['locale'],
-        ];
-        $this->writer->write('app', $values);
-    }
-
-    private function setupAppEnv()
-    {
-
         $values = [
             'url'    => $this->config->app['url'],
             'locale' => $this->config->app['locale'],
         ];
+
+        if ($env === 'prod') {
+            $values = [
+                'debug'  => 'false',
+                'locale' => $this->config->app['locale'],
+            ];
+        }
+
         $this->writer->write('app', $values);
     }
 

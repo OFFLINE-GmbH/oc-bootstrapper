@@ -16,3 +16,7 @@ plugins:
     - Rainlab.Builder
     - git://xxx
 
+mail:
+    name: User Name
+    address: email@example.com
+    driver: log
