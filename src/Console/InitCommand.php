@@ -42,7 +42,7 @@ class InitCommand extends Command
 
         $this->createWorkingDirectory($dir);
 
-        $template = __DIR__ . '/../october.yaml';
+        $template = __DIR__ . '/../../october.yaml';
         $target   = $dir . '/october.yaml';
 
         $output->writeln('<info>Creating default october.yaml...</info>');
