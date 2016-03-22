@@ -4,14 +4,17 @@ namespace OFFLINE\Bootstrapper\October\Console;
 
 use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Config\Yaml;
+use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
 use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
 use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
+use OFFLINE\Bootstrapper\October\Util\Composer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Process;
 use ZipArchive;
 
 /**
