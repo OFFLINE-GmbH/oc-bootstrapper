@@ -5,9 +5,16 @@ namespace OFFLINE\Bootstrapper\October\Util;
 
 use Symfony\Component\Process\Process;
 
+/**
+ * Class Composer
+ * @package OFFLINE\Bootstrapper\October\Util
+ */
 class Composer
 {
 
+    /**
+     * @var string
+     */
     protected $composer;
 
     /**

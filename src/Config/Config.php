@@ -1,10 +1,8 @@
 <?php
-
-
 namespace OFFLINE\Bootstrapper\October\Config;
 
 
-interface ConfigInterface
+interface Config
 {
     public function __get($name);
 }

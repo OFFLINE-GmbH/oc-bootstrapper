@@ -3,8 +3,17 @@
 namespace OFFLINE\Bootstrapper\October\Util;
 
 
+/**
+ * Class KeyGenerator
+ * @package OFFLINE\Bootstrapper\October\Util
+ */
 class KeyGenerator
 {
+    /**
+     * @param int $length
+     *
+     * @return string
+     */
     public function generate($length = 32)
     {
         $string = '';
@@ -17,6 +26,11 @@ class KeyGenerator
         return $string;
     }
 
+    /**
+     * @param int $length
+     *
+     * @return string
+     */
     private function randomBytes($length = 32)
     {
         $bytes = 'CHANGE_ME!!!!!!!';

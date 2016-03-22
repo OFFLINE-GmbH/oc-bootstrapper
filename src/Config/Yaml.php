@@ -6,10 +6,23 @@ namespace OFFLINE\Bootstrapper\October\Config;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
-class Yaml implements ConfigInterface
+/**
+ * Class Yaml
+ * @package OFFLINE\Bootstrapper\October\Config
+ */
+class Yaml implements Config
 {
+    /**
+     * @var mixed
+     */
     protected $config;
 
+    /**
+     * Yaml constructor.
+     *
+     * @param             $file
+     * @param Parser|null $parser
+     */
     public function __construct($file, Parser $parser = null)
     {
         if ($parser === null) {
@@ -23,6 +36,11 @@ class Yaml implements ConfigInterface
         }
     }
 
+    /**
+     * @param $name
+     *
+     * @return mixed
+     */
     public function __get($name) {
         return $this->config[$name];
     }

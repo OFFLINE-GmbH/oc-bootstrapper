@@ -4,19 +4,34 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use GitElephant\Repository;
-use OFFLINE\Bootstrapper\October\Config\ConfigInterface;
+use OFFLINE\Bootstrapper\October\Config\Config;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Class PluginInstaller
+ * @package OFFLINE\Bootstrapper\October\Installer
+ */
 class PluginInstaller
 {
+    /**
+     * @var Config
+     */
     protected $config;
 
-    public function __construct(ConfigInterface $config)
+    /**
+     * PluginInstaller constructor.
+     *
+     * @param Config $config
+     */
+    public function __construct(Config $config)
     {
         $this->config = $config;
     }
 
+    /**
+     *
+     */
     public function install()
     {
 
@@ -47,6 +62,11 @@ class PluginInstaller
         }
     }
 
+    /**
+     * @param $plugin
+     *
+     * @return mixed
+     */
     protected function parse($plugin)
     {
         // Vendor.Plugin (Remote)

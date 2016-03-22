@@ -9,6 +9,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class InitCommand
+ * @package OFFLINE\Bootstrapper\October\Console
+ */
 class InitCommand extends Command
 {
     /**

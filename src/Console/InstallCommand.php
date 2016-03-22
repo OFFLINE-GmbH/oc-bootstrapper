@@ -4,21 +4,25 @@ namespace OFFLINE\Bootstrapper\October\Console;
 
 use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Config\Yaml;
-use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
-use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
 use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
-use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\LogicException;
-use Symfony\Component\Process\Process;
 use ZipArchive;
 
+/**
+ * Class InstallCommand
+ * @package OFFLINE\Bootstrapper\October\Console
+ */
 class InstallCommand extends Command
 {
+    /**
+     * @var
+     */
     public $config;
 
     /**
@@ -73,6 +77,10 @@ class InstallCommand extends Command
         $output->writeln('<info>Removing demo data...</info>');
         (new Process('php artisan october:fresh'))->run();
 
+        $output->writeln('<info>Clearing cache...</info>');
+        (new Process('php artisan clear-compiled'))->run();
+        (new Process('php artisan cache:clear'))->run();
+
         $output->writeln('<info>Installing Theme...</info>');
         try {
             (new ThemeInstaller($this->config))->install();
@@ -87,9 +95,15 @@ class InstallCommand extends Command
             $output->writeln("<error>${e}</error>");
         }
 
+        $output->writeLn('<info>Creating .gitignore</info>');
+        $this->gitignore();
+
         $output->writeln('<comment>Application ready! Build something amazing.</comment>');
     }
 
+    /**
+     *
+     */
     protected function writeConfig()
     {
         $setup = new Setup($this->config);
@@ -97,5 +111,21 @@ class InstallCommand extends Command
         $setup
             ->devEnvironment()
             ->prodEnvironment();
+    }
+
+    /**
+     *
+     */
+    protected function gitignore()
+    {
+        file_put_contents(getcwd() . '/.gitignore', implode("\n", [
+                '.DS_Store',
+                '*.log',
+                '*node_modules*',
+                '.idea',
+                '*.sass-cache*',
+                'vendor',
+            ])
+        );
     }
 }

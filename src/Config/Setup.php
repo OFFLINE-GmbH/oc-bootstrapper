@@ -6,17 +6,35 @@ namespace OFFLINE\Bootstrapper\October\Config;
 use OFFLINE\Bootstrapper\October\Util\ConfigWriter;
 use OFFLINE\Bootstrapper\October\Util\KeyGenerator;
 
+/**
+ * Class Setup
+ * @package OFFLINE\Bootstrapper\October\Config
+ */
 class Setup
 {
+    /**
+     * @var Config
+     */
     protected $config;
+    /**
+     * @var ConfigWriter
+     */
     protected $writer;
 
-    public function __construct(ConfigInterface $config)
+    /**
+     * Setup constructor.
+     *
+     * @param Config $config
+     */
+    public function __construct(Config $config)
     {
         $this->config = $config;
         $this->writer = new ConfigWriter();
     }
 
+    /**
+     * @return $this
+     */
     public function devEnvironment()
     {
         $this->writer
@@ -32,6 +50,9 @@ class Setup
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function prodEnvironment()
     {
         $this->writer->env = 'prod';
@@ -43,6 +64,9 @@ class Setup
         return $this;
     }
 
+    /**
+     * @param string $env
+     */
     private function setupMail($env = 'prod')
     {
         $values = [
@@ -55,6 +79,9 @@ class Setup
         $this->writer->write('mail', $values);
     }
 
+    /**
+     *
+     */
     private function setupDatabase()
     {
         // DB CONFIG
@@ -71,6 +98,9 @@ class Setup
         $this->writer->write('database', $values);
     }
 
+    /**
+     * @param string $env
+     */
     private function setupApp($env = 'prod')
     {
         $values = [
@@ -88,6 +118,9 @@ class Setup
         $this->writer->write('app', $values);
     }
 
+    /**
+     *
+     */
     private function setupCms()
     {
         $values = [
@@ -98,6 +131,9 @@ class Setup
         $this->writer->write('cms', $values);
     }
 
+    /**
+     *
+     */
     private function setupTheme()
     {
         $values = [

@@ -4,12 +4,30 @@ namespace OFFLINE\Bootstrapper\October\Util;
 
 use October\Rain\Config\Rewrite;
 
+/**
+ * Class ConfigWriter
+ * @package OFFLINE\Bootstrapper\October\Util
+ */
 class ConfigWriter
 {
+    /**
+     * @var string
+     */
     public $env = 'dev';
+    /**
+     * @var Rewrite
+     */
     protected $writer;
+    /**
+     * @var string
+     */
     protected $dir;
 
+    /**
+     * ConfigWriter constructor.
+     *
+     * @param Rewrite|null $writer
+     */
     public function __construct(Rewrite $writer = null)
     {
         if ($writer === null) {
@@ -19,6 +37,11 @@ class ConfigWriter
         $this->dir    = getcwd() . '/config';
     }
 
+    /**
+     * @param string $appEnv
+     *
+     * @return $this
+     */
     public function setAppEnv($appEnv = 'dev')
     {
         file_put_contents(getcwd() . '/.env', 'APP_ENV=' . $appEnv);
@@ -26,6 +49,11 @@ class ConfigWriter
         return $this;
     }
 
+    /**
+     * @param $files
+     *
+     * @return $this
+     */
     public function copyConfigFileToEnv($files)
     {
         if ( ! is_array($files)) {
@@ -42,6 +70,12 @@ class ConfigWriter
         return $this;
     }
 
+    /**
+     * @param       $file
+     * @param array $values
+     *
+     * @return $this|ConfigWriter
+     */
     public function write($file, array $values)
     {
         if ($file === 'app') {
@@ -80,11 +114,19 @@ class ConfigWriter
         return $this;
     }
 
+    /**
+     * @param $key
+     */
     public function setAppKey($key)
     {
         $this->writer->toFile($this->dir . '/app.php', compact('key'), false);
     }
 
+    /**
+     * @param $file
+     *
+     * @return string
+     */
     protected function filePath($file)
     {
         $envPath   = $this->env === 'prod' ? '' : $this->env . '/';

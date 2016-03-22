@@ -1,5 +1,5 @@
 app:
-    url: http://localhost/october
+    url: http://october.dev
     locale: en
 
 database:
@@ -9,14 +9,14 @@ database:
     database: bootstrapper
     host: 192.168.10.10
 
-theme:
-    name: demo
-    remote: git://
+theme: name (user@remote.git)
 
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
-    - OFFLINE.Contact (git@xy.com)
+    - OFFLINE.SiteSearch
+    - OFFLINE.ResponsiveImages
+    # - Vendor.Private (user@remote.git)
 
 mail:
     name: User Name
