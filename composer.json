@@ -1,7 +1,6 @@
 {
   "name": "offline/oc-bootstrapper",
   "description": "Easily bootstrap a new October CMS project",
-  "minimum-stability": "dev",
   "license": "MIT",
   "authors": [
     {
