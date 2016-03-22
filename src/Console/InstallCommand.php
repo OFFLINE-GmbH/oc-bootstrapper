@@ -4,8 +4,10 @@ namespace OFFLINE\Bootstrapper\October\Console;
 
 use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Config\Yaml;
+use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
 use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
 use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
+use OFFLINE\Bootstrapper\October\Util\Composer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -56,11 +58,11 @@ class InstallCommand extends Command
 
         $this->config = new Yaml($configFile);
 
-//        $output->writeln('<info>Downloading latest October CMS...</info>');
-//        (new OctoberCms())->download();
-//
-//        $output->writeln('<info>Installing composer dependencies...</info>');
-//        (new Composer())->install();
+        $output->writeln('<info>Downloading latest October CMS...</info>');
+        (new OctoberCms())->download();
+
+        $output->writeln('<info>Installing composer dependencies...</info>');
+        (new Composer())->install();
 
         $output->writeln('<info>Setting up config files...</info>');
         $this->writeConfig();
@@ -71,12 +73,12 @@ class InstallCommand extends Command
         $output->writeln('<info>Removing demo data...</info>');
         (new Process('php artisan october:fresh'))->run();
 
-        // $output->writeln('<info>Installing Theme...</info>');
-        // try {
-        //     (new ThemeInstaller($this->config))->install();
-        // } catch (\RuntimeException $e) {
-        //     $output->writeln("<error>${e}</error>");
-        // }
+        $output->writeln('<info>Installing Theme...</info>');
+        try {
+            (new ThemeInstaller($this->config))->install();
+        } catch (\RuntimeException $e) {
+            $output->writeln("<error>${e}</error>");
+        }
 
         $output->writeln('<info>Installing Plugins...</info>');
         try {

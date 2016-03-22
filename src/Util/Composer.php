@@ -22,10 +22,15 @@ class Composer
      * Composer install
      *
      * @return void
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
      */
     public function install()
     {
-        (new Process($this->composer . ' install --no-scripts'))->run();
+        (new Process($this->composer . ' install --no-scripts'))
+            ->setTimeout(3600)
+            ->run();
     }
 
     /**
