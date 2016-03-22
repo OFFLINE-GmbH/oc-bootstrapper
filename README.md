@@ -25,7 +25,7 @@ The following steps will be taken care of:
 
 ## Installation
 
-```composer require global offline/oc-bootstrapper``` 
+```composer global require offline/oc-bootstrapper``` 
 
 Now you should be able to call `october` from your command line.
 
