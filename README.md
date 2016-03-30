@@ -23,16 +23,39 @@ The following steps will be taken care of:
 * Zip PHP extension (`sudo apt-get install php7.0-zip`) 
 * Composer (via global binary or `composer.phar` in your working directory) 
 
+## Tested on
+
+* Ubuntu 15.10
+* Windows 7 (using `Git Bash`) 
+
+
 ## Installation
 
 ```composer global require offline/oc-bootstrapper``` 
 
-Now you should be able to call `october` from your command line.
+You can now run `october` from your command line.
 
 ```bash
 $ october
-October CMS Bootstrapper version 0.0.1
+October CMS Bootstrapper version 0.0.7
 ```
+
+### Fix cURL error 60 on Windows using XAMPP
+
+If you are working with XAMPP on Windows you will most likely get the following error during `october install`:
+
+    cURL error 60: SSL certificate problem: unable to get local issuer certificate
+    
+You can fix this error by executing the following steps.
+
+1. Download the `cacert.pem` file from [VersatilityWerks](https://gist.github.com/VersatilityWerks/5719158/download)
+2. Extract the `cacert.pem` to the `php` folder in your xampp directory (eg. `c:\xampp\php`)
+3. Edit your `php.ini` (`C:\xampp\php\php.ini`). Add the following line.
+
+   `curl.cainfo = "\xampp\php\cacert.pem"`
+
+`october install` should work now as expected.
+
 
 ## Usage
 
