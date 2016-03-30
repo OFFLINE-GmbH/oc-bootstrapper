@@ -15,11 +15,11 @@
   },
   "require": {
     "guzzlehttp/guzzle": "~6.0",
-    "symfony/console": "~3.0",
-    "symfony/process": "~3.0",
     "offline/laravel-config-writer": "~1.0",
-    "symfony/yaml": "^3.0",
-    "cypresslab/gitelephant": "^1.1"
+    "cypresslab/gitelephant": "^1.1",
+    "symfony/console": "^3.0",
+    "symfony/process": "^3.0",
+    "symfony/yaml": "^3.0"
   },
   "bin": [
     "october"
