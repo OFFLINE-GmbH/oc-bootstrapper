@@ -83,7 +83,7 @@ class OctoberCms
         @unlink($this->zipFile);
 
         $directory = getcwd();
-        $source    = $directory . '/october-master';
+        $source    = $directory . DS . 'october-master';
 
         (new Process(sprintf('mv %s %s', $source . '/*', $directory)))->run();
         (new Process(sprintf('rm -rf %s', $source)))->run();
@@ -102,7 +102,7 @@ class OctoberCms
      */
     protected function makeFilename()
     {
-        return getcwd() . '/october_' . md5(time() . uniqid()) . '.zip';
+        return getcwd() . DS . 'october_' . md5(time() . uniqid()) . '.zip';
     }
 
 }

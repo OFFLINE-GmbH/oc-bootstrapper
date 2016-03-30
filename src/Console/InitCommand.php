@@ -42,12 +42,12 @@ class InitCommand extends Command
     {
         $output->writeln('<info>Creating project directory...</info>');
 
-        $dir = getcwd() . '/' . $input->getArgument('directory');
+        $dir = getcwd() . DS . $input->getArgument('directory');
 
         $this->createWorkingDirectory($dir);
 
-        $template = __DIR__ . '/../../october.yaml';
-        $target   = $dir . '/october.yaml';
+        $template = __DIR__ . DS . implode(DS, ['..', '..', 'october.yaml']);
+        $target   = $dir . DS . 'october.yaml';
 
         $output->writeln('<info>Creating default october.yaml...</info>');
 

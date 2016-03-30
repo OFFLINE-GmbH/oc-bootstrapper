@@ -42,7 +42,7 @@ class ThemeInstaller
             return;
         }
 
-        $themeDir = getcwd() . '/themes/' . $theme;
+        $themeDir = getcwd() . DS . implode(DS, ['themes', $theme]);
         if ( ! is_dir($themeDir)) {
             mkdir($themeDir);
         }

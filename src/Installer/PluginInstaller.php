@@ -47,7 +47,7 @@ class PluginInstaller
             }
 
             $vendorDir = $this->createVendorDir($vendor);
-            $pluginDir = $vendorDir . '/' . $plugin;
+            $pluginDir = $vendorDir . DS . $plugin;
 
             $this->mkdir($pluginDir);
 
@@ -88,7 +88,7 @@ class PluginInstaller
      */
     protected function createVendorDir($vendor)
     {
-        $pluginDir = getcwd() . '/plugins/' . $vendor;
+        $pluginDir = getcwd() . DS . implode(DS, ['plugins', $vendor]);
 
         return $this->mkdir($pluginDir);
     }

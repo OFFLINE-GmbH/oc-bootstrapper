@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+define('DS', DIRECTORY_SEPARATOR);
 
 if (file_exists(__DIR__.'/../../autoload.php')) {
     require __DIR__.'/../../autoload.php';

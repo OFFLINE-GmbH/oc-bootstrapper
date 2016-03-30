@@ -58,7 +58,7 @@ class InstallCommand extends Command
             throw new RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
 
-        $configFile = getcwd() . '/october.yaml';
+        $configFile = getcwd() . DS . 'october.yaml';
         if ( ! file_exists($configFile)) {
             return $output->writeln('<comment>october.yaml not found. Run october init first.</comment>');
         }
@@ -121,7 +121,7 @@ class InstallCommand extends Command
      */
     protected function gitignore()
     {
-        file_put_contents(getcwd() . '/.gitignore', implode("\n", [
+        file_put_contents(getcwd() . DS . '.gitignore', implode("\n", [
                 '.DS_Store',
                 '*.log',
                 '*node_modules*',

@@ -34,7 +34,7 @@ class ConfigWriter
             $writer = new Rewrite();
         }
         $this->writer = $writer;
-        $this->dir    = getcwd() . '/config';
+        $this->dir    = getcwd() . DS . 'config';
     }
 
     /**
@@ -44,7 +44,7 @@ class ConfigWriter
      */
     public function setAppEnv($appEnv = 'dev')
     {
-        file_put_contents(getcwd() . '/.env', 'APP_ENV=' . $appEnv);
+        file_put_contents(getcwd() . DS . '.env', 'APP_ENV=' . $appEnv);
 
         return $this;
     }
@@ -63,7 +63,7 @@ class ConfigWriter
         foreach ($files as $file) {
             $target = $this->filePath($file);
             if ( ! file_exists($target)) {
-                copy($this->dir . '/' . $file . '.php', $target);
+                copy($this->dir . DS . $file . '.php', $target);
             }
         }
 
@@ -119,7 +119,7 @@ class ConfigWriter
      */
     public function setAppKey($key)
     {
-        $this->writer->toFile($this->dir . '/app.php', compact('key'), false);
+        $this->writer->toFile($this->dir . DS . 'app.php', compact('key'), false);
     }
 
     /**
@@ -129,8 +129,8 @@ class ConfigWriter
      */
     protected function filePath($file)
     {
-        $envPath   = $this->env === 'prod' ? '' : $this->env . '/';
-        $targetDir = $this->dir . '/' . $envPath;
+        $envPath   = $this->env === 'prod' ? '' : $this->env . DS;
+        $targetDir = $this->dir . DS . $envPath;
 
         if ( ! is_dir($targetDir)) {
             mkdir($targetDir);
