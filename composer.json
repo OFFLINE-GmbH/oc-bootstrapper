@@ -17,12 +17,12 @@
     "guzzlehttp/guzzle": "~6.0",
     "symfony/console": "~2.6",
     "symfony/process": "~2.6",
-    "nwidart/laravel-config-writer": "dev-master",
+    "offline/laravel-config-writer": "~1.0",
     "symfony/yaml": "^2.6",
     "cypresslab/gitelephant": "^1.1"
   },
   "bin": [
-    "oc-bootstrapper"
+    "october"
   ],
   "require-dev": {
     "symfony/var-dumper": "^2.6"

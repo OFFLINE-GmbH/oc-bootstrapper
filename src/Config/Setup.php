@@ -136,8 +136,9 @@ class Setup
      */
     private function setupTheme()
     {
+        $activeTheme = explode(' ', $this->config->theme);
         $values = [
-            'activeTheme' => $this->config->theme['name'],
+            'activeTheme' => $activeTheme[0],
         ];
         $this->writer->write('cms', $values);
     }
