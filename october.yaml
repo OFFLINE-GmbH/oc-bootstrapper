@@ -15,6 +15,7 @@ plugins:
     - Rainlab.Pages
     - Rainlab.Builder
     - Adrenth.Redirect
+    - Bedard.Webhooks
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
     # - Vendor.Private (user@remote.git)
