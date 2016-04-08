@@ -123,7 +123,7 @@ When you are done editing your configuration file, simply run `october install` 
 - [X] Clear compiled / cache
 - [X] Create .gitignore
 - [ ] Remove .git directories so no submodules are created
-- [ ] Remove .gitignore in config/dev
+- [ ] Remove .gitignore in config/dev or implement command to recreate this environment if needed
 - [ ] Check what's wrong with .htaccess / why it is missing
 - [ ] Update command to update private plugins
 - [ ] Remove CONTRIBUTION and other README files after the october repo clone
