@@ -26,7 +26,6 @@ The following steps will be taken care of:
 ## Tested on
 
 * Ubuntu 15.10
-* Windows 7 (using `Git Bash`) 
 
 
 ## Installation
