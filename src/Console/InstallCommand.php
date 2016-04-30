@@ -129,6 +129,7 @@ class InstallCommand extends Command
                 '.idea',
                 '*.sass-cache*',
                 'vendor',
+                'composer.phar',
                 'tests',
                 '.env',
             ])
