@@ -6,3 +6,4 @@
 vendor/
 composer.phar
 .env
+config/database.php
