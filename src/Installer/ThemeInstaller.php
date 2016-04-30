@@ -4,30 +4,14 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use GitElephant\Repository;
-use OFFLINE\Bootstrapper\October\Config\Config;
 use Symfony\Component\Process\Process;
 
 /**
  * Class ThemeInstaller
- * @package OFFLINE\Bootstrapper\October\Installer
+ * @package OFFLINE\Bootstrapper\October\BaseInstaller
  */
-class ThemeInstaller extends Installer
+class ThemeInstaller extends BaseInstaller
 {
-    /**
-     * @var Config
-     */
-    protected $config;
-
-    /**
-     * ThemeInstaller constructor.
-     *
-     * @param Config $config
-     */
-    public function __construct(Config $config)
-    {
-        $this->config = $config;
-    }
-
     /**
      *
      * @throws \Symfony\Component\Process\Exception\LogicException

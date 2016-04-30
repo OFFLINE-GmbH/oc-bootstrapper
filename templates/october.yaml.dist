@@ -11,6 +11,8 @@ database:
 
 theme: name (user@remote.git)
 
+deployment: gitlab
+
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder

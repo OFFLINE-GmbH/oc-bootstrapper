@@ -39,23 +39,6 @@ $ october
 October CMS Bootstrapper version 0.0.7
 ```
 
-### Fix cURL error 60 on Windows using XAMPP
-
-If you are working with XAMPP on Windows you will most likely get the following error during `october install`:
-
-    cURL error 60: SSL certificate problem: unable to get local issuer certificate
-    
-You can fix this error by executing the following steps.
-
-1. Download the `cacert.pem` file from [VersatilityWerks](https://gist.github.com/VersatilityWerks/5719158/download)
-2. Extract the `cacert.pem` to the `php` folder in your xampp directory (eg. `c:\xampp\php`)
-3. Edit your `php.ini` (`C:\xampp\php\php.ini`). Add the following line.
-
-   `curl.cainfo = "\xampp\php\cacert.pem"`
-
-`october install` should work now as expected.
-
-
 ## Usage
 
 ### Initialize your project
@@ -100,6 +83,8 @@ mail:
     name: User Name
     address: email@example.com
     driver: log
+    
+deployment: false
 ```
 
 #### Theme and Plugin syntax
@@ -108,9 +93,36 @@ mail:
 append your repo's address in `()` to tell `oc-bootstrapper` to check it out for you.
 If no repo is defined the plugins are loaded from the October Marketplace.
 
+
 ### Install October CMS
 
 When you are done editing your configuration file, simply run `october install` to install October. 
+
+
+### SSH deployments
+
+Set the `deployment` option to `false` if you don't want to setup deployments.
+
+Currently `oc-bootstrapper` supports a simple setup to deploy a project on push via GitLab CI. To create all needed files set the `deployment` option to `gitlab`.
+
+Support for other CI systems is added on request.
+
+#### GitLab CI with Envoy
+
+If you use the gitlab deployment option the `.gitlab-ci.yml` and `Envoy.blade.php` files are created for you.
+
+Change the variables inside the `Envoy.blade.php` to fit your needs. 
+
+If you push to your GitLab server and CI builds are enabled, the ssh tasks inside `Envoy.blade.php` are executed. Make sure that your GitLab CI Runner user can access your target server via `ssh user@targetserver`. You'll need to copy your ssh public key to the target server and enable password-less logins via ssh.
+
+For more information on how to use ssh keys during a CI build see [http://doc.gitlab.com/ce/ci/ssh_keys/README.html](http://doc.gitlab.com/ce/ci/ssh_keys/README.html)
+
+### File templates
+
+You can overwrite all default file templates by creating a copy of the relevant file in `~/.composer/vendor/offline/oc-bootstrapper/templates` and removing the `.dist` extension.
+
+So to overwrite the default `october.yaml` template copy `october.yaml.dist` to `october.yaml` and modify as needed. 
+
 
 ## Features
 
@@ -126,3 +138,23 @@ When you are done editing your configuration file, simply run `october install` 
 - [ ] Check what's wrong with .htaccess / why it is missing
 - [ ] Update command to update private plugins
 - [ ] Remove CONTRIBUTION and other README files after the october repo clone
+
+## Troubleshooting
+
+
+### Fix cURL error 60 on Windows using XAMPP
+
+If you are working with XAMPP on Windows you will most likely get the following error during `october install`:
+
+    cURL error 60: SSL certificate problem: unable to get local issuer certificate
+    
+You can fix this error by executing the following steps.
+
+1. Download the `cacert.pem` file from [VersatilityWerks](https://gist.github.com/VersatilityWerks/5719158/download)
+2. Extract the `cacert.pem` to the `php` folder in your xampp directory (eg. `c:\xampp\php`)
+3. Edit your `php.ini` (`C:\xampp\php\php.ini`). Add the following line.
+
+   `curl.cainfo = "\xampp\php\cacert.pem"`
+
+`october install` should work now as expected.
+

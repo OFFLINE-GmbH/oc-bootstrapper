@@ -1,0 +1,5 @@
+deploy:
+    only: master
+    script:
+        - composer global require --prefer-dist laravel/envoy=~1.0 --no-interaction --prefer-dist --quiet
+        - envoy run deploy

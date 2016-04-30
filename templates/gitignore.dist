@@ -1,0 +1,8 @@
+.DS_Store
+*.log
+*node_modules*
+.idea
+*.sass-cache*
+vendor/
+composer.phar
+.env

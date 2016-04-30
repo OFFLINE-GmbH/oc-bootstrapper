@@ -3,13 +3,28 @@
 namespace OFFLINE\Bootstrapper\October\Installer;
 
 
+use OFFLINE\Bootstrapper\October\Config\Config;
 use RuntimeException;
 
-abstract class Installer
+abstract class BaseInstaller
 {
 
     public abstract function install();
 
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * DeploymentInstaller constructor.
+     *
+     * @param Config $config
+     */
+    public function __construct(Config $config)
+    {
+        $this->config = $config;
+    }
 
     /**
      * Creates a directory.

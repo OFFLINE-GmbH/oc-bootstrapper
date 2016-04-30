@@ -2,6 +2,7 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
+use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class InitCommand extends Command
 {
+    use UsesTemplate;
+    
     /**
      * Configure the command options.
      *
@@ -46,7 +49,7 @@ class InitCommand extends Command
 
         $this->createWorkingDirectory($dir);
 
-        $template = __DIR__ . DS . implode(DS, ['..', '..', 'october.yaml']);
+        $template = $this->getTemplate('october.yaml');
         $target   = $dir . DS . 'october.yaml';
 
         $output->writeln('<info>Creating default october.yaml...</info>');

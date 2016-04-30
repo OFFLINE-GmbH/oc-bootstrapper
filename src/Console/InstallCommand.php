@@ -5,9 +5,11 @@ namespace OFFLINE\Bootstrapper\October\Console;
 use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Config\Yaml;
 use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
+use OFFLINE\Bootstrapper\October\Installer\DeploymentInstaller;
 use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
 use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
 use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -23,6 +25,8 @@ use ZipArchive;
  */
 class InstallCommand extends Command
 {
+    use UsesTemplate;
+
     /**
      * @var
      */
@@ -97,6 +101,13 @@ class InstallCommand extends Command
             $output->writeln("<error>${e}</error>");
         }
 
+        $output->writeln('<info>Setting up deployments</info>');
+        try {
+            (new DeploymentInstaller($this->config))->install();
+        } catch (\RuntimeException $e) {
+            $output->writeln("<error>${e}</error>");
+        }
+        
         $output->writeln('<info>Creating .gitignore</info>');
         $this->gitignore();
 
@@ -122,16 +133,7 @@ class InstallCommand extends Command
      */
     protected function gitignore()
     {
-        file_put_contents(getcwd() . DS . '.gitignore', implode("\n", [
-                '.DS_Store',
-                '*.log',
-                '*node_modules*',
-                '.idea',
-                '*.sass-cache*',
-                'vendor/',
-                'composer.phar',
-                '.env',
-            ])
-        );
+        $template = $this->getTemplate('gitignore');
+        copy($template, getcwd() . DS . '.gitignore');
     }
 }
