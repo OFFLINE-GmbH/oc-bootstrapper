@@ -50,7 +50,6 @@ class InstallCommand extends Command
      * @throws RuntimeException
      * @throws LogicException
      * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @return mixed
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -98,10 +97,12 @@ class InstallCommand extends Command
             $output->writeln("<error>${e}</error>");
         }
 
-        $output->writeLn('<info>Creating .gitignore</info>');
+        $output->writeln('<info>Creating .gitignore</info>');
         $this->gitignore();
 
         $output->writeln('<comment>Application ready! Build something amazing.</comment>');
+
+        return true;
     }
 
     /**
@@ -129,6 +130,7 @@ class InstallCommand extends Command
                 '*.sass-cache*',
                 'vendor',
                 'tests',
+                '.env',
             ])
         );
     }
