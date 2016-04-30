@@ -101,17 +101,17 @@ class InstallCommand extends Command
             $output->writeln("<error>${e}</error>");
         }
 
-        $output->writeln('<info>Setting up deployments</info>');
+        $output->writeln('<info>Setting up deployments...</info>');
         try {
             (new DeploymentInstaller($this->config))->install();
         } catch (\RuntimeException $e) {
             $output->writeln("<error>${e}</error>");
         }
 
-        $output->writeln('<info>Creating .gitignore</info>');
+        $output->writeln('<info>Creating .gitignore...</info>');
         $this->gitignore();
 
-        $output->writeln('<info>Creating README</info>');
+        $output->writeln('<info>Creating README...</info>');
         $this->readme();
 
         $output->writeln('<info>Cleaning up...</info>');

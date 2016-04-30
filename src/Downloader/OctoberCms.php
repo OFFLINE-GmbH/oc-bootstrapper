@@ -33,6 +33,7 @@ class OctoberCms
     {
         $this->fetchZip()
              ->extract()
+             ->fetchHtaccess()
              ->cleanUp();
 
         return $this;
@@ -60,12 +61,25 @@ class OctoberCms
      */
     protected function extract()
     {
-        $directory = getcwd();
-
         $archive = new ZipArchive;
         $archive->open($this->zipFile);
-        $archive->extractTo($directory);
+        $archive->extractTo(getcwd());
         $archive->close();
+
+        return $this;
+    }
+
+    /**
+     * Download the latest .htaccess file from
+     * GitHub since ZipArchive does not support extracting
+     * hidden files.
+     *
+     * @return $this
+     */
+    protected function fetchHtaccess()
+    {
+        $contents = file_get_contents('https://raw.githubusercontent.com/octobercms/october/master/.htaccess');
+        file_put_contents(getcwd() . DS . '.htaccess', $contents);
 
         return $this;
     }
