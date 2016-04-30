@@ -11,13 +11,12 @@ database:
 
 theme: name (user@remote.git)
 
-deployment: gitlab
+deployment: false
 
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
     - Adrenth.Redirect
-    - Bedard.Webhooks
     - Indikator.Backend
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
