@@ -12,11 +12,11 @@
     cd {{ $directory }}
     git pull
     [ ! -f "composer.phar" ] && wget https://getcomposer.org/composer.phar
-    php composer.phar install --no-interaction --no-dev --prefer-dist --quiet
-    php artisan october:up
+    php composer.phar install --no-interaction --no-dev --prefer-dist
+    php artisan -v october:up
 @endtask
 
 @after
     $message = 'Deployed project ' . $project;
-    @slack('webhook', 'deployments', $message)
+    // @slack('webhook', 'deployments', $message)
 @endafter
