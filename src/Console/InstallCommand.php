@@ -128,7 +128,7 @@ class InstallCommand extends Command
                 '*node_modules*',
                 '.idea',
                 '*.sass-cache*',
-                'vendor',
+                'vendor/',
                 'composer.phar',
                 '.env',
             ])
