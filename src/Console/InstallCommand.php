@@ -130,7 +130,6 @@ class InstallCommand extends Command
                 '*.sass-cache*',
                 'vendor',
                 'composer.phar',
-                'tests',
                 '.env',
             ])
         );
