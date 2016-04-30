@@ -136,9 +136,9 @@ So to overwrite the default `october.yaml` template copy `october.yaml.dist` to 
 - [X] Clear compiled / cache
 - [X] Create .gitignore
 - [X] Remove .git directories so no submodules are created
+- [X] Remove CONTRIBUTION and other README files after the october repo clone
 - [ ] Check what's wrong with .htaccess / why it is missing
 - [ ] Update command to update private plugins
-- [ ] Remove CONTRIBUTION and other README files after the october repo clone
 
 ## Troubleshooting
 

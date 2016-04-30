@@ -111,6 +111,12 @@ class InstallCommand extends Command
         $output->writeln('<info>Creating .gitignore</info>');
         $this->gitignore();
 
+        $output->writeln('<info>Creating README</info>');
+        $this->readme();
+
+        $output->writeln('<info>Cleaning up...</info>');
+        $this->cleanup();
+
         $output->writeln('<comment>Application ready! Build something amazing.</comment>');
 
         return true;
@@ -135,5 +141,25 @@ class InstallCommand extends Command
     {
         $template = $this->getTemplate('gitignore');
         copy($template, getcwd() . DS . '.gitignore');
+    }
+
+    /**
+     *
+     */
+    protected function readme()
+    {
+        $template = $this->getTemplate('README.md');
+        copy($template, getcwd() . DS . 'README.md');
+    }
+
+    /**
+     *
+     */
+    protected function cleanup()
+    {
+        $remove = ['CONTRIBUTING.md', 'CHANGELOG.md'];
+        foreach ($remove as $file) {
+            @unlink(getcwd() . DS . $file);
+        }
     }
 }
