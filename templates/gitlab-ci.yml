@@ -1,3 +1,0 @@
-deploy:
-    only: master
-    script: envoy run deploy
