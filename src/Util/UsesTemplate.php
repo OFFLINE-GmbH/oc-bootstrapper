@@ -8,12 +8,9 @@ trait UsesTemplate
 {
     public function getTemplate($file)
     {
-        $path = __DIR__ . DS . implode(DS, ['..', '..', 'templates', $file]);
+        $dist      = __DIR__ . DS . implode(DS, ['..', '..', 'templates', $file]);
+        $overwrite = __DIR__ . DS . implode(DS, ['..', '..', '..', '..', 'october', $file]);
 
-        if (file_exists($path)) {
-            return realpath($path);
-        }
-
-        return realpath($path . '.dist');
+        return file_exists($overwrite) ? realpath($overwrite) : realpath($dist);
     }
 }

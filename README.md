@@ -120,10 +120,10 @@ For more information on how to use ssh keys during a CI build see [http://doc.gi
 
 ### File templates
 
-You can overwrite all default file templates by creating a copy of the relevant file in `~/.composer/vendor/offline/oc-bootstrapper/templates` and removing the `.dist` extension.
+You can overwrite all default file templates by creating a folder called `october` in your global composer directory.
+Usually that is located under `~/.composer/`.
 
-So to overwrite the default `october.yaml` template copy `october.yaml.dist` to `october.yaml` and modify as needed. 
-
+Place the files you want to use as defaults in `~/.composer/october`. All files from the `templates` directory can be overwritten.
 
 ## Features
 
@@ -140,7 +140,6 @@ So to overwrite the default `october.yaml` template copy `october.yaml.dist` to 
 - [ ] Update command to update private plugins
 
 ## Troubleshooting
-
 
 ### Fix cURL error 60 on Windows using XAMPP
 
