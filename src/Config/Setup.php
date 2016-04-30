@@ -135,11 +135,19 @@ class Setup
      */
     private function setupTheme()
     {
-        $activeTheme = explode(' ', $this->config->theme);
-        $values      = [
+        try {
+            $activeTheme = explode(' ', $this->config->theme);
+        } catch (\RuntimeException $e) {
+            // No theme set
+            return false;
+        }
+
+        $values = [
             'activeTheme' => $activeTheme[0],
         ];
         $this->writer->write('cms', $values);
+
+        return true;
     }
 
 }

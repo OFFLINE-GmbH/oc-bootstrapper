@@ -70,7 +70,6 @@ database:
     database: bootstrapper
     host: 192.168.10.10
 
-# Currently only git repos are supported (no marketplace themes)
 theme: name (user@remote.git)
 
 plugins:

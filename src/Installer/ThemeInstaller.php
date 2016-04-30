@@ -20,12 +20,18 @@ class ThemeInstaller extends BaseInstaller
      */
     public function install()
     {
+        try {
+            $config = $this->config->theme;
+        } catch (\RuntimeException $e) {
+            // No theme set
+            return false;
+        }
 
-        list($theme, $remote) = $this->parse($this->config->theme);
+        list($theme, $remote) = $this->parse($config);
         if ($remote === false) {
-            (new Process("php artisan plugin:install {$theme}"))->run();
+            (new Process("php artisan theme:install {$theme}"))->run();
 
-            return;
+            return true;
         }
 
         $themeDir = getcwd() . DS . implode(DS, ['themes', $theme]);
@@ -39,6 +45,8 @@ class ThemeInstaller extends BaseInstaller
         }
 
         $this->cleanup($themeDir);
+
+        return true;
     }
 
     /**
@@ -48,7 +56,7 @@ class ThemeInstaller extends BaseInstaller
      */
     protected function parse($theme)
     {
-        // Vendor.Plugin (Remote)
+        // Theme (Remote)
         preg_match("/([^ ]+)(?: ?\(([^\)]+))?/", $theme, $matches);
 
         array_shift($matches);

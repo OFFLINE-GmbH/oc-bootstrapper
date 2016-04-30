@@ -22,9 +22,14 @@ class PluginInstaller extends BaseInstaller
      */
     public function install()
     {
+        try {
+            $config = $this->config->plugins;
+        } catch (\RuntimeException $e) {
+            // No plugin set
+            return false;
+        }
 
-        foreach ($this->config->plugins as $plugin) {
-
+        foreach ($config as $plugin) {
             list($vendor, $plugin, $remote) = $this->parse($plugin);
             $vendor = strtolower($vendor);
             $plugin = strtolower($plugin);
@@ -50,6 +55,8 @@ class PluginInstaller extends BaseInstaller
 
             $this->cleanup($pluginDir);
         }
+
+        return true;
     }
 
     /**
