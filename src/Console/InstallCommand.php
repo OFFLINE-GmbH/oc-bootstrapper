@@ -107,7 +107,7 @@ class InstallCommand extends Command
         } catch (\RuntimeException $e) {
             $output->writeln("<error>${e}</error>");
         }
-        
+
         $output->writeln('<info>Creating .gitignore</info>');
         $this->gitignore();
 

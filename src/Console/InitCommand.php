@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InitCommand extends Command
 {
     use UsesTemplate;
-    
+
     /**
      * Configure the command options.
      *

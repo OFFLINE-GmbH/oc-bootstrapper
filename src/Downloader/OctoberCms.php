@@ -102,7 +102,7 @@ class OctoberCms
      */
     protected function makeFilename()
     {
-        return getcwd() . DS . 'october_' . md5(time() . uniqid()) . '.zip';
+        return getcwd() . DS . 'october_' . md5(time() . uniqid('oc-', true)) . '.zip';
     }
 
 }

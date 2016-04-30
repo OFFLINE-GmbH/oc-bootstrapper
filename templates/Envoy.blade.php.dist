@@ -18,5 +18,5 @@
 
 @after
     $message = 'Deployed project ' . $project;
-    @slack('webkook', 'deployments', $message)
+    @slack('webhook', 'deployments', $message)
 @endafter

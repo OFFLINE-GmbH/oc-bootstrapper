@@ -24,6 +24,7 @@ class ThemeInstaller extends BaseInstaller
         list($theme, $remote) = $this->parse($this->config->theme);
         if ($remote === false) {
             (new Process("php artisan plugin:install {$theme}"))->run();
+
             return;
         }
 

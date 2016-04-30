@@ -3,7 +3,6 @@
 namespace OFFLINE\Bootstrapper\October\Config;
 
 
-use OFFLINE\Bootstrapper\October\Util\ConfigWriter;
 use OFFLINE\Bootstrapper\October\Util\KeyGenerator;
 
 /**
@@ -17,7 +16,7 @@ class Setup
      */
     protected $config;
     /**
-     * @var ConfigWriter
+     * @var Writer
      */
     protected $writer;
 
@@ -29,7 +28,7 @@ class Setup
     public function __construct(Config $config)
     {
         $this->config = $config;
-        $this->writer = new ConfigWriter();
+        $this->writer = new Writer();
     }
 
     /**
@@ -137,7 +136,7 @@ class Setup
     private function setupTheme()
     {
         $activeTheme = explode(' ', $this->config->theme);
-        $values = [
+        $values      = [
             'activeTheme' => $activeTheme[0],
         ];
         $this->writer->write('cms', $values);
