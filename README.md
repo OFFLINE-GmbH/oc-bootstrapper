@@ -9,7 +9,7 @@ the install command.
 The following steps will be taken care of:
 
 1. The latest October CMS gets downloaded from github and gets installed
-2. All composer dependencies get installed
+2. All composer dependencies are installed
 3. A `dev` environment gets created for you where all your settings from the config file are set
 4. Some sensible configuration defaults for your `prod` environment get set
 5. Your database gets migrated
@@ -17,6 +17,7 @@ The following steps will be taken care of:
 7. Your selected theme gets downloaded and installed
 8. All your plugins get downloaded and installed 
 9. A .gitignore file gets created 
+10. A push to deploy setup gets initialized for you 
 
 ## Dependencies
 
@@ -26,6 +27,8 @@ The following steps will be taken care of:
 ## Tested on
 
 * Ubuntu 15.10
+
+Should work on OS X. Will probably not work on Windows.
 
 
 ## Installation
@@ -46,8 +49,8 @@ October CMS Bootstrapper version 0.0.7
 Use the `october init` command to create a new project with a config file:
 
 ```sh
-cd /var/www
 october init myproject.com
+cd myproject.com
 ```
 
 ### Change your configuration
@@ -67,10 +70,9 @@ database:
     database: bootstrapper
     host: 192.168.10.10
 
-# What theme to install
+# Currently only git repos are supported (no marketplace themes)
 theme: name (user@remote.git)
 
-# What plugins to install
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
@@ -84,7 +86,7 @@ mail:
     address: email@example.com
     driver: log
     
-deployment: false
+deployment: gitlab
 ```
 
 #### Theme and Plugin syntax
@@ -103,7 +105,7 @@ When you are done editing your configuration file, simply run `october install` 
 
 Set the `deployment` option to `false` if you don't want to setup deployments.
 
-Currently `oc-bootstrapper` supports a simple setup to deploy a project on push via GitLab CI. To create all needed files set the `deployment` option to `gitlab`.
+Currently `oc-bootstrapper` supports a simple setup to deploy a project on push via GitLab CI. To automatically create all needed files, simply set the `deployment` option to `gitlab`.
 
 Support for other CI systems is added on request.
 
@@ -134,7 +136,6 @@ So to overwrite the default `october.yaml` template copy `october.yaml.dist` to 
 - [X] Clear compiled / cache
 - [X] Create .gitignore
 - [X] Remove .git directories so no submodules are created
-- [ ] Remove .gitignore in config/dev or implement command to recreate this environment if needed
 - [ ] Check what's wrong with .htaccess / why it is missing
 - [ ] Update command to update private plugins
 - [ ] Remove CONTRIBUTION and other README files after the october repo clone
