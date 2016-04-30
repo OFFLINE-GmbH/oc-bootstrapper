@@ -5,14 +5,13 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 use GitElephant\Repository;
 use OFFLINE\Bootstrapper\October\Config\Config;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
  * Class ThemeInstaller
  * @package OFFLINE\Bootstrapper\October\Installer
  */
-class ThemeInstaller
+class ThemeInstaller extends Installer
 {
     /**
      * @var Config
@@ -31,6 +30,9 @@ class ThemeInstaller
 
     /**
      *
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function install()
     {
@@ -38,18 +40,11 @@ class ThemeInstaller
         list($theme, $remote) = $this->parse($this->config->theme);
         if ($remote === false) {
             (new Process("php artisan plugin:install {$theme}"))->run();
-
             return;
         }
 
         $themeDir = getcwd() . DS . implode(DS, ['themes', $theme]);
-        if ( ! is_dir($themeDir)) {
-            mkdir($themeDir);
-        }
-
-        if ( ! is_dir($themeDir)) {
-            throw new RuntimeException('Could not create theme directory: ' . $themeDir);
-        }
+        $this->mkdir($themeDir);
 
         $repo = Repository::open($themeDir);
         try {
@@ -57,6 +52,8 @@ class ThemeInstaller
         } catch (\RuntimeException $e) {
             throw new \RuntimeException('Error while cloning theme repo: ' . $e->getMessage());
         }
+
+        $this->cleanup($themeDir);
     }
 
     /**

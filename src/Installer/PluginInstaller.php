@@ -5,14 +5,13 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 use GitElephant\Repository;
 use OFFLINE\Bootstrapper\October\Config\Config;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
  * Class PluginInstaller
  * @package OFFLINE\Bootstrapper\October\Installer
  */
-class PluginInstaller
+class PluginInstaller extends Installer
 {
     /**
      * @var Config
@@ -31,6 +30,10 @@ class PluginInstaller
 
     /**
      *
+     * @throws \RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function install()
     {
@@ -59,6 +62,8 @@ class PluginInstaller
             }
 
             (new Process("php artisan plugin:refresh {$vendor}.{$plugin}"))->run();
+
+            $this->cleanup($pluginDir);
         }
     }
 
@@ -91,21 +96,5 @@ class PluginInstaller
         $pluginDir = getcwd() . DS . implode(DS, ['plugins', $vendor]);
 
         return $this->mkdir($pluginDir);
-    }
-
-    /**
-     * @param $dir
-     */
-    protected function mkdir($dir)
-    {
-        if ( ! is_dir($dir)) {
-            mkdir($dir);
-        }
-
-        if ( ! is_dir($dir)) {
-            throw new RuntimeException('Could not create plugin directory: ' . $dir);
-        }
-
-        return $dir;
     }
 }
