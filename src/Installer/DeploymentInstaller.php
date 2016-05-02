@@ -39,5 +39,6 @@ class DeploymentInstaller extends BaseInstaller
     {
         copy($this->getTemplate('gitlab-ci.yml'), getcwd() . DS . '.gitlab-ci.yml');
         copy($this->getTemplate('Envoy.blade.php'), getcwd() . DS . 'Envoy.blade.php');
+        copy($this->getTemplate('git.cron.sh'), getcwd() . DS . 'git.cron.sh');
     }
 }

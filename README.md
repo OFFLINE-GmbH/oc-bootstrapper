@@ -118,6 +118,14 @@ If you push to your GitLab server and CI builds are enabled, the ssh tasks insid
 
 For more information on how to use ssh keys during a CI build see [http://doc.gitlab.com/ce/ci/ssh_keys/README.html](http://doc.gitlab.com/ce/ci/ssh_keys/README.html)
 
+##### Cronjob to commit changes from prod into git
+
+If a deployed website is edited by a customer directly on the prod server you might want to commit
+ those changes back to your git repository. 
+ 
+To do this, simply create a cronjob that executes `git.cron.sh` every X minutes. This script will commit all changes
+to your git repo automatically.
+
 ### File templates
 
 You can overwrite all default file templates by creating a folder called `october` in your global composer directory.
