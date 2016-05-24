@@ -28,9 +28,19 @@ class InstallCommand extends Command
     use UsesTemplate;
 
     /**
+     * Exit code for processes
+     */
+    const EXIT_CODE_OK = 0;
+
+    /**
      * @var
      */
     public $config;
+
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
 
     /**
      * Configure the command options.
@@ -51,15 +61,20 @@ class InstallCommand extends Command
      * @param  InputInterface  $input
      * @param  OutputInterface $output
      *
-     * @throws RuntimeException
-     * @throws LogicException
+     * @return mixed
      * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws LogicException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ( ! class_exists('ZipArchive')) {
             throw new RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
+
+        $this->output = $output;
 
         $configFile = getcwd() . DS . 'october.yaml';
         if ( ! file_exists($configFile)) {
@@ -78,27 +93,27 @@ class InstallCommand extends Command
         $this->writeConfig();
 
         $output->writeln('<info>Migrating Database...</info>');
-        (new Process('php artisan october:up'))->run();
+        $this->runProcess('php artisan october:up', 'Migrations failed!');
 
         $output->writeln('<info>Removing demo data...</info>');
-        (new Process('php artisan october:fresh'))->run();
+        $this->runProcess('php artisan october:fresh', 'Failed to remove demo data!');
 
         $output->writeln('<info>Clearing cache...</info>');
-        (new Process('php artisan clear-compiled'))->run();
-        (new Process('php artisan cache:clear'))->run();
-
+        $this->runProcess('php artisan clear-compiled', 'Failed to clear compiled files!');
+        $this->runProcess('php artisan cache:clear', 'Failed to clear cache!');
+        
         $output->writeln('<info>Installing Theme...</info>');
         try {
             (new ThemeInstaller($this->config))->install();
         } catch (\RuntimeException $e) {
-            $output->writeln("<error>${e}</error>");
+            $output->writeln("<error>" . $e->getMessage() . "</error>");
         }
 
         $output->writeln('<info>Installing Plugins...</info>');
         try {
             (new PluginInstaller($this->config))->install();
         } catch (\RuntimeException $e) {
-            $output->writeln("<error>${e}</error>");
+            $output->writeln("<error>" . $e->getMessage() . "</error>");
         }
 
         $output->writeln('<info>Setting up deployments...</info>');
@@ -161,5 +176,42 @@ class InstallCommand extends Command
         foreach ($remove as $file) {
             @unlink(getcwd() . DS . $file);
         }
+    }
+
+    /**
+     * Runs a process and checks it's result.
+     * Prints an error message if necessary.
+     *
+     * @param $command
+     * @param $errorMessage
+     *
+     * @return bool
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     */
+    protected function runProcess($command, $errorMessage)
+    {
+        $exitCode = (new Process($command))->run();
+
+        return $this->checkResult($exitCode, $errorMessage);
+    }
+
+    /**
+     * Checks the result of a process.
+     *
+     * @param $exitCode
+     * @param $message
+     *
+     * @return bool
+     */
+    protected function checkResult($exitCode, $message)
+    {
+        if ($exitCode !== $this::EXIT_CODE_OK) {
+            $this->output->writeln('<error>' . $message . '</error>');
+
+            return false;
+        }
+
+        return true;
     }
 }

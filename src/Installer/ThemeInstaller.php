@@ -4,6 +4,9 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use GitElephant\Repository;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -14,9 +17,10 @@ class ThemeInstaller extends BaseInstaller
 {
     /**
      *
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws LogicException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function install()
     {
@@ -29,19 +33,23 @@ class ThemeInstaller extends BaseInstaller
 
         list($theme, $remote) = $this->parse($config);
         if ($remote === false) {
-            (new Process("php artisan theme:install {$theme}"))->run();
-
-            return true;
+            return $this->installViaArtisan($theme);
         }
 
         $themeDir = getcwd() . DS . implode(DS, ['themes', $theme]);
         $this->mkdir($themeDir);
 
+        if ( ! $this->isEmpty($themeDir)) {
+            throw new RuntimeException(
+                sprintf('Your theme directory "%s" is not empty. Cannot clone your repo into it.', $themeDir)
+            );
+        }
+
         $repo = Repository::open($themeDir);
         try {
             $repo->cloneFrom($remote, $themeDir);
-        } catch (\RuntimeException $e) {
-            throw new \RuntimeException('Error while cloning theme repo: ' . $e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new RuntimeException('Error while cloning theme repo: ' . $e->getMessage());
         }
 
         $this->cleanup($themeDir);
@@ -66,5 +74,38 @@ class ThemeInstaller extends BaseInstaller
         }
 
         return $matches;
+    }
+
+    /**
+     * Installs a theme via artisan command.
+     *
+     * @param $theme
+     *
+     * @return bool
+     *
+     * @throws LogicException
+     * @throws RuntimeException
+     */
+    protected function installViaArtisan($theme)
+    {
+        $exitCode = (new Process("php artisan theme:install {$theme}"))->run();
+
+        if ($exitCode !== $this::EXIT_CODE_OK) {
+            throw new RuntimeException(sprintf('Error while installing theme "%s" via artisan.', $theme));
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if a directory is empty.
+     *
+     * @param $themeDir
+     *
+     * @return bool
+     */
+    protected function isEmpty($themeDir)
+    {
+        return count(glob($themeDir . '/*')) === 0;
     }
 }

@@ -8,6 +8,10 @@ use RuntimeException;
 
 abstract class BaseInstaller
 {
+    /**
+     * Exit code for processes
+     */
+    const EXIT_CODE_OK = 0;
 
     public abstract function install();
 

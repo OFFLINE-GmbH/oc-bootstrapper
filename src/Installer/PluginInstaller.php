@@ -4,6 +4,8 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use GitElephant\Repository;
+use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -12,12 +14,11 @@ use Symfony\Component\Process\Process;
  */
 class PluginInstaller extends BaseInstaller
 {
-
     /**
      *
      * @throws \RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws LogicException
+     * @throws RuntimeException
      * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function install()
@@ -35,7 +36,7 @@ class PluginInstaller extends BaseInstaller
             $plugin = strtolower($plugin);
 
             if ($remote === false) {
-                (new Process("php artisan plugin:install {$vendor}.{$plugin}"))->run();
+                $this->installViaArtisan($vendor, $plugin);
                 continue;
             }
 
@@ -47,8 +48,8 @@ class PluginInstaller extends BaseInstaller
             $repo = Repository::open($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);
-            } catch (\RuntimeException $e) {
-                throw new \RuntimeException('Error while cloning plugin repo: ' . $e->getMessage());
+            } catch (RuntimeException $e) {
+                throw new RuntimeException('Error while cloning plugin repo: ' . $e->getMessage());
             }
 
             (new Process("php artisan plugin:refresh {$vendor}.{$plugin}"))->run();
@@ -88,5 +89,27 @@ class PluginInstaller extends BaseInstaller
         $pluginDir = getcwd() . DS . implode(DS, ['plugins', $vendor]);
 
         return $this->mkdir($pluginDir);
+    }
+
+    /**
+     * Installs a plugin via artisan command.
+     *
+     * @param $vendor
+     * @param $plugin
+     *
+     * @throws LogicException
+     * @throws RuntimeException
+     */
+    protected function installViaArtisan($vendor, $plugin)
+    {
+        $exitCode = (new Process("php artisan plugin:install {$vendor}.{$plugin}"))->run();
+
+        if ($exitCode !== $this::EXIT_CODE_OK) {
+            throw new RuntimeException(
+                sprintf('Error while installing plugin %s via artisan. Is your database set up correctly?',
+                    $vendor . '.' . $plugin
+                )
+            );
+        }
     }
 }
