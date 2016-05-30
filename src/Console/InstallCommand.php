@@ -101,19 +101,19 @@ class InstallCommand extends Command
         $output->writeln('<info>Clearing cache...</info>');
         $this->runProcess('php artisan clear-compiled', 'Failed to clear compiled files!');
         $this->runProcess('php artisan cache:clear', 'Failed to clear cache!');
-        
+
         $output->writeln('<info>Installing Theme...</info>');
         try {
             (new ThemeInstaller($this->config))->install();
         } catch (\RuntimeException $e) {
-            $output->writeln("<error>" . $e->getMessage() . "</error>");
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
         }
 
         $output->writeln('<info>Installing Plugins...</info>');
         try {
             (new PluginInstaller($this->config))->install();
         } catch (\RuntimeException $e) {
-            $output->writeln("<error>" . $e->getMessage() . "</error>");
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
         }
 
         $output->writeln('<info>Setting up deployments...</info>');
@@ -138,19 +138,21 @@ class InstallCommand extends Command
     }
 
     /**
-     *
+     * Create the .env and config files.
+     * 
+     * @return void
      */
     protected function writeConfig()
     {
         $setup = new Setup($this->config);
 
-        $setup
-            ->devEnvironment()
-            ->prodEnvironment();
+        $setup->env()->config();
     }
 
     /**
-     *
+     * Copy the .gitignore template.
+     * 
+     * @return void
      */
     protected function gitignore()
     {
@@ -159,7 +161,9 @@ class InstallCommand extends Command
     }
 
     /**
+     * Copy the README template.
      *
+     * @return void
      */
     protected function readme()
     {
@@ -167,9 +171,6 @@ class InstallCommand extends Command
         copy($template, getcwd() . DS . 'README.md');
     }
 
-    /**
-     *
-     */
     protected function cleanup()
     {
         $remove = ['CONTRIBUTING.md', 'CHANGELOG.md'];

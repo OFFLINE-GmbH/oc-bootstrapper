@@ -14,6 +14,7 @@ class DeploymentInstaller extends BaseInstaller
     use UsesTemplate;
 
     /**
+     * Install the deployment setup.
      *
      * @throws \Symfony\Component\Process\Exception\LogicException
      * @throws \Symfony\Component\Process\Exception\RuntimeException
@@ -35,6 +36,11 @@ class DeploymentInstaller extends BaseInstaller
         return $this->{$deployment}();
     }
 
+    /**
+     * Copy the neccessary tempalte files.
+     *
+     * @return void
+     */
     public function gitlab()
     {
         copy($this->getTemplate('gitlab-ci.yml'), getcwd() . DS . '.gitlab-ci.yml');

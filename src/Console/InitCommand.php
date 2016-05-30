@@ -67,6 +67,8 @@ class InitCommand extends Command
 
     /**
      * @param $dir
+     *
+     * @throws \RuntimeException
      */
     protected function createWorkingDirectory($dir)
     {
@@ -78,6 +80,8 @@ class InitCommand extends Command
     /**
      * @param $template
      * @param $target
+     *
+     * @throws \RuntimeException
      */
     protected function copyYamlTemplate($template, $target)
     {

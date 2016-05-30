@@ -48,6 +48,18 @@ abstract class BaseInstaller
     }
 
     /**
+     * Checks if a directory is empty.
+     *
+     * @param $themeDir
+     *
+     * @return bool
+     */
+    protected function isEmpty($themeDir)
+    {
+        return count(glob($themeDir . '/*')) === 0;
+    }
+
+    /**
      * Removes .git Directories.
      *
      * @param $path

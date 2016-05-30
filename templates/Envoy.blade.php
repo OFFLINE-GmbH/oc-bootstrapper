@@ -14,7 +14,7 @@
     [ ! -f "composer.phar" ] && wget https://getcomposer.org/composer.phar
     php composer.phar install --no-interaction --no-dev --prefer-dist
     php artisan -v october:up
-git status -s
+    git status -s
 @endtask
 
 @after
