@@ -10,8 +10,8 @@ The following steps will be taken care of:
 
 1. The latest October CMS gets downloaded from github and gets installed
 2. All composer dependencies are installed
-3. A `dev` environment gets created for you where all your settings from the config file are set
-4. Some sensible configuration defaults for your `prod` environment get set
+3. Relevant config entries are moved to a `.env` file for easy customization
+4. Sensible configuration defaults for your `prod` environment get preset
 5. Your database gets migrated
 6. All demo data gets removed
 7. Your selected theme gets downloaded and installed
@@ -39,7 +39,7 @@ You can now run `october` from your command line.
 
 ```bash
 $ october
-October CMS Bootstrapper version 0.0.7
+October CMS Bootstrapper version 0.1.0
 ```
 
 ## Usage
@@ -62,6 +62,11 @@ to suite your needs.
 app:
     url: http://october.dev
     locale: en
+    debug: true
+
+cms:
+    theme: name (user@remote.git)
+    edgeUpdates: false
 
 database:
     connection: mysql
@@ -70,22 +75,21 @@ database:
     database: bootstrapper
     host: 192.168.10.10
 
-theme: name (user@remote.git)
+deployment: gitlab
 
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
+    - Adrenth.Redirect
+    - Indikator.Backend
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
     # - Vendor.Private (user@remote.git)
 
-# Default mail settings (mail.php)
 mail:
     name: User Name
     address: email@example.com
     driver: log
-    
-deployment: gitlab
 ```
 
 #### Theme and Plugin syntax
@@ -99,6 +103,10 @@ If no repo is defined the plugins are loaded from the October Marketplace.
 
 When you are done editing your configuration file, simply run `october install` to install October. 
 
+### Change config
+
+To change your installation's configuration, simply edit the `.env` file in your project root. 
+When deploying to production, make sure to edit your `.env.production` template file and rename it to `.env`.  
 
 ### SSH deployments
 
@@ -129,22 +137,12 @@ to your git repo automatically.
 ### File templates
 
 You can overwrite all default file templates by creating a folder called `october` in your global composer directory.
-Usually that is located under `~/.composer/`.
+Usually it is located under `~/.composer/`.
 
 Place the files you want to use as defaults in `~/.composer/october`. All files from the `templates` directory can be overwritten.
 
-## Features
+## ToDo
 
-- [X] Prod / Dev Environment Config in yaml
-- [X] Mail Config mail.from.address mail.from.name mail.driver
-- [X] Copy cms and app config into dev environment
-- [X] php artisan october:fresh
-- [X] Install plugins
-- [X] Clear compiled / cache
-- [X] Create .gitignore
-- [X] Remove .git directories so no submodules are created
-- [X] Remove CONTRIBUTION and other README files after the october repo clone
-- [X] Check what's wrong with .htaccess / why it is missing
 - [ ] Update command to update private plugins
 
 ## Troubleshooting

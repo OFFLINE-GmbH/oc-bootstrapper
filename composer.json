@@ -15,7 +15,6 @@
   },
   "require": {
     "guzzlehttp/guzzle": "~6.0",
-    "offline/laravel-config-writer": "~1.0",
     "cypresslab/gitelephant": "~1.1",
     "symfony/console": "~3.0",
     "symfony/process": "~3.0",

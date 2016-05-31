@@ -70,9 +70,8 @@ class OctoberCms
     }
 
     /**
-     * Download the latest .htaccess file from
-     * GitHub since ZipArchive does not support extracting
-     * hidden files.
+     * Download the latest .htaccess file from GitHub separately
+     * since ZipArchive does not support extracting hidden files.
      *
      * @return $this
      */
@@ -85,7 +84,7 @@ class OctoberCms
     }
 
     /**
-     * Clean-up the Zip file, move folder contents one level up.
+     * Remove the Zip file, move folder contents one level up.
      *
      * @throws LogicException
      * @throws \Symfony\Component\Process\Exception\RuntimeException

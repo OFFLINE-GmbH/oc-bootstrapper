@@ -10,6 +10,8 @@ namespace OFFLINE\Bootstrapper\October\Util;
 class KeyGenerator
 {
     /**
+     * Generate the application's key.
+     * 
      * @param int $length
      *
      * @return string
@@ -27,6 +29,8 @@ class KeyGenerator
     }
 
     /**
+     * Generate a random string.
+     *
      * @param int $length
      *
      * @return string
