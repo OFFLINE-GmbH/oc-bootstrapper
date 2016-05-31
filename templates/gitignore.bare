@@ -1,0 +1,7 @@
+*
+!.gitignore
+!.env.*
+!october.yaml
+!themes
+!themes/**/*
+!plugins

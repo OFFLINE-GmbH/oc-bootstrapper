@@ -14,7 +14,9 @@ database:
     database: bootstrapper
     host: 192.168.10.10
 
-deployment: false
+git:
+    deployment: false
+    bareRepo: true          # Exclude everything except themes and custom plugins in git
 
 plugins:
     - Rainlab.Pages

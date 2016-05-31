@@ -12,6 +12,7 @@ use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
 class DeploymentInstaller extends BaseInstaller
 {
     use UsesTemplate;
+    protected $force = false;
 
     /**
      * Install the deployment setup.
@@ -20,18 +21,21 @@ class DeploymentInstaller extends BaseInstaller
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      */
-    public function install()
+    public function install($force = false)
     {
         try {
-            $deployment = $this->config->deployment;
+            $deployment = $this->config->git['deployment'];
         } catch (\RuntimeException $e) {
             // Config entry is not set.
             return false;
         }
 
         if ( ! method_exists($this, $deployment)) {
+            $this->write('<comment>-> Unknown deployment option "' . $deployment . '"</comment>');
             return false;
         }
+
+        $this->force = $force;
 
         return $this->{$deployment}();
     }
@@ -40,11 +44,18 @@ class DeploymentInstaller extends BaseInstaller
      * Copy the neccessary tempalte files.
      *
      * @return void
+     * @throws \LogicException
      */
     public function gitlab()
     {
-        copy($this->getTemplate('gitlab-ci.yml'), getcwd() . DS . '.gitlab-ci.yml');
-        copy($this->getTemplate('Envoy.blade.php'), getcwd() . DS . 'Envoy.blade.php');
-        copy($this->getTemplate('git.cron.sh'), getcwd() . DS . 'git.cron.sh');
+        $base = getcwd() . DS;
+
+        if(! $this->force && file_exists($base . '.gitlab-ci.yml')) {
+            return $this->write('<comment>-> Deployment is already set up. Use --force to overwrite</comment>');
+        }
+
+        copy($this->getTemplate('gitlab-ci.yml'), $base . '.gitlab-ci.yml');
+        copy($this->getTemplate('Envoy.blade.php'), $base . 'Envoy.blade.php');
+        copy($this->getTemplate('git.cron.sh'), $base . 'git.cron.sh');
     }
 }
