@@ -1,6 +1,11 @@
 app:
     url: http://october.dev
     locale: en
+    debug: true
+
+cms:
+    theme: name (user@remote.git)
+    edgeUpdates: false
 
 database:
     connection: mysql
@@ -8,8 +13,6 @@ database:
     password: secret
     database: bootstrapper
     host: 192.168.10.10
-
-theme: name (user@remote.git)
 
 deployment: false
 

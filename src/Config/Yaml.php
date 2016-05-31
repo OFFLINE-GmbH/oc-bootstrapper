@@ -22,6 +22,8 @@ class Yaml implements Config
      *
      * @param             $file
      * @param Parser|null $parser
+     *
+     * @throws \RuntimeException
      */
     public function __construct($file, Parser $parser = null)
     {

@@ -15,7 +15,8 @@ use Symfony\Component\Process\Process;
 class PluginInstaller extends BaseInstaller
 {
     /**
-     *
+     * Install a plugin via git or artisan.
+     * 
      * @throws \RuntimeException
      * @throws LogicException
      * @throws RuntimeException
@@ -45,6 +46,12 @@ class PluginInstaller extends BaseInstaller
 
             $this->mkdir($pluginDir);
 
+            if ( ! $this->isEmpty($pluginDir)) {
+                throw new RuntimeException(
+                    sprintf('Your plugin directory "%s" is not empty. Cannot clone your repo into it.', $pluginDir)
+                );
+            }
+
             $repo = Repository::open($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);
@@ -61,6 +68,9 @@ class PluginInstaller extends BaseInstaller
     }
 
     /**
+     * Parse the Vendor, Plugin and Remote values out of the
+     * given plugin declaration.
+     *
      * @param $plugin
      *
      * @return mixed
@@ -80,9 +90,12 @@ class PluginInstaller extends BaseInstaller
     }
 
     /**
+     * Create the plugin's vendor directory.
+     *
      * @param $vendor
      *
      * @return string
+     * @throws \RuntimeException
      */
     protected function createVendorDir($vendor)
     {

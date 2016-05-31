@@ -16,6 +16,7 @@ use Symfony\Component\Process\Process;
 class ThemeInstaller extends BaseInstaller
 {
     /**
+     * Install a theme via git or artisan.
      *
      * @throws LogicException
      * @throws RuntimeException
@@ -25,7 +26,7 @@ class ThemeInstaller extends BaseInstaller
     public function install()
     {
         try {
-            $config = $this->config->theme;
+            $config = $this->config->cms['theme'];
         } catch (\RuntimeException $e) {
             // No theme set
             return false;
@@ -58,6 +59,9 @@ class ThemeInstaller extends BaseInstaller
     }
 
     /**
+     * Parse the theme's name and remote path out of the
+     * given theme declaration.
+     *
      * @param $theme
      *
      * @return mixed
@@ -95,17 +99,5 @@ class ThemeInstaller extends BaseInstaller
         }
 
         return true;
-    }
-
-    /**
-     * Checks if a directory is empty.
-     *
-     * @param $themeDir
-     *
-     * @return bool
-     */
-    protected function isEmpty($themeDir)
-    {
-        return count(glob($themeDir . '/*')) === 0;
     }
 }
