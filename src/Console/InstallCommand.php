@@ -10,6 +10,7 @@ use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
 use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
 use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\Gitignore;
+use OFFLINE\Bootstrapper\October\Util\RunsProcess;
 use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -18,8 +19,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\LogicException;
-use Symfony\Component\Process\Process;
-use ZipArchive;
 
 /**
  * Class InstallCommand
@@ -27,18 +26,12 @@ use ZipArchive;
  */
 class InstallCommand extends Command
 {
-    use UsesTemplate;
-
-    /**
-     * Exit code for processes
-     */
-    const EXIT_CODE_OK = 0;
+    use UsesTemplate, RunsProcess;
 
     /**
      * @var
      */
     public $config;
-
     /**
      * @var OutputInterface
      */
@@ -116,6 +109,9 @@ class InstallCommand extends Command
         $output->writeln('<info>Setting up config files...</info>');
         $this->writeConfig($force);
 
+        $output->writeln('<info>Migrating database...</info>');
+        $this->runProcess('php artisan october:up', 'Migrations failed!');
+
         $output->writeln('<info>Installing Theme...</info>');
         try {
             (new ThemeInstaller($this->config, $this->gitignore, $this->output))->install();
@@ -129,6 +125,9 @@ class InstallCommand extends Command
         } catch (\RuntimeException $e) {
             $output->writeln('<comment>' . $e->getMessage() . '</comment>');
         }
+
+        $output->writeln('<info>Migrating plugin tables...</info>');
+        $this->runProcess('php artisan october:up', 'Migrations failed!');
 
         $output->writeln('<info>Setting up deployments...</info>');
         try {
@@ -151,9 +150,6 @@ class InstallCommand extends Command
             $this->cleanup();
         }
 
-        $output->writeln('<info>Migrating Database...</info>');
-        $this->runProcess('php artisan october:up', 'Migrations failed!');
-
         $output->writeln('<info>Clearing cache...</info>');
         $this->runProcess('php artisan clear-compiled', 'Failed to clear compiled files!');
         $this->runProcess('php artisan cache:clear', 'Failed to clear cache!');
@@ -174,7 +170,7 @@ class InstallCommand extends Command
             return $this->output->writeln('<comment>-> Configuration already set up. Use --force to regenerate.</comment>');
         }
 
-        $setup = new Setup($this->config);
+        $setup = new Setup($this->config, $this->output);
         $setup->env()->config();
     }
 
@@ -219,42 +215,5 @@ class InstallCommand extends Command
         foreach ($remove as $file) {
             @unlink(getcwd() . DS . $file);
         }
-    }
-
-    /**
-     * Runs a process and checks it's result.
-     * Prints an error message if necessary.
-     *
-     * @param $command
-     * @param $errorMessage
-     *
-     * @return bool
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     */
-    protected function runProcess($command, $errorMessage)
-    {
-        $exitCode = (new Process($command))->run();
-
-        return $this->checkResult($exitCode, $errorMessage);
-    }
-
-    /**
-     * Checks the result of a process.
-     *
-     * @param $exitCode
-     * @param $message
-     *
-     * @return bool
-     */
-    protected function checkResult($exitCode, $message)
-    {
-        if ($exitCode !== $this::EXIT_CODE_OK) {
-            $this->output->writeln('<error>' . $message . '</error>');
-
-            return false;
-        }
-
-        return true;
     }
 }

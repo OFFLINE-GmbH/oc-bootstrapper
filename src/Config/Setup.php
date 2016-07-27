@@ -4,6 +4,8 @@ namespace OFFLINE\Bootstrapper\October\Config;
 
 
 use OFFLINE\Bootstrapper\October\Util\KeyGenerator;
+use OFFLINE\Bootstrapper\October\Util\RunsProcess;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class Setup
@@ -11,6 +13,8 @@ use OFFLINE\Bootstrapper\October\Util\KeyGenerator;
  */
 class Setup
 {
+    use RunsProcess;
+
     /**
      * @var Config
      */
@@ -19,15 +23,21 @@ class Setup
      * @var Writer
      */
     protected $writer;
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
 
     /**
      * Setup constructor.
      *
-     * @param Config $config
+     * @param Config          $config
+     * @param OutputInterface $output
      */
-    public function __construct(Config $config)
+    public function __construct(Config $config, OutputInterface $output)
     {
         $this->config = $config;
+        $this->output = $output;
         $this->writer = new Writer();
     }
 
@@ -38,42 +48,59 @@ class Setup
      */
     public function config()
     {
-        $this->database();
-        $this->theme();
         $this->app();
+        $this->theme();
         $this->mail();
-        $this->cms();
     }
 
     /**
      * Write .env files.
      *
      * @return $this
+     * @throws \Symfony\Component\Process\Exception\LogicException
      */
     public function env()
     {
         $this->writer->backupExistingEnv();
+        $this->runProcess('php artisan october:env', 'Failed to create env config!');
 
         $lines = [
-            'APP_ENV'          => 'dev',
-            'APP_URL'          => $this->config->app['url'],
-            'APP_KEY'          => (new KeyGenerator())->generate(),
-            'APP_DEBUG'        => (bool)$this->config->app['debug'] ? 'true' : 'false',
+            'APP_DEBUG'       => (bool)$this->config->app['debug'] ? 'true' : 'false',
+            'APP_URL'         => $this->config->app['url'],
+            'APP_KEY'         => (new KeyGenerator())->generate(),
+            'APP_ENV'         => 'dev',
             '',
-            'CMS_EDGE_UPDATES' => (bool)$this->config->cms['edgeUpdates'] ? 'true' : 'false',
-            'CMS_ASSETS_CACHE' => 'false',
-            'CMS_ROUTES_CACHE' => 'false',
+            'DB_CONNECTION'   => $this->config->database['connection'],
+            'DB_HOST'         => $this->config->database['host'],
+            'DB_PORT'         => $this->config->database['port'],
+            'DB_DATABASE'     => $this->config->database['database'],
+            'DB_USERNAME'     => $this->config->database['username'],
+            'DB_PASSWORD'     => $this->config->database['password'],
             '',
-            'DB_CONNECTION'    => $this->config->database['connection'],
-            'DB_USERNAME'      => $this->config->database['username'],
-            'DB_PASSWORD'      => $this->config->database['password'],
-            'DB_DATABASE'      => $this->config->database['database'],
-            'DB_HOST'          => $this->config->database['host'],
+            'REDIS_HOST'      => '127.0.0.1',
+            'REDIS_PASSWORD'  => 'null',
+            'REDIS_PORT'      => '6379',
             '',
-            'MAIL_DRIVER'      => $this->config->mail['driver'],
-            'MAIL_NAME'        => '"' . $this->config->mail['name'] . '"',
-            'MAIL_ADDRESS'     => $this->config->mail['address'],
+            'CACHE_DRIVER'    => 'file',
+            'SESSION_DRIVER'  => 'file',
+            'QUEUE_DRIVER'    => 'sync',
+            '',
+            'MAIL_DRIVER'     => $this->config->mail['driver'],
+            'MAIL_HOST'       => '"' . $this->config->mail['host'] . '"',
+            'MAIL_PORT'       => '587',
+            'MAIL_ENCRYPTION' => 'tls',
+            'MAIL_USERNAME'   => null,
+            'MAIL_PASSWORD'   => null,
+            'MAIL_NAME'       => '"' . $this->config->mail['name'] . '"',
+            'MAIL_ADDRESS'    => $this->config->mail['address'],
+            '',
+            'ASSETS_CACHE'    => 'false',
+            'ROUTES_CACHE'    => 'false',
+            'LINK_POLICY'     => 'detect',
+            'ENABLE_CSRF'     => 'false',
         ];
+
+        $this->writer->removeCurrentEnv();
 
         foreach ($lines as $key => $value) {
             $this->writer->writeEnvFile($key, $value);
@@ -86,52 +113,6 @@ class Setup
     }
 
     /**
-     * Write the mail configuration.
-     *
-     * @return void
-     */
-    protected function mail()
-    {
-        $values = [
-            'driver' => "env('MAIL_DRIVER', 'log')",
-        ];
-        $this->writer->write('mail', $values);
-
-        // Replace the inline 'address/name' config entry separately
-        // since this edge case is not supported by the generic
-        // Writer->write method.
-        $contents = file_get_contents($this->writer->filePath('mail'));
-
-        $regex   = "/'address'\s+=>\s+'[^']+',\s+\'name\'\s+=>\s+'[^']+'/";
-        $replace = "'address' => env('MAIL_ADDRESS'), 'name' => env('MAIL_NAME')";
-
-        file_put_contents($this->writer->filePath('mail'), preg_replace($regex, $replace, $contents));
-    }
-
-    /**
-     * Write the database configuration.
-     *
-     * @return void
-     */
-    protected function database()
-    {
-        $values = ['default' => "env('DB_CONNECTION')"];
-
-        foreach ($this->config->database as $key => $setting) {
-            // Do nothing for the "connection" config entry since
-            // this only specifies which "default" to use. This
-            // entry is set separately above.
-            if ($key === 'connection') {
-                continue;
-            }
-
-            $values[$key] = "env('DB_" . strtoupper($key) . "')";
-        }
-
-        $this->writer->write('database', $values);
-    }
-
-    /**
      * Write the app configuration.
      *
      * @return void
@@ -139,30 +120,10 @@ class Setup
     protected function app()
     {
         $values = [
-            'url'    => "env('APP_URL')",
-            'key'    => "env('APP_KEY')",
-            'debug'  => "env('APP_DEBUG', false)",
             'locale' => $this->config->app['locale'],
         ];
 
         $this->writer->write('app', $values);
-    }
-
-    /**
-     * Write the cms configuration.
-     *
-     * @return void
-     */
-    protected function cms()
-    {
-        $values = [
-            'edgeUpdates'          => "env('CMS_EDGE_UPDATES', false)",
-            'enableRoutesCache'    => "env('CMS_ROUTES_CACHE', true)",
-            'enableAssetCache'     => "env('CMS_ASSETS_CACHE', true)",
-            'enableCsrfProtection' => "env('CMS_CSRF_PROTECTION', true)",
-        ];
-
-        $this->writer->write('cms', $values);
     }
 
     /**
@@ -188,4 +149,21 @@ class Setup
         return true;
     }
 
+    /**
+     * Write the mail configuration.
+     *
+     * @return void
+     */
+    protected function mail()
+    {
+        // Replace the inline 'address/name' config entry separately
+        // since this edge case is not supported by the generic
+        // Writer->write method.
+        $contents = file_get_contents($this->writer->filePath('mail'));
+
+        $regex   = "/'address'\s+=>\s+'[^']+',\s+\'name\'\s+=>\s+'[^']+'/";
+        $replace = "'address' => env('MAIL_ADDRESS'), 'name' => env('MAIL_NAME')";
+
+        file_put_contents($this->writer->filePath('mail'), preg_replace($regex, $replace, $contents));
+    }
 }

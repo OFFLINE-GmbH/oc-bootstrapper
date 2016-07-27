@@ -9,10 +9,11 @@ cms:
 
 database:
     connection: mysql
+    host: 192.168.10.10
+    port: 3306
     username: homestead
     password: secret
     database: bootstrapper
-    host: 192.168.10.10
 
 git:
     deployment: false
@@ -28,6 +29,7 @@ plugins:
     # - Vendor.Private (user@remote.git)
 
 mail:
+    host: smtp.mailgun.org
     name: User Name
     address: email@example.com
     driver: log

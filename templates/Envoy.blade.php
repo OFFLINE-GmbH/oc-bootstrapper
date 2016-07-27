@@ -13,6 +13,8 @@
     git pull
     [ ! -f "composer.phar" ] && wget https://getcomposer.org/composer.phar
     php composer.phar install --no-interaction --no-dev --prefer-dist
+## Enable this line when using bare repos
+# ~/.composer/vendor/bin/october install
     php artisan -v october:up
     git status -s
 @endtask
