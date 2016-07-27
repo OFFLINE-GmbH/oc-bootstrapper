@@ -166,7 +166,7 @@ class InstallCommand extends Command
      */
     protected function writeConfig($force = false)
     {
-        if ( ! $this->firstRun) {
+        if ( ! $this->firstRun || (file_exists(getcwd() . DS . '.env') && $force === false)) {
             return $this->output->writeln('<comment>-> Configuration already set up. Use --force to regenerate.</comment>');
         }
 
@@ -211,7 +211,7 @@ class InstallCommand extends Command
             return;
         }
 
-        $remove = ['CONTRIBUTING.md', 'CHANGELOG.md'];
+        $remove = ['CONTRIBUTING.md', 'CHANGELOG.md', 'ISSUE_TEMPLATE.md'];
         foreach ($remove as $file) {
             @unlink(getcwd() . DS . $file);
         }

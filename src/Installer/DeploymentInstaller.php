@@ -30,6 +30,11 @@ class DeploymentInstaller extends BaseInstaller
             return false;
         }
 
+        // Deployments are disabled
+        if ($deployment === false) {
+            return true;
+        }
+
         if ( ! method_exists($this, $deployment)) {
             $this->write('<comment>-> Unknown deployment option "' . $deployment . '"</comment>');
             return false;
