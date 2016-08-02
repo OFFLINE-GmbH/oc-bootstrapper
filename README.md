@@ -142,11 +142,7 @@ Support for other CI systems is added on request.
 
  #### SSH deployments with bare repos
   
-  If you use SSH deployments with a bare repo, make sure to require `oc-bootstrapper` locally in your procect:
-   
-    composer require offline/oc-bootstrapper
-    
-Then, in your deployment script simply run `./vendor/bin/october install` to install the October source code and all of your plugins during deployment. If the October source code is already available it won't be downloaded again.
+  If you use SSH deployments with a bare repo, make sure to  run `./vendor/bin/october install` in your deployment script to install the October source code and all of your plugins . If the October source code is already available it won't be downloaded again.
 
 If you use the provided GitLab deployment via Envoy make sure to simply uncomment [this line](https://github.com/OFFLINE-GmbH/oc-bootstrapper/blob/fd45b66580f4b1af24880a3b331635a7654cf4ed/templates/Envoy.blade.php#L17).
   

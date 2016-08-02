@@ -105,6 +105,7 @@ class InstallCommand extends Command
 
         $output->writeln('<info>Installing composer dependencies...</info>');
         (new Composer())->install();
+        (new Composer())->addDependency('offline/oc-bootstrapper');
 
         $output->writeln('<info>Setting up config files...</info>');
         $this->writeConfig($force);
