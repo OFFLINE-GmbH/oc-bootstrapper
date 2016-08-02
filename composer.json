@@ -16,14 +16,14 @@
   "require": {
     "guzzlehttp/guzzle": "~6.0",
     "cypresslab/gitelephant": "~1.1",
-    "symfony/console": "~2.7",
-    "symfony/process": "~2.7",
+    "symfony/console": "~2.7|~3.0",
+    "symfony/process": "~2.7|~3.0",
     "symfony/yaml": "~2.1|~3.0"
   },
   "bin": [
     "october"
   ],
   "require-dev": {
-    "symfony/var-dumper": "~2.7"
+    "symfony/var-dumper": "~2.7|~3.0"
   }
 }
