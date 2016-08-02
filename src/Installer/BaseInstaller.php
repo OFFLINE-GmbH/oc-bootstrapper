@@ -4,7 +4,9 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use OFFLINE\Bootstrapper\October\Config\Config;
+use OFFLINE\Bootstrapper\October\Util\Gitignore;
 use RuntimeException;
+use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class BaseInstaller
 {
@@ -12,6 +14,14 @@ abstract class BaseInstaller
      * Exit code for processes
      */
     const EXIT_CODE_OK = 0;
+    /**
+     * @var Gitignore
+     */
+    protected $gitignore;
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
 
     public abstract function install();
 
@@ -23,11 +33,15 @@ abstract class BaseInstaller
     /**
      * DeploymentInstaller constructor.
      *
-     * @param Config $config
+     * @param Config          $config
+     * @param Gitignore       $gitignore
+     * @param OutputInterface $output
      */
-    public function __construct(Config $config)
+    public function __construct(Config $config, Gitignore $gitignore, OutputInterface $output)
     {
-        $this->config = $config;
+        $this->config    = $config;
+        $this->gitignore = $gitignore;
+        $this->output    = $output;
     }
 
     /**
@@ -85,5 +99,9 @@ abstract class BaseInstaller
         }
 
         return rmdir($dir);
+    }
+
+    protected function write($line) {
+        $this->output->writeln($line);
     }
 }

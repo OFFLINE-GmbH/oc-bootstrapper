@@ -22,6 +22,7 @@ class ThemeInstaller extends BaseInstaller
      * @throws RuntimeException
      * @throws InvalidArgumentException
      * @throws \RuntimeException
+     * @throws \LogicException
      */
     public function install()
     {
@@ -41,9 +42,8 @@ class ThemeInstaller extends BaseInstaller
         $this->mkdir($themeDir);
 
         if ( ! $this->isEmpty($themeDir)) {
-            throw new RuntimeException(
-                sprintf('Your theme directory "%s" is not empty. Cannot clone your repo into it.', $themeDir)
-            );
+            $this->write(sprintf('<comment>-> Theme "%s" is already installed. Skipping.</comment>', $theme));
+            return;
         }
 
         $repo = Repository::open($themeDir);

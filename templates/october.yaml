@@ -9,12 +9,15 @@ cms:
 
 database:
     connection: mysql
-    username: homestead
-    password: secret
-    database: bootstrapper
-    host: 192.168.10.10
+    host: localhost
+    port: 3306
+    username: root
+    password: password
+    database: myproject
 
-deployment: false
+git:
+    deployment: false
+    bareRepo: true          # Exclude everything except themes and custom plugins in git
 
 plugins:
     - Rainlab.Pages
@@ -26,6 +29,7 @@ plugins:
     # - Vendor.Private (user@remote.git)
 
 mail:
+    host: smtp.mailgun.org
     name: User Name
     address: email@example.com
     driver: log

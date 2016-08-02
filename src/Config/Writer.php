@@ -63,6 +63,20 @@ class Writer
 
         if (file_exists($env)) {
             copy($env, $env . '.' . uniqid('original_', false));
+            $this->removeCurrentEnv();
+        }
+    }
+
+    /**
+     * Remove existing .env file.
+     *
+     * @return void
+     */
+    public function removeCurrentEnv()
+    {
+        $env = getcwd() . DS . '.env';
+
+        if (file_exists($env)) {
             unlink($env);
         }
     }
@@ -101,7 +115,9 @@ class Writer
 
         $this->replaceLine('MAIL_DRIVER', 'MAIL_DRIVER=mail', $file);
 
-        $this->removeLines(['CMS_ASSETS_CACHE', 'CMS_ROUTES_CACHE'], $file);
+        $this->replaceLine('ASSETS_CACHE', 'ASSETS_CACHE=true', $file);
+        $this->replaceLine('ROUTES_CACHE', 'ROUTES_CACHE=true', $file);
+        $this->replaceLine('ENABLE_CSRF', 'ENABLE_CSRF=true', $file);
 
         return $this;
     }
@@ -186,7 +202,7 @@ class Writer
 
         foreach ($values as $key => $value) {
             // No quotes for env() calls
-            $replace  = substr($value, 0, 4) === 'env(' ? $value : "'{$value}'";
+            $replace = substr($value, 0, 4) === 'env(' ? $value : "'{$value}'";
             // Replace "key => value" entries in the file's contents
             $contents = preg_replace("/('{$key}'\s+=>\s+)([^\n\]]+),/", "$1" . $replace . ',', $contents);
         }
