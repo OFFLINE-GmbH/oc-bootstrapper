@@ -4,6 +4,7 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use GitElephant\Repository;
+use OFFLINE\Bootstrapper\October\Util\Gitignore;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
@@ -16,22 +17,29 @@ class PluginInstaller extends BaseInstaller
 {
     /**
      * Install a plugin via git or artisan.
-     * 
-     * @throws \RuntimeException
-     * @throws LogicException
-     * @throws RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     *
+     * @param Gitignore $gitignore
+     *
+     * @return bool
      */
     public function install()
     {
         try {
             $config = $this->config->plugins;
         } catch (\RuntimeException $e) {
+            $this->write('<info> - Nothing to install</info>');
+
             // No plugin set
             return false;
         }
 
+        $isBare     = (bool)$this->config->git['bareRepo'];
+        $exceptions = [];
+
         foreach ($config as $plugin) {
+
+            $this->write('<info> - ' . $plugin . '</info>');
+
             list($vendor, $plugin, $remote) = $this->parse($plugin);
             $vendor = strtolower($vendor);
             $plugin = strtolower($plugin);
@@ -47,19 +55,23 @@ class PluginInstaller extends BaseInstaller
             $this->mkdir($pluginDir);
 
             if ( ! $this->isEmpty($pluginDir)) {
-                throw new RuntimeException(
-                    sprintf('Your plugin directory "%s" is not empty. Cannot clone your repo into it.', $pluginDir)
-                );
+                $this->write('<comment>   -> ' . sprintf('Plugin "%s" already installed. Skipping.', $plugin) . '</comment>');
+                continue;
             }
 
             $repo = Repository::open($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);
             } catch (RuntimeException $e) {
-                throw new RuntimeException('Error while cloning plugin repo: ' . $e->getMessage());
+                $this->write('<error> - ' . 'Error while cloning plugin repo: ' . $e->getMessage() . '</error>');
+                continue;
             }
 
             (new Process("php artisan plugin:refresh {$vendor}.{$plugin}"))->run();
+
+            if ($isBare) {
+                $this->gitignore->addPlugin($vendor, $plugin);
+            }
 
             $this->cleanup($pluginDir);
         }

@@ -49,7 +49,24 @@ class Composer
      */
     public function install()
     {
-        (new Process($this->composer . ' install --no-scripts'))
+        (new Process($this->composer . ' install --no-scripts --no-interaction'))
+            ->setTimeout(3600)
+            ->run();
+    }
+
+    /**
+     * Composer require
+     *
+     * @return void
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     */
+    public function addDependency($package)
+    {
+        $package = escapeshellarg($package);
+
+        (new Process($this->composer . ' require ' . $package . '--no-interaction'))
             ->setTimeout(3600)
             ->run();
     }

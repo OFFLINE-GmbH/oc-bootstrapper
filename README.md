@@ -11,7 +11,7 @@ The following steps will be taken care of:
 1. The latest October CMS gets downloaded from github and gets installed
 2. All composer dependencies are installed
 3. Relevant config entries are moved to a `.env` file for easy customization
-4. Sensible configuration defaults for your `prod` environment get preset
+4. Sensible configuration defaults for your `prod` environment get pre-set
 5. Your database gets migrated
 6. All demo data gets removed
 7. Your selected theme gets downloaded and installed
@@ -27,6 +27,7 @@ The following steps will be taken care of:
 ## Tested on
 
 * Ubuntu 15.10
+* Ubuntu 16.04
 
 Should work on OS X. Will probably not work on Windows.
 
@@ -39,7 +40,7 @@ You can now run `october` from your command line.
 
 ```bash
 $ october
-October CMS Bootstrapper version 0.1.0
+October CMS Bootstrapper version 0.2.0
 ```
 
 ## Usage
@@ -75,7 +76,11 @@ database:
     database: bootstrapper
     host: 192.168.10.10
 
-deployment: gitlab
+git:
+    deployment: false
+    
+    # Exclude everything except themes and custom plugins in git
+    bareRepo: true          
 
 plugins:
     - Rainlab.Pages
@@ -87,9 +92,11 @@ plugins:
     # - Vendor.Private (user@remote.git)
 
 mail:
+    host: smtp.mailgun.org
     name: User Name
     address: email@example.com
     driver: log
+
 ```
 
 #### Theme and Plugin syntax
@@ -103,11 +110,28 @@ If no repo is defined the plugins are loaded from the October Marketplace.
 
 When you are done editing your configuration file, simply run `october install` to install October. 
 
+#### Install additional plugins
+
+If at any point in time you need to install additional plugins, simply add them to your `october.yaml` and rerun `october install`. Missing plugins will be installed.
+
 ### Change config
 
 To change your installation's configuration, simply edit the `.env` file in your project root. 
 When deploying to production, make sure to edit your `.env.production` template file and rename it to `.env`.  
 
+### Bare repos
+
+If you don't want to have the complete October source code in your repository set the `bareRepo`
+ option to `true`.
+ 
+ This will set up a `.gitignore` file that excludes everything except your `theme` directory and all the **manually installed** plugins in your `plugins` directory.
+  
+  > If you want to deploy a bare repo please read the section `SSH deployments with bare repos` below.
+  
+#### Get up and running after `git clone`
+
+After cloning a bare repo for the first time, simply run `october install`. October CMS and all missing plugins will get installed locally on your machine. 
+  
 ### SSH deployments
 
 Set the `deployment` option to `false` if you don't want to setup deployments.
@@ -116,6 +140,18 @@ Currently `oc-bootstrapper` supports a simple setup to deploy a project on push 
 
 Support for other CI systems is added on request.
 
+ #### SSH deployments with bare repos
+  
+  If you use SSH deployments with a bare repo, make sure to require `oc-bootstrapper` locally in your procect:
+   
+    composer require offline/oc-bootstrapper
+    
+Then, in your deployment script simply run `./vendor/bin/october install` to install the October source code and all of your plugins during deployment. If the October source code is already available it won't be downloaded again.
+
+If you use the provided GitLab deployment via Envoy make sure to simply uncomment [this line](https://github.com/OFFLINE-GmbH/oc-bootstrapper/blob/fd45b66580f4b1af24880a3b331635a7654cf4ed/templates/Envoy.blade.php#L17).
+  
+  It is important that you list every installed plugin in your `october.yaml` file. Otherwise the plugins won't be available after deployment.
+  
 #### GitLab CI with Envoy
 
 If you use the gitlab deployment option the `.gitlab-ci.yml` and `Envoy.blade.php` files are created for you.

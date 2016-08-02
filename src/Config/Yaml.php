@@ -46,10 +46,6 @@ class Yaml implements Config
      */
     public function __get($name)
     {
-        if ( ! isset($this->config[$name])) {
-            throw new \RuntimeException("There is no config entry called $name");
-        }
-
-        return $this->config[$name];
+        return isset($this->config[$name]) ? $this->config[$name] : null;
     }
 }

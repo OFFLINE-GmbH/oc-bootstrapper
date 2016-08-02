@@ -1,0 +1,10 @@
+*
+!.gitignore
+!composer.*
+!.env.*
+!october.yaml
+!Envoy.blade.php
+!.gitlab-ci.yml
+!themes
+!themes/**/*
+!plugins

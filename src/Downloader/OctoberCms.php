@@ -25,12 +25,18 @@ class OctoberCms
     /**
      * Download latest October CMS.
      *
-     * @throws LogicException
-     * @throws RuntimeException
+     * @param bool $force
+     *
      * @return $this
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
      */
-    public function download()
+    public function download($force = false)
     {
+        if($this->alreadyInstalled($force)) {
+            throw new \LogicException('-> October is already installed. Use --force to reinstall.');
+        }
+        
         $this->fetchZip()
              ->extract()
              ->fetchHtaccess()
@@ -116,6 +122,16 @@ class OctoberCms
     protected function makeFilename()
     {
         return getcwd() . DS . 'october_' . md5(time() . uniqid('oc-', true)) . '.zip';
+    }
+
+    /**
+     * @param $force
+     *
+     * @return bool
+     */
+    protected function alreadyInstalled($force)
+    {
+        return ! $force && is_dir(getcwd() . DS . 'bootstrap') && is_dir(getcwd() . DS . 'modules');
     }
 
 }

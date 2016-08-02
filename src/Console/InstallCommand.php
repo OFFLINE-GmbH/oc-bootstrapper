@@ -9,15 +9,16 @@ use OFFLINE\Bootstrapper\October\Installer\DeploymentInstaller;
 use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
 use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
 use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\Gitignore;
+use OFFLINE\Bootstrapper\October\Util\RunsProcess;
 use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\LogicException;
-use Symfony\Component\Process\Process;
-use ZipArchive;
 
 /**
  * Class InstallCommand
@@ -25,22 +26,24 @@ use ZipArchive;
  */
 class InstallCommand extends Command
 {
-    use UsesTemplate;
-
-    /**
-     * Exit code for processes
-     */
-    const EXIT_CODE_OK = 0;
+    use UsesTemplate, RunsProcess;
 
     /**
      * @var
      */
     public $config;
-
     /**
      * @var OutputInterface
      */
     protected $output;
+    /**
+     * @var Gitignore
+     */
+    protected $gitignore;
+    /**
+     * @var bool
+     */
+    protected $firstRun;
 
     /**
      * Configure the command options.
@@ -52,7 +55,13 @@ class InstallCommand extends Command
     {
         $this
             ->setName('install')
-            ->setDescription('Install October CMS.');
+            ->setDescription('Install October CMS.')
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Make the installer behave as if it is run for the first time. Existing files may get overwritten.'
+            );
     }
 
     /**
@@ -74,6 +83,9 @@ class InstallCommand extends Command
             throw new RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
 
+        $force          = $input->getOption('force');
+        $this->firstRun = ! is_dir(getcwd() . DS . 'bootstrap') || $force;
+
         $this->output = $output;
 
         $configFile = getcwd() . DS . 'october.yaml';
@@ -81,56 +93,66 @@ class InstallCommand extends Command
             return $output->writeln('<comment>october.yaml not found. Run october init first.</comment>');
         }
 
-        $this->config = new Yaml($configFile);
+        $this->config    = new Yaml($configFile);
+        $this->gitignore = new Gitignore($this->getGitignore());
 
         $output->writeln('<info>Downloading latest October CMS...</info>');
-        (new OctoberCms())->download();
+        try {
+            (new OctoberCms())->download($force);
+        } catch (\LogicException $e) {
+            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
+        }
 
         $output->writeln('<info>Installing composer dependencies...</info>');
         (new Composer())->install();
 
         $output->writeln('<info>Setting up config files...</info>');
-        $this->writeConfig();
+        $this->writeConfig($force);
 
-        $output->writeln('<info>Migrating Database...</info>');
+        $output->writeln('<info>Migrating database...</info>');
         $this->runProcess('php artisan october:up', 'Migrations failed!');
-
-        $output->writeln('<info>Removing demo data...</info>');
-        $this->runProcess('php artisan october:fresh', 'Failed to remove demo data!');
-
-        $output->writeln('<info>Clearing cache...</info>');
-        $this->runProcess('php artisan clear-compiled', 'Failed to clear compiled files!');
-        $this->runProcess('php artisan cache:clear', 'Failed to clear cache!');
 
         $output->writeln('<info>Installing Theme...</info>');
         try {
-            (new ThemeInstaller($this->config))->install();
+            (new ThemeInstaller($this->config, $this->gitignore, $this->output))->install();
         } catch (\RuntimeException $e) {
-            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
         }
 
         $output->writeln('<info>Installing Plugins...</info>');
         try {
-            (new PluginInstaller($this->config))->install();
+            (new PluginInstaller($this->config, $this->gitignore, $this->output))->install();
         } catch (\RuntimeException $e) {
-            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
         }
+
+        $output->writeln('<info>Migrating plugin tables...</info>');
+        $this->runProcess('php artisan october:up', 'Migrations failed!');
 
         $output->writeln('<info>Setting up deployments...</info>');
         try {
-            (new DeploymentInstaller($this->config))->install();
+            (new DeploymentInstaller($this->config, $this->gitignore, $this->output))->install($force);
         } catch (\RuntimeException $e) {
             $output->writeln("<error>${e}</error>");
         }
 
         $output->writeln('<info>Creating .gitignore...</info>');
-        $this->gitignore();
+        $this->gitignore->write();
 
-        $output->writeln('<info>Creating README...</info>');
-        $this->readme();
+        if ($this->firstRun) {
+            $output->writeln('<info>Removing demo data...</info>');
+            $this->runProcess('php artisan october:fresh', 'Failed to remove demo data!');
 
-        $output->writeln('<info>Cleaning up...</info>');
-        $this->cleanup();
+            $output->writeln('<info>Creating README...</info>');
+            $this->readme();
+
+            $output->writeln('<info>Cleaning up...</info>');
+            $this->cleanup();
+        }
+
+        $output->writeln('<info>Clearing cache...</info>');
+        $this->runProcess('php artisan clear-compiled', 'Failed to clear compiled files!');
+        $this->runProcess('php artisan cache:clear', 'Failed to clear cache!');
 
         $output->writeln('<comment>Application ready! Build something amazing.</comment>');
 
@@ -139,25 +161,37 @@ class InstallCommand extends Command
 
     /**
      * Create the .env and config files.
-     * 
-     * @return void
+     *
+     * @param bool $force
      */
-    protected function writeConfig()
+    protected function writeConfig($force = false)
     {
-        $setup = new Setup($this->config);
+        if ( ! $this->firstRun || (file_exists(getcwd() . DS . '.env') && $force === false)) {
+            return $this->output->writeln('<comment>-> Configuration already set up. Use --force to regenerate.</comment>');
+        }
 
+        $setup = new Setup($this->config, $this->output);
         $setup->env()->config();
     }
 
     /**
-     * Copy the .gitignore template.
-     * 
-     * @return void
+     * Get the .gitignore template.
+     *
+     * @return string
      */
-    protected function gitignore()
+    protected function getGitignore()
     {
-        $template = $this->getTemplate('gitignore');
-        copy($template, getcwd() . DS . '.gitignore');
+        $target = getcwd() . DS . '.gitignore';
+        if (file_exists($target)) {
+            return $target;
+        }
+
+        $file     = $this->config->git['bareRepo'] ? 'gitignore.bare' : 'gitignore';
+        $template = $this->getTemplate($file);
+
+        copy($template, $target);
+
+        return $target;
     }
 
     /**
@@ -173,46 +207,13 @@ class InstallCommand extends Command
 
     protected function cleanup()
     {
-        $remove = ['CONTRIBUTING.md', 'CHANGELOG.md'];
+        if ( ! $this->firstRun) {
+            return;
+        }
+
+        $remove = ['CONTRIBUTING.md', 'CHANGELOG.md', 'ISSUE_TEMPLATE.md'];
         foreach ($remove as $file) {
             @unlink(getcwd() . DS . $file);
         }
-    }
-
-    /**
-     * Runs a process and checks it's result.
-     * Prints an error message if necessary.
-     *
-     * @param $command
-     * @param $errorMessage
-     *
-     * @return bool
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     */
-    protected function runProcess($command, $errorMessage)
-    {
-        $exitCode = (new Process($command))->run();
-
-        return $this->checkResult($exitCode, $errorMessage);
-    }
-
-    /**
-     * Checks the result of a process.
-     *
-     * @param $exitCode
-     * @param $message
-     *
-     * @return bool
-     */
-    protected function checkResult($exitCode, $message)
-    {
-        if ($exitCode !== $this::EXIT_CODE_OK) {
-            $this->output->writeln('<error>' . $message . '</error>');
-
-            return false;
-        }
-
-        return true;
     }
 }
