@@ -66,7 +66,7 @@ class Composer
     {
         $package = escapeshellarg($package);
 
-        (new Process($this->composer . ' require ' . $package . '--no-interaction'))
+        (new Process($this->composer . ' require ' . $package . ' --no-interaction'))
             ->setTimeout(3600)
             ->run();
     }
