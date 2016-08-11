@@ -55,16 +55,20 @@ class Writer
     /**
      * Backup an clear existing .env file.
      *
-     * @return void
+     * @return string|boolean
      */
     public function backupExistingEnv()
     {
-        $env = getcwd() . DS . '.env';
+        if (file_exists($this->env)) {
+            $newEnv = $this->env . '.' . uniqid('original_', false);
 
-        if (file_exists($env)) {
-            copy($env, $env . '.' . uniqid('original_', false));
+            copy($this->env, $newEnv);
             $this->removeCurrentEnv();
+
+            return $newEnv;
         }
+
+        return false;
     }
 
     /**
@@ -74,10 +78,8 @@ class Writer
      */
     public function removeCurrentEnv()
     {
-        $env = getcwd() . DS . '.env';
-
-        if (file_exists($env)) {
-            unlink($env);
+        if (file_exists($this->env)) {
+            unlink($this->env);
         }
     }
 
@@ -146,6 +148,16 @@ class Writer
     }
 
     /**
+     * Restores a backed up .env file.
+     *
+     * @param $newEnv
+     */
+    public function restore($newEnv)
+    {
+        copy($newEnv, $this->env);
+    }
+
+    /**
      * Remove a line from a file.
      *
      * @param array $startsWith
@@ -210,5 +222,15 @@ class Writer
         file_put_contents($file, $contents);
 
         return $this;
+    }
+
+    /**
+     * Checks if an .env file is present.
+     *
+     * @return boolean
+     */
+    public function hasEnv()
+    {
+        return file_exists($this->env);
     }
 }

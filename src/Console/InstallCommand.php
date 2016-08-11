@@ -170,11 +170,18 @@ class InstallCommand extends Command
         $setup = new Setup($this->config, $this->output);
         $setup->config();
 
-        if ( ! $this->firstRun || (file_exists(getcwd() . DS . '.env') && $force === false)) {
+        if ($this->firstRun) {
+            $setup->env(false, true);
+
+            return;
+        }
+
+        if ((file_exists(getcwd() . DS . '.env') && $force === false)) {
             return $this->output->writeln('<comment>-> Configuration already set up. Use --force to regenerate.</comment>');
         }
 
         $setup->env();
+
     }
 
     /**
