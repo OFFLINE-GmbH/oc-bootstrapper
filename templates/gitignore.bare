@@ -3,6 +3,7 @@
 !composer.*
 !.env.*
 !october.yaml
+!git.cron.sh
 !Envoy.blade.php
 !.gitlab-ci.yml
 !themes
