@@ -110,6 +110,8 @@ class InstallCommand extends Command
         $output->writeln('<info>Setting up config files...</info>');
         $this->writeConfig($force);
 
+        $this->prepareDatabase();
+        
         $output->writeln('<info>Migrating database...</info>');
         $this->runProcess('php artisan october:up', 'Migrations failed!');
 
@@ -224,6 +226,21 @@ class InstallCommand extends Command
         $remove = ['CONTRIBUTING.md', 'CHANGELOG.md', 'ISSUE_TEMPLATE.md'];
         foreach ($remove as $file) {
             @unlink(getcwd() . DS . $file);
+        }
+    }
+
+    /**
+     * Prepare database before migrations.
+     */
+    public function prepareDatabase()
+    {
+        // If SQLite database does not exist, create it
+        if ($this->config->database['connection'] === 'sqlite') {
+            $path = $this->config->database['database'];
+            if (!file_exists($path) && is_dir(dirname($path))) {
+                $this->output->writeln("<info>Creating $path ...</info>");
+                touch($path);
+            }
         }
     }
 }
