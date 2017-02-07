@@ -22,7 +22,7 @@ git:
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
-    - Adrenth.Redirect
+    - OFFLINE.Indirect (git@github.com:OFFLINE-GmbH/oc-indirect-plugin.git)
     - Indikator.Backend
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
