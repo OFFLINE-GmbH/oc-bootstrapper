@@ -49,7 +49,7 @@ class Composer
      */
     public function install()
     {
-        (new Process($this->composer . ' install --no-scripts --no-interaction'))
+        (new Process($this->composer . ' install --no-scripts --no-interaction --prefer-dist'))
             ->setTimeout(3600)
             ->run();
     }
