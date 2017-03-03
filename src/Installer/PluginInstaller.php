@@ -44,11 +44,6 @@ class PluginInstaller extends BaseInstaller
             $vendor = strtolower($vendor);
             $plugin = strtolower($plugin);
 
-            if ($remote === false) {
-                $this->installViaArtisan($vendor, $plugin);
-                continue;
-            }
-
             $vendorDir = $this->createVendorDir($vendor);
             $pluginDir = $vendorDir . DS . $plugin;
 
@@ -59,6 +54,11 @@ class PluginInstaller extends BaseInstaller
                 continue;
             }
 
+            if ($remote === false) {
+                $this->installViaArtisan($vendor, $plugin);
+                continue;
+            }
+            
             $repo = Repository::open($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);

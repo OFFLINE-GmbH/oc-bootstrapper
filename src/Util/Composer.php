@@ -32,7 +32,7 @@ class Composer
      */
     protected function findComposer()
     {
-        if (file_exists(getcwd() . '/composer.phar')) {
+        if (file_exists(getcwd() . DS . 'composer.phar')) {
             return '"' . PHP_BINARY . '" composer.phar';
         }
 
@@ -49,7 +49,7 @@ class Composer
      */
     public function install()
     {
-        (new Process($this->composer . ' install --no-scripts --no-interaction'))
+        (new Process($this->composer . ' install --no-scripts --no-interaction --prefer-dist'))
             ->setTimeout(3600)
             ->run();
     }
@@ -64,6 +64,12 @@ class Composer
      */
     public function addDependency($package)
     {
+        // If the package is already installed don't add it again
+        $slashed = str_replace('/', '\/', $package);
+        if(preg_grep('/' . $slashed . '/', file(getcwd() . DS . 'composer.json'))) {
+            return true;
+        }
+
         $package = escapeshellarg($package);
 
         (new Process($this->composer . ' require ' . $package . ' --no-interaction'))
