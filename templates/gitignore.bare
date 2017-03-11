@@ -1,6 +1,7 @@
 *
 !.gitignore
 !composer.*
+composer.phar
 !.env.*
 !october.yaml
 !git.cron.sh
