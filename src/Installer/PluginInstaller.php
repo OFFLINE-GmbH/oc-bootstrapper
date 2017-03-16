@@ -40,7 +40,7 @@ class PluginInstaller extends BaseInstaller
 
             $this->write('<info> - ' . $plugin . '</info>');
 
-            list($vendor, $plugin, $remote) = $this->parse($plugin);
+            list($vendor, $plugin, $remote, $branch) = $this->parse($plugin);
             $vendor = strtolower($vendor);
             $plugin = strtolower($plugin);
 
@@ -62,6 +62,10 @@ class PluginInstaller extends BaseInstaller
             $repo = Repository::open($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);
+                if ($branch !== false) {
+                    $this->write('<comment>   -> ' . sprintf('Checkout "%s" ...', $branch) . '</comment>');
+                    $repo->checkout($branch);
+                }
             } catch (RuntimeException $e) {
                 $this->write('<error> - ' . 'Error while cloning plugin repo: ' . $e->getMessage() . '</error>');
                 continue;
@@ -90,12 +94,16 @@ class PluginInstaller extends BaseInstaller
     protected function parse($plugin)
     {
         // Vendor.Plugin (Remote)
-        preg_match("/([^\.]+)\.([^ ]+)(?: ?\(([^\)]+))?/", $plugin, $matches);
+        preg_match("/([^\.]+)\.([^ #]+)(?: ?\(([^\#)]+)(?:#([^\)]+)?)?)?/", $plugin, $matches);
 
         array_shift($matches);
 
         if (count($matches) < 3) {
             $matches[2] = false;
+        }
+
+        if (count($matches) < 4) {
+            $matches[3] = false;
         }
 
         return $matches;
