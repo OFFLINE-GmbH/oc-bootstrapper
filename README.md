@@ -90,6 +90,7 @@ plugins:
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
     # - Vendor.Private (user@remote.git)
+    # - Vendor.PrivateCustomBranch (user@remote.git#branch)
 
 mail:
     host: smtp.mailgun.org
