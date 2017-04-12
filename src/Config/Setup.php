@@ -49,6 +49,7 @@ class Setup
     public function config()
     {
         $this->app();
+        $this->cms();
         $this->theme();
         $this->mail();
     }
@@ -75,6 +76,8 @@ class Setup
             'APP_URL'         => $this->config->app['url'],
             'APP_KEY'         => (new KeyGenerator())->generate(),
             'APP_ENV'         => 'dev',
+            '',
+            'CMS_SAFE_MODE'   => $this->getSafeMode(),
             '',
             'DB_CONNECTION'   => $this->config->database['connection'],
             'DB_HOST'         => $this->config->database['host'],
@@ -114,8 +117,8 @@ class Setup
             $this->writer->writeEnvFile($key, $value);
         }
 
-        if($newEnv !== false) {
-            if($restoreBackup) {
+        if ($newEnv !== false) {
+            if ($restoreBackup) {
                 $this->writer->restore($newEnv);
             }
 
@@ -142,6 +145,20 @@ class Setup
         ];
 
         $this->writer->write('app', $values);
+    }
+
+    /**
+     * Write the cms configuration.
+     *
+     * @return void
+     */
+    protected function cms()
+    {
+        $values = [
+            'enableSafeMode' => "env('CMS_SAFE_MODE', " . $this->getSafeMode() . ')',
+        ];
+
+        $this->writer->write('cms', $values);
     }
 
     /**
@@ -183,5 +200,23 @@ class Setup
         $replace = "'address' => env('MAIL_ADDRESS'), 'name' => env('MAIL_NAME')";
 
         file_put_contents($this->writer->filePath('mail'), preg_replace($regex, $replace, $contents));
+    }
+
+    /**
+     * Since the enableSafeMode property can be null, true or false
+     * we need to be careful when parsing it to a string.
+     * 
+     * @return string
+     */
+    protected function getSafeMode()
+    {
+        $safeMode = 'null';
+        if (array_key_exists('enableSafeMode', $this->config->cms)) {
+            if ($this->config->cms['enableSafeMode'] !== null) {
+                $safeMode = $this->config->cms['enableSafeMode'] === true ? 'true' : 'false';
+            }
+        }
+
+        return $safeMode;
     }
 }

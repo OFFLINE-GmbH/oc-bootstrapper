@@ -68,6 +68,7 @@ app:
 cms:
     theme: name (user@remote.git)
     edgeUpdates: false
+    enableSafeMode: false
 
 database:
     connection: mysql
