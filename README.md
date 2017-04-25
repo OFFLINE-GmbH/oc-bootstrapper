@@ -86,10 +86,10 @@ git:
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
-    - Adrenth.Redirect
     - Indikator.Backend
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
+    - OFFLINE.Indirect (https://github.com/OFFLINE-GmbH/oc-indirect-plugin.git)
     # - Vendor.Private (user@remote.git)
     # - Vendor.PrivateCustomBranch (user@remote.git#branch)
 
