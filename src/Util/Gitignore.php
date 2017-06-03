@@ -34,6 +34,7 @@ class Gitignore
     public function hasLine($line)
     {
         foreach ($this->contents as $entry) {
+            $entry = str_replace("\n", '', $entry);
             if (strtolower($line) === strtolower($entry)) {
                 return true;
             }
@@ -49,7 +50,7 @@ class Gitignore
 
     public function addPlugin($vendor, $plugin)
     {
-        $header = sprintf("# %s.%s", $vendor, $plugin);
+        $header = $this->buildHeader($vendor, $plugin);
         if ($this->hasLine($header)) {
             return;
         }
@@ -59,6 +60,18 @@ class Gitignore
         $this->add('!plugins/' . $vendor);
         $this->add('!plugins/' . $vendor . '/' . $plugin);
         $this->add('!plugins/' . $vendor . '/' . $plugin . '/**/*');
+    }
+
+    public function hasPluginHeader($vendor, $plugin)
+    {
+        $header = $this->buildHeader($vendor, $plugin);
+
+        return $this->hasLine($header);
+    }
+
+    protected function buildHeader($vendor, $plugin)
+    {
+        return sprintf("# %s.%s", $vendor, $plugin);
     }
 
 

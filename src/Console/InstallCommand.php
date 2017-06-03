@@ -130,7 +130,7 @@ class InstallCommand extends Command
         }
 
         $output->writeln('<info>Migrating plugin tables...</info>');
-        $this->runProcess('php artisan october:up', 'Migrations failed!');
+        $this->runProcess('php artisan october:up', 'Plugin migrations failed!');
 
         $output->writeln('<info>Setting up deployments...</info>');
         try {
