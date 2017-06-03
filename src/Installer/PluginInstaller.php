@@ -4,7 +4,6 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use GitElephant\Repository;
-use OFFLINE\Bootstrapper\October\Util\Gitignore;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
@@ -17,8 +16,6 @@ class PluginInstaller extends BaseInstaller
 {
     /**
      * Install a plugin via git or artisan.
-     *
-     * @param Gitignore $gitignore
      *
      * @return bool
      */
@@ -33,8 +30,8 @@ class PluginInstaller extends BaseInstaller
             return false;
         }
 
-        $isBare     = (bool)$this->config->git['bareRepo'];
-        $exceptions = [];
+        $isBare         = (bool)$this->config->git['bareRepo'];
+        $excludePlugins = (bool)$this->config->git['excludePlugins'];
 
         foreach ($config as $plugin) {
 
@@ -50,15 +47,17 @@ class PluginInstaller extends BaseInstaller
             $this->mkdir($pluginDir);
 
             if ( ! $this->isEmpty($pluginDir)) {
-                $this->write('<comment>   -> ' . sprintf('Plugin "%s" already installed. Skipping.', $plugin) . '</comment>');
-                continue;
+
+                if ($this->handleExistingPlugin($excludePlugins, $remote, $vendor, $plugin, $pluginDir, $isBare) === false) {
+                    continue;
+                }
             }
 
             if ($remote === false) {
                 $this->installViaArtisan($vendor, $plugin);
                 continue;
             }
-            
+
             $repo = Repository::open($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);
@@ -71,14 +70,42 @@ class PluginInstaller extends BaseInstaller
                 continue;
             }
 
-            (new Process("php artisan plugin:refresh {$vendor}.{$plugin}"))->run();
+            if ($excludePlugins === false) {
+                (new Process("php artisan plugin:refresh {$vendor}.{$plugin}"))->run();
 
-            if ($isBare) {
-                $this->gitignore->addPlugin($vendor, $plugin);
+                if ($isBare) {
+                    $this->gitignore->addPlugin($vendor, $plugin);
+                }
             }
 
             $this->cleanup($pluginDir);
         }
+
+        return true;
+    }
+
+    protected function handleExistingPlugin($excludePlugins, $remote, $vendor, $plugin, $pluginDir, $isBare)
+    {
+        if ($excludePlugins === false || $remote === false || $isBare === false) {
+            $this->write('<comment>   -> ' . sprintf('Plugin "%s.%s" already installed. Skipping.',
+                    $vendor, $plugin) . '</comment>');
+
+            return false;
+        }
+
+        // Remove any existing local version of the private plugin so it can be checked out via git again
+        if ($this->gitignore->hasPluginHeader($vendor, $plugin)) {
+            $this->write('<comment>   -> ' . sprintf('Plugin "%s.%s" found in .gitignore. Skipping redownload of newest version ...',
+                    $vendor, $plugin) . '</comment>');
+
+            return false;
+        }
+
+        $this->write('<comment>   -> ' . sprintf('Removing "%s" to redownload the newest version ...',
+                $pluginDir) . '</comment>');
+
+        $this->rmdir($pluginDir);
+        $this->mkdir($pluginDir);
 
         return true;
     }
