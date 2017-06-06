@@ -28,8 +28,9 @@ The following steps will be taken care of:
 
 * Ubuntu 15.10
 * Ubuntu 16.04
+* OSX 10.11 (El Capitain)
 
-Should work on OS X. Will probably not work on Windows.
+Will probably not work on Windows.
 
 
 ## Installation
