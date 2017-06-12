@@ -28,8 +28,9 @@ The following steps will be taken care of:
 
 * Ubuntu 15.10
 * Ubuntu 16.04
+* OSX 10.11 (El Capitain)
 
-Should work on OS X. Will probably not work on Windows.
+Will probably not work on Windows.
 
 
 ## Installation
@@ -88,10 +89,10 @@ git:
 plugins:
     - Rainlab.Pages
     - Rainlab.Builder
-    - Adrenth.Redirect
     - Indikator.Backend
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
+    - OFFLINE.Indirect (https://github.com/OFFLINE-GmbH/oc-indirect-plugin.git)
     # - Vendor.Private (user@remote.git)
     # - Vendor.PrivateCustomBranch (user@remote.git#branch)
 
