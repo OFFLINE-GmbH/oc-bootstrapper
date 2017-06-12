@@ -30,8 +30,13 @@ class PluginInstaller extends BaseInstaller
             return false;
         }
 
-        $isBare         = (bool)$this->config->git['bareRepo'];
-        $excludePlugins = (bool)$this->config->git['excludePlugins'];
+        $isBare = isset($this->config->git['bareRepo'])
+            ? (bool)$this->config->git['bareRepo']
+            : false;
+        
+        $excludePlugins = isset($this->config->git['excludePlugins'])
+            ? (bool)$this->config->git['excludePlugins']
+            : false;
 
         foreach ($config as $plugin) {
 
@@ -48,7 +53,9 @@ class PluginInstaller extends BaseInstaller
 
             if ( ! $this->isEmpty($pluginDir)) {
 
-                if ($this->handleExistingPlugin($excludePlugins, $remote, $vendor, $plugin, $pluginDir, $isBare) === false) {
+                if ($this->handleExistingPlugin($excludePlugins, $remote, $vendor, $plugin, $pluginDir,
+                        $isBare) === false
+                ) {
                     continue;
                 }
             }
