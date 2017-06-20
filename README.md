@@ -28,7 +28,7 @@ The following steps will be taken care of:
 
 * Ubuntu 15.10
 * Ubuntu 16.04
-* OSX 10.11 (El Capitain)
+* OSX 10.11 (El Capitan)
 
 Will probably not work on Windows.
 
