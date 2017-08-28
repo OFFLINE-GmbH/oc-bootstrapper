@@ -55,6 +55,21 @@ class Composer
     }
 
     /**
+     * Composer update --lock
+     *
+     * @return void
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     */
+    public function updateLock()
+    {
+        (new Process($this->composer . ' update --no-scripts --no-interaction --prefer-dist --lock'))
+            ->setTimeout(3600)
+            ->run();
+    }
+
+    /**
      * Composer require
      *
      * @return void
