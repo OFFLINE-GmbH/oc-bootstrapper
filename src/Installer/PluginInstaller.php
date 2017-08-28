@@ -4,6 +4,7 @@ namespace OFFLINE\Bootstrapper\October\Installer;
 
 
 use GitElephant\Repository;
+use OFFLINE\Bootstrapper\October\Util\Composer;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
@@ -18,6 +19,9 @@ class PluginInstaller extends BaseInstaller
      * Install a plugin via git or artisan.
      *
      * @return bool
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function install()
     {
@@ -30,10 +34,11 @@ class PluginInstaller extends BaseInstaller
             return false;
         }
 
-        $isBare = isset($this->config->git['bareRepo'])
+        $privatePluginInstalled = false;
+        $isBare                 = isset($this->config->git['bareRepo'])
             ? (bool)$this->config->git['bareRepo']
             : false;
-        
+
         $excludePlugins = isset($this->config->git['excludePlugins'])
             ? (bool)$this->config->git['excludePlugins']
             : false;
@@ -86,6 +91,12 @@ class PluginInstaller extends BaseInstaller
             }
 
             $this->cleanup($pluginDir);
+            $privatePluginInstalled = true;
+        }
+
+        if ($privatePluginInstalled) {
+            $this->write('<info>Installing dependencies of private plugins...</info>');
+            (new Composer())->updateLock();
         }
 
         return true;
