@@ -54,7 +54,7 @@ class OctoberCms
      */
     protected function fetchZip()
     {
-        $response = (new Client)->get('https://github.com/octobercms/october/archive/master.zip');
+        $response = (new Client)->get('https://github.com/octobercms/october/archive/v1.0.419.zip');
         file_put_contents($this->zipFile, $response->getBody());
 
         return $this;
