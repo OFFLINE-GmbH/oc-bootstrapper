@@ -70,7 +70,7 @@ class Composer
     }
 
     /**
-     * Composer require
+     * Composer require (if not already there)
      *
      * @return void
      * @throws \Symfony\Component\Process\Exception\LogicException
@@ -88,6 +88,24 @@ class Composer
         $package = escapeshellarg($package);
 
         (new Process($this->composer . ' require ' . $package . ' --no-interaction'))
+            ->setTimeout(3600)
+            ->run();
+    }
+
+    /**
+     * Composer require <package> <version>
+     *
+     * @return void
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     */
+    public function requireVersion($package, $version)
+    {
+        $package = escapeshellarg($package);
+        $version = escapeshellarg($version);
+
+        (new Process($this->composer . ' require ' . $package . ' ' . $version . ' --no-interaction'))
             ->setTimeout(3600)
             ->run();
     }
