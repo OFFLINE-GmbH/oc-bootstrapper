@@ -102,7 +102,7 @@ class OctoberCms
         @unlink($this->zipFile);
 
         $directory = getcwd();
-        $source    = $directory . DS . 'october-master';
+        $source    = $directory . DS . 'october-1.0.419';
 
         (new Process(sprintf('mv %s %s', $source . '/*', $directory)))->run();
         (new Process(sprintf('rm -rf %s', $source)))->run();

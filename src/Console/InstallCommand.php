@@ -103,6 +103,12 @@ class InstallCommand extends Command
             $output->writeln('<comment>' . $e->getMessage() . '</comment>');
         }
 
+        $output->writeln('<info>Fixing dependencies to build 419...</info>');
+        (new Composer())->requireVersion('october/rain', '1.0.419');
+        (new Composer())->requireVersion('october/system', '1.0.419');
+        (new Composer())->requireVersion('october/backend', '1.0.419');
+        (new Composer())->requireVersion('october/cms', '1.0.419');
+
         $output->writeln('<info>Installing composer dependencies...</info>');
         (new Composer())->install();
         (new Composer())->addDependency('offline/oc-bootstrapper');
