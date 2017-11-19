@@ -54,7 +54,7 @@ class OctoberCms
      */
     protected function fetchZip()
     {
-        $response = (new Client)->get('https://github.com/octobercms/october/archive/v1.0.419.zip');
+        $response = (new Client)->get('https://github.com/octobercms/october/archive/master.zip');
         file_put_contents($this->zipFile, $response->getBody());
 
         return $this;
@@ -102,7 +102,7 @@ class OctoberCms
         @unlink($this->zipFile);
 
         $directory = getcwd();
-        $source    = $directory . DS . 'october-1.0.419';
+        $source    = $directory . DS . 'october-master';
 
         (new Process(sprintf('mv %s %s', $source . '/*', $directory)))->run();
         (new Process(sprintf('rm -rf %s', $source)))->run();
