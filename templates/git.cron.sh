@@ -4,7 +4,7 @@ GIT=$( which git )
 
 # Commit changes from prod server back to git
 if [[ -n $(git status -s) ]]; then
-    $GIT add .
+    $GIT add --all .
     $GIT commit -m "[ci skip] Added changes from $HOSTNAME"
     $GIT push origin master
 fi
