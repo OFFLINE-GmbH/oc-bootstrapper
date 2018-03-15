@@ -92,7 +92,7 @@ class ThemeInstaller extends BaseInstaller
      */
     protected function installViaArtisan($theme)
     {
-        $exitCode = (new Process("php artisan theme:install {$theme}"))->run();
+        $exitCode = (new Process($this->php . " artisan theme:install {$theme}"))->run();
 
         if ($exitCode !== $this::EXIT_CODE_OK) {
             throw new RuntimeException(sprintf('Error while installing theme "%s" via artisan.', $theme));

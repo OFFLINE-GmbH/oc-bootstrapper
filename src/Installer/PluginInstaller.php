@@ -83,7 +83,7 @@ class PluginInstaller extends BaseInstaller
             }
 
             if ($excludePlugins === false) {
-                (new Process("php artisan plugin:refresh {$vendor}.{$plugin}"))->run();
+                (new Process($this->php . " artisan plugin:refresh {$vendor}.{$plugin}"))->run();
 
                 if ($isBare) {
                     $this->gitignore->addPlugin($vendor, $plugin);
@@ -180,7 +180,7 @@ class PluginInstaller extends BaseInstaller
      */
     protected function installViaArtisan($vendor, $plugin)
     {
-        $exitCode = (new Process("php artisan plugin:install {$vendor}.{$plugin}"))->run();
+        $exitCode = (new Process($this->php . " artisan plugin:install {$vendor}.{$plugin}"))->run();
 
         if ($exitCode !== $this::EXIT_CODE_OK) {
             throw new RuntimeException(

@@ -19,7 +19,9 @@ trait RunsProcess
      */
     protected function runProcess($command, $errorMessage)
     {
-        $exitCode = (new Process($command))->run();
+
+        $process = (new Process($command));
+        $exitCode = $process->run();
 
         return $this->checkProcessResult($exitCode, $errorMessage);
     }
