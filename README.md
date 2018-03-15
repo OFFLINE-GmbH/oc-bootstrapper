@@ -115,6 +115,24 @@ If no repo is defined the plugins are loaded from the October Marketplace.
 
 When you are done editing your configuration file, simply run `october install` to install October. 
 
+```
+october install 
+```
+
+Use the `--help` flag to see all available options.
+
+```
+october install --help 
+```
+ 
+#### Use a custom php binary
+
+Via the `--php` flag you can specify a custom php binary to be used for the installation commands:
+
+```
+october install --php=/usr/local/bin/php72
+```
+
 #### Install additional plugins
 
 If at any point in time you need to install additional plugins, simply add them to your `october.yaml` and rerun `october install`. Missing plugins will be installed.
