@@ -22,6 +22,10 @@ abstract class BaseInstaller
      * @var OutputInterface
      */
     protected $output;
+    /**
+     * @var string
+     */
+    protected $php;
 
     public abstract function install();
 
@@ -37,11 +41,12 @@ abstract class BaseInstaller
      * @param Gitignore       $gitignore
      * @param OutputInterface $output
      */
-    public function __construct(Config $config, Gitignore $gitignore, OutputInterface $output)
+    public function __construct(Config $config, Gitignore $gitignore, OutputInterface $output, $php)
     {
         $this->config    = $config;
         $this->gitignore = $gitignore;
         $this->output    = $output;
+        $this->php       = $php;
     }
 
     /**
@@ -101,7 +106,8 @@ abstract class BaseInstaller
         return rmdir($dir);
     }
 
-    protected function write($line) {
+    protected function write($line)
+    {
         $this->output->writeln($line);
     }
 }

@@ -27,6 +27,10 @@ class Setup
      * @var OutputInterface
      */
     protected $output;
+    /**
+     * @var string
+     */
+    protected $php;
 
     /**
      * Setup constructor.
@@ -34,11 +38,12 @@ class Setup
      * @param Config          $config
      * @param OutputInterface $output
      */
-    public function __construct(Config $config, OutputInterface $output)
+    public function __construct(Config $config, OutputInterface $output, $php)
     {
         $this->config = $config;
         $this->output = $output;
         $this->writer = new Writer();
+        $this->php    = $php;
     }
 
     /**
@@ -69,7 +74,7 @@ class Setup
         // Remove to be able to run october:env
         $this->writer->removeCurrentEnv();
 
-        $this->runProcess('php artisan october:env', 'Failed to create env config!');
+        $this->runProcess($this->php . ' artisan october:env', 'Failed to create env config!');
 
         $lines = [
             'APP_DEBUG'       => (bool)$this->config->app['debug'] ? 'true' : 'false',
@@ -205,7 +210,7 @@ class Setup
     /**
      * Since the enableSafeMode property can be null, true or false
      * we need to be careful when parsing it to a string.
-     * 
+     *
      * @return string
      */
     protected function getSafeMode()
