@@ -24,13 +24,13 @@ git:
                             # Manual changes to these plugins will be overwritten.
 
 plugins:
+    - Adrenth.Redirect
     - Rainlab.Pages
     - Rainlab.Builder
     - Indikator.Backend
     - Inetis.Dump
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
-    - OFFLINE.Indirect (https://github.com/OFFLINE-GmbH/oc-indirect-plugin.git)
     # - Vendor.Private (user@remote.git)
 
 mail:
