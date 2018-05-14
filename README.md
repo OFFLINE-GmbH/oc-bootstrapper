@@ -83,7 +83,7 @@ git:
     
     bareRepo: true          # Exclude everything except themes and custom plugins in git  
     excludePlugins: false   # Even exclude plugins from your repo. Private plugins will be
-                            # checkout out again during each "install" run. Be careful!
+                            # checked out again during each "install" run. Be careful!
                             # Manual changes to these plugins will be overwritten.        
 
 plugins:
