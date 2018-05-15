@@ -90,7 +90,12 @@ class Writer
      */
     public function createEnvExample()
     {
-        copy($this->env, $this->env . '.example');
+        $file = $this->env . '.example';
+
+        copy($this->env, $file);
+
+        $this->replaceLine('DB_USERNAME', 'DB_USERNAME=', $file);
+        $this->replaceLine('DB_PASSWORD', 'DB_PASSWORD=', $file);
 
         return $this;
     }

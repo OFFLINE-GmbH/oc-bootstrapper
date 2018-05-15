@@ -83,7 +83,7 @@ git:
     
     bareRepo: true          # Exclude everything except themes and custom plugins in git  
     excludePlugins: false   # Even exclude plugins from your repo. Private plugins will be
-                            # checkout out again during each "install" run. Be careful!
+                            # checked out again during each "install" run. Be careful!
                             # Manual changes to these plugins will be overwritten.        
 
 plugins:
@@ -205,9 +205,9 @@ to your git repo automatically.
 ### File templates
 
 You can overwrite all default file templates by creating a folder called `october` in your global composer directory.
-Usually it is located under `~/.composer/`.
+Usually it is located under `~/.config/composer`.
 
-Place the files you want to use as defaults in `~/.composer/october`. All files from the `templates` directory can be overwritten.
+Place the files you want to use as defaults in `~/.config/composer/october`. All files from the `templates` directory can be overwritten.
 
 ## ToDo
 
