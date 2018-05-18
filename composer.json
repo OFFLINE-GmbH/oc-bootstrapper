@@ -15,7 +15,7 @@
   },
   "require": {
     "guzzlehttp/guzzle": "~6.0",
-    "cypresslab/gitelephant": "~1.1",
+    "cypresslab/gitelephant": "~2.0",
     "symfony/console": "~2.7|~3.0",
     "symfony/process": "~2.7|~3.0",
     "symfony/filesystem": "~2.7|~3.0",
