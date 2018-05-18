@@ -4,32 +4,32 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc14b6e4bd6086cd9c0d5467ab4ba69c",
+    "content-hash": "a2d55372671890b250ef1d4a0c8235a1",
     "packages": [
         {
             "name": "cypresslab/gitelephant",
-            "version": "1.1.2",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matteosister/GitElephant.git",
-                "reference": "aa4bac748447a89fb72008a795e0ed67566fca73"
+                "reference": "f9cf0d963f34f76486059d6e4f92c4bd9e5cf052"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matteosister/GitElephant/zipball/aa4bac748447a89fb72008a795e0ed67566fca73",
-                "reference": "aa4bac748447a89fb72008a795e0ed67566fca73",
+                "url": "https://api.github.com/repos/matteosister/GitElephant/zipball/f9cf0d963f34f76486059d6e4f92c4bd9e5cf052",
+                "reference": "f9cf0d963f34f76486059d6e4f92c4bd9e5cf052",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
+                "php": ">=7.0.0",
                 "phpcollection/phpcollection": "~0.4",
-                "symfony/filesystem": "~2.0|~3.0",
-                "symfony/finder": "~2.0|~3.0",
-                "symfony/process": "~2.0|~3.0"
+                "symfony/filesystem": "~2.0|~3.0|~4.0",
+                "symfony/finder": "~2.0|~3.0|~4.0",
+                "symfony/process": "~2.0|~3.0|~4.0"
             },
             "require-dev": {
                 "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "~6.0"
             },
             "type": "library",
             "autoload": {
@@ -52,7 +52,7 @@
             "keywords": [
                 "git"
             ],
-            "time": "2017-06-12T11:48:39+00:00"
+            "time": "2018-04-30T15:14:11+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
