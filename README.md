@@ -207,6 +207,21 @@ Usually it is located under `~/.config/composer`.
 
 Place the files you want to use as defaults in `~/.config/composer/october`. All files from the `templates` directory can be overwritten.
 
+#### File templates from a git repository
+
+If your templates folder is a git repository `oc-bootstrapper` will pull the latest changes for the repo every time 
+you run `october init`.
+
+This is a great feature if you want to share the template files with your team via a central 
+git repository. Just make sure you are able to fetch the latest changes via `git pull` and you're all set!
+
+```bash
+cd ~/.config/composer/october
+git clone your-central-templates-repo.git .
+git branch --set-upstream-to=origin/master master
+git pull # Make sure this works without any user interaction
+```
+
 ## ToDo
 
 - [ ] Update command to update private plugins
