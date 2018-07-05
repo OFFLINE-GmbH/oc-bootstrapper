@@ -2,7 +2,6 @@
 
 namespace OFFLINE\Bootstrapper\October\Util;
 
-use GitElephant\Repository;
 use RuntimeException;
 
 trait UsesTemplate
@@ -33,7 +32,7 @@ trait UsesTemplate
             return;
         }
 
-        $repo = Repository::open($overridePath);
+        $repo = Git::repo($overridePath);
         try {
             $repo->pull();
         } catch (\Throwable $e) {

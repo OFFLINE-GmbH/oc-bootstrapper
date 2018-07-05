@@ -3,7 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Installer;
 
 
-use GitElephant\Repository;
+use OFFLINE\Bootstrapper\October\Util\Git;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -43,10 +43,11 @@ class ThemeInstaller extends BaseInstaller
 
         if ( ! $this->isEmpty($themeDir)) {
             $this->write(sprintf('<comment>-> Theme "%s" is already installed. Skipping.</comment>', $theme));
+
             return;
         }
 
-        $repo = Repository::open($themeDir);
+        $repo = Git::repo($themeDir);
         try {
             $repo->cloneFrom($remote, $themeDir);
         } catch (RuntimeException $e) {
