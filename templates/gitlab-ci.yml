@@ -1,6 +1,10 @@
 deploy:
+    image: composer:latest
     only:
         - master
     script:
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIVATE_KEY" > /tmp/id_rsa && chmod 400 /tmp/id_rsa && ssh-add /tmp/id_rsa && mkdir -p ~/.ssh
+        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
         - composer global require --prefer-dist laravel/envoy=~1.0 --no-interaction --prefer-dist --quiet
-        - envoy run deploy
+        - /tmp/vendor/bin/envoy run deploy

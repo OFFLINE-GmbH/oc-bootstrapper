@@ -21,7 +21,7 @@ The following steps will be taken care of:
 
 ## Dependencies
 
-* Zip PHP extension (`sudo apt-get install php7.0-zip`) 
+* Zip PHP extension (`sudo apt-get install php-zip`) 
 * Composer (via global binary or `composer.phar` in your working directory) 
 
 ## Tested on
@@ -30,7 +30,7 @@ The following steps will be taken care of:
 * Ubuntu 16.04
 * OSX 10.11 (El Capitan)
 
-Will probably not work on Windows.
+Works on Windows via Ubuntu Bash or Git Bash.
 
 
 ## Installation
@@ -188,11 +188,9 @@ If you use the provided GitLab deployment via Envoy make sure to simply uncommen
 
 If you use the gitlab deployment option the `.gitlab-ci.yml` and `Envoy.blade.php` files are created for you.
 
-Change the variables inside the `Envoy.blade.php` to fit your needs. 
+Change the variables inside the `Envoy.blade.php` to fit your needs. You have to create a Pipeline Variable in GitLab called `SSH_PRIVATE_KEY` that contains your private key. Add your public key to the target server.
 
-If you push to your GitLab server and CI builds are enabled, the ssh tasks inside `Envoy.blade.php` are executed. Make sure that your GitLab CI Runner user can access your target server via `ssh user@targetserver`. You'll need to copy your ssh public key to the target server and enable password-less logins via ssh.
-
-For more information on how to use ssh keys during a CI build see [http://doc.gitlab.com/ce/ci/ssh_keys/README.html](http://doc.gitlab.com/ce/ci/ssh_keys/README.html)
+If you push to your GitLab server and CI builds are enabled, your private key is added to the `ssh-agent` inside the Docker container and the tasks from `Envoy.blade.php` will be executed on your target server. 
 
 ##### Cronjob to commit changes from prod into git
 
