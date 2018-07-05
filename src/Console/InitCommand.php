@@ -49,6 +49,9 @@ class InitCommand extends Command
 
         $this->createWorkingDirectory($dir);
 
+        $output->writeln('<info>Updating template files...</info>');
+        $this->updateTemplateFiles();
+
         $template = $this->getTemplate('october.yaml');
         $target   = $dir . DS . 'october.yaml';
 
