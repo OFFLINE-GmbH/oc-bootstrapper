@@ -3,8 +3,8 @@
 namespace OFFLINE\Bootstrapper\October\Installer;
 
 
-use GitElephant\Repository;
 use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\Git;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
@@ -70,7 +70,7 @@ class PluginInstaller extends BaseInstaller
                 continue;
             }
 
-            $repo = Repository::open($pluginDir);
+            $repo = Git::repo($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);
                 if ($branch !== false) {

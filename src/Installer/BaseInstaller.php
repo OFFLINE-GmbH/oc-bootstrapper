@@ -7,6 +7,7 @@ use OFFLINE\Bootstrapper\October\Config\Config;
 use OFFLINE\Bootstrapper\October\Util\Gitignore;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 abstract class BaseInstaller
 {
@@ -89,7 +90,7 @@ abstract class BaseInstaller
     }
 
     /**
-     * Removes a directory recursive.
+     * Removes a directory recursively.
      *
      * @param $dir
      *
@@ -100,10 +101,34 @@ abstract class BaseInstaller
         $entries = array_diff(scandir($dir), ['.', '..']);
         foreach ($entries as $entry) {
             $path = $dir . DS . $entry;
-            is_dir($path) ? $this->rmdir($path) : unlink($path);
+            is_dir($path) ? $this->rmdir($path) : $this->unlink($path);
         }
 
         return rmdir($dir);
+    }
+
+    /**
+     * Delete a file. Fallback to OS native rm command if the file to be deleted is write protected.
+     *
+     * @param string $file
+     */
+    public function unlink($file)
+    {
+        if (is_writable($file)) {
+            unlink($file);
+        } else {
+            // Just to be sure that we don't delete "too much" by accident...
+            if (\in_array($file, ['*', '**', '.', '..', '/', '/*'])) {
+                return;
+            }
+
+            // If there are write-protected files present (primarily on Windows) we can use
+            // the force mode of rm to remove it. PHP itself won't delete write-protected files.
+            $command = stripos(PHP_OS, 'WIN') === 0 ? 'rm /f' : 'rm -f';
+            $file    = escapeshellarg($file);
+
+            (new Process($command . ' ' . $file))->setTimeout(60)->run();
+        }
     }
 
     protected function write($line)
