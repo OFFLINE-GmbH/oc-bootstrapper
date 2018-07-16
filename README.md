@@ -49,7 +49,7 @@ October CMS Bootstrapper version 0.2.0
 An official Docker image that bundles `oc-bootstrapper`, `composer` and `Envoy` is available on [hub.docker.com](https://hub.docker.com/r/offlinegmbh/oc-bootstrapper/) as `offlinegmbh/oc-bootstrapper`.
 
 ```bash
-docker exec offlinegmbh/oc-bootstrapper -v
+docker run offlinegmbh/oc-bootstrapper -v
 ```
 
 ## Usage
