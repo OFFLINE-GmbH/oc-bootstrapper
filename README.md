@@ -42,6 +42,7 @@ You can now run `october` from your command line.
 ```bash
 $ october
 October CMS Bootstrapper version 0.2.0
+```
 
 ### Docker image
 
