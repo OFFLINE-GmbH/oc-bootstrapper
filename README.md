@@ -42,6 +42,16 @@ You can now run `october` from your command line.
 ```bash
 $ october
 October CMS Bootstrapper version 0.2.0
+
+### Docker image
+
+An official Docker image that bundles `oc-bootstrapper`, `composer` and `Envoy` is available on [hub.docker.com](https://hub.docker.com/r/offlinegmbh/oc-bootstrapper/) as `offlinegmbh/oc-bootstrapper`.
+
+```
+docker exec offlinegmbh/oc-bootstrapper -v
+```
+
+
 ```
 
 ## Usage
