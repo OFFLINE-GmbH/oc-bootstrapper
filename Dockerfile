@@ -14,6 +14,6 @@ RUN ln -s /tmp/vendor/bin/envoy /usr/bin/envoy
 
 WORKDIR /build
 
-CMD ["/tmp/bootstrapper/october"]
+ENTRYPOINT ["/tmp/bootstrapper/october"]
 
 
