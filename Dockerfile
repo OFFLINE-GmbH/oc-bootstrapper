@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 
+RUN docker-php-ext-install pdo_sqlite
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install curl
 RUN docker-php-ext-install xml
