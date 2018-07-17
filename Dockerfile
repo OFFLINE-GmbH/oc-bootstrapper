@@ -1,5 +1,20 @@
 FROM composer:latest
 
+RUN apk add --no-cache \
+                curl \
+                curl-dev \
+        libcurl \
+        libssl1.0 \
+        libxml2-dev     \
+    && rm -rf /var/cache/apk/*
+
+
+RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install curl
+RUN docker-php-ext-install xml
+RUN docker-php-ext-install zip
+RUN docker-php-ext-install posix
+
 RUN mkdir /tmp/bootstrapper /build
 
 RUN composer global require --prefer-dist laravel/envoy --no-interaction
