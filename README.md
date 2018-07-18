@@ -213,9 +213,11 @@ to your git repo automatically.
 ### File templates
 
 You can overwrite all default file templates by creating a folder called `october` in your global composer directory.
-Usually it is located under `~/.config/composer`.
+Usually it is located under `~/.config/composer`. 
 
 Place the files you want to use as defaults in `~/.config/composer/october`. All files from the `templates` directory can be overwritten.
+
+On Windows you can store your files in `%USERPROFILE%/AppData/Roaming/Composer/october/`
 
 #### File templates from a git repository
 
