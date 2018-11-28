@@ -24,7 +24,7 @@ git:
                             # Manual changes to these plugins will be overwritten.
 
 plugins:
-    - Adrenth.Redirect
+    - Vdlp.Redirect
     - Rainlab.Pages
     - Rainlab.Builder
     - Indikator.Backend
