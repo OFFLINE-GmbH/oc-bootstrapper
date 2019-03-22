@@ -3,6 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Util;
 
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 
 /**
  * Trait with directory helpers

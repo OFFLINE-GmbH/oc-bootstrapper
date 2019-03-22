@@ -2,6 +2,8 @@
 
 namespace OFFLINE\Bootstrapper\October\Manager;
 
+use OFFLINE\Bootstrapper\October\Util\Git;
+
 /**
  * Plugin manager class
  */
@@ -49,7 +51,11 @@ class ThemeManager extends BaseManager
     public function getDirPath(string $themeDeclaration)
     {
         list($theme, $remote) = $this->parseDeclaration($themeDeclaration);
+
+        $theme = strtolower($theme);
+
         $themeDir = $this->pwd() . implode(DS, ['themes', $theme]);
+
         return $themeDir;
     }
 
@@ -64,7 +70,7 @@ class ThemeManager extends BaseManager
      */
     public function install(string $themeDeclaration)
     {
-        list($theme, $remote) = $this->parse($themeDeclaration);
+        list($theme, $remote) = $this->parseDeclaration($themeDeclaration);
 
         if ($remote === false) {
             return $this->installViaArtisan($theme);

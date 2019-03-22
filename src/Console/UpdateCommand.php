@@ -112,7 +112,7 @@ class UpdateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->setOutput($output);
+        $this->prepareEnv($input, $output);
 
         try {
             $this->makeConfig();
@@ -134,6 +134,7 @@ class UpdateCommand extends Command
 
         $pluginsConfigs = $this->config->plugins;
 
+        $this->write("<info>Removing private plugins</info>");
         foreach ($pluginsConfigs as $pluginConfig) {
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
 
@@ -150,16 +151,24 @@ class UpdateCommand extends Command
         }
         if ($themeConfig) {
             list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
+
+            $this->write("<info>Removing ${theme} theme</info>");
+
             if ($remote) {
                 $this->themeManager->removeDir($themeConfig);
             }
         }
 
+        $this->write("<info>Cleared private plugins and theme</info>");
+
         // 3. Run `php artisan october:update`, which updates core and marketplace plugins / themes
 
+        $this->write("<info>Running artisan october:update</info>");
         $this->artisan->call('october:update');
 
         // 4. Git clone all plugins and themes again
+
+        $this->write("<info>Reinstalling plugins:</info>");
 
         foreach ($pluginsConfigs as $pluginConfig) {
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
@@ -171,6 +180,9 @@ class UpdateCommand extends Command
 
         if ($themeConfig) {
             list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
+
+            $this->write("<info>Reinstalling ${theme} theme</info>");
+
             if ($remote) {
                 $this->themeManager->install($themeConfig);
             }
@@ -178,15 +190,32 @@ class UpdateCommand extends Command
 
         // 5. Run `php artisan october:up` to migrate all versions of plugins
 
+        $this->write("<info>Migrating all unmigrated versions</info>");
+
         $this->artisan->call('october:up');
 
         // 6. Run `composer update` to update all composer packages
 
+        $this->write("<info>Running composer update</info>");
         $this->composer->updateLock();
 
         // 7. IDEA: Optionally commit and push to git repo
 
 
         return true;
+    }
+
+    /**
+     * Prepare the environment
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    protected function prepareEnv(InputInterface $input, OutputInterface $output)
+    {
+        $this->setOutput($output);
+        $this->pluginManager->setOutput($output);
+        $this->themeManager->setOutput($output);
     }
 }

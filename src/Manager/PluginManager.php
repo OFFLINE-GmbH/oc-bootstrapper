@@ -89,7 +89,12 @@ class PluginManager extends BaseManager
     public function getDirPath(string $pluginDeclaration)
     {
         list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+
+        $vendor = strtolower($vendor);
+        $plugin = strtolower($plugin);
+
         $pluginDir = $this->pwd() . implode(DS, ['plugins', $vendor, $plugin]);
+
         return $pluginDir;
     }
 
@@ -98,9 +103,6 @@ class PluginManager extends BaseManager
         list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
 
         $this->write('<info> - ' . $vendor . '.' . $plugin . '</info>');
-
-        $vendor = strtolower($vendor);
-        $plugin = strtolower($plugin);
 
         $pluginDir = $this->createDir($pluginDeclaration);
 
