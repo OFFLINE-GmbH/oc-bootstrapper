@@ -7,6 +7,8 @@ use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
 use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\RunsProcess;
+use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
+use OFFLINE\Bootstrapper\October\Util\CliIO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -21,7 +23,7 @@ use Symfony\Component\Process\Exception\LogicException;
  */
 class UpdateCommand extends Command
 {
-    use RunsProcess;
+    use ConfigMaker, RunsProcess, CliIO;
 
     /**
      * @var Artisan
@@ -42,11 +44,6 @@ class UpdateCommand extends Command
      * @var ThemeManager
      */
     protected $themeManager;
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
 
     /**
      * @var string
@@ -115,12 +112,12 @@ class UpdateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
+        $this->setOutput($output);
 
         try {
             $this->makeConfig();
         } catch (RuntimeException $e) {
-            return $this->output->writeln($e->message);
+            return $this->write($e->message);
         }
 
         // 1. Run `october install` command, which will install all plugins and themes that are not installed yet
@@ -129,14 +126,16 @@ class UpdateCommand extends Command
             $this->setPhp($php);
         }
 
-        $this->runProcess($this->php . ' october install', 'Installation failed!');
+        $this->write("<info>Installing new plugins</info>");
+        //TODO: change before release
+        $this->runProcess($this->php . ' ../oc-bootstrapper/october install', 'Installation failed!');
 
         // 2. Remove every plugin / theme that has git repo specified in october.yaml, for `october:update` command not to try update them
 
         $pluginsConfigs = $this->config->plugins;
 
         foreach ($pluginsConfigs as $pluginConfig) {
-            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parsePluginDeclaration($pluginConfig);
+            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
 
             if (!empty($remote)) {
                 $this->pluginManager->removeDir($pluginConfig);
@@ -150,9 +149,9 @@ class UpdateCommand extends Command
             $themeConfig = false;
         }
         if ($themeConfig) {
-            list($theme, $remote) = $this->themeManager->parseThemeDeclaration($themeConfig);
+            list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
             if ($remote) {
-                $this->themeManager->removeThemeDir($themeConfig);
+                $this->themeManager->removeDir($themeConfig);
             }
         }
 
@@ -163,7 +162,7 @@ class UpdateCommand extends Command
         // 4. Git clone all plugins and themes again
 
         foreach ($pluginsConfigs as $pluginConfig) {
-            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parsePluginDeclaration($pluginConfig);
+            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
 
             if (!empty($remote)) {
                 $this->pluginManager->install($pluginConfig);
@@ -171,7 +170,7 @@ class UpdateCommand extends Command
         }
 
         if ($themeConfig) {
-            list($theme, $remote) = $this->themeManager->parseThemeDeclaration($themeConfig);
+            list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
             if ($remote) {
                 $this->themeManager->install($themeConfig);
             }

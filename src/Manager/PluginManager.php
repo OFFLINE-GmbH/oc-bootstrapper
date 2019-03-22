@@ -95,7 +95,7 @@ class PluginManager extends BaseManager
 
     public function install(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parse($pluginDeclaration);
+        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
 
         $this->write('<info> - ' . $vendor . '.' . $plugin . '</info>');
 

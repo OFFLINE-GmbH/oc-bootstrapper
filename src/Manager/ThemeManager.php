@@ -15,7 +15,7 @@ class ThemeManager extends BaseManager
      *
      * @return array array $theme[, remote]
      */
-    protected function parseDeclaration(string $theme): array
+    public function parseDeclaration(string $theme): array
     {
         preg_match("/([^ ]+)(?: ?\(([^\)]+))?/", $theme, $matches);
 

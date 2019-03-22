@@ -4,6 +4,7 @@ namespace OFFLINE\Bootstrapper\October\Manager;
 
 use OFFLINE\Bootstrapper\October\Util\Artisan;
 use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\CliIO;
 use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
 
 /**
@@ -11,7 +12,7 @@ use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
  */
 class BaseManager
 {
-    use ManageDirectory;
+    use CliIO, ManageDirectory;
 
     /**
      * @var Artisan
@@ -32,7 +33,7 @@ class BaseManager
     {
         $this->artisan = new Artisan();
 
-        $this->artisan = new Composer();
+        $this->composer = new Composer();
 
         $this->setPhp();
     }
