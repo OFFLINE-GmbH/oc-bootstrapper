@@ -127,8 +127,7 @@ class UpdateCommand extends Command
         }
 
         $this->write("<info>Installing new plugins</info>");
-        //TODO: change before release
-        $this->runProcess($this->php . ' ../oc-bootstrapper/october install', 'Installation failed!');
+        $this->runProcess($this->php . ' october install', 'Installation failed!');
 
         // 2. Remove every plugin / theme that has git repo specified in october.yaml, for `october:update` command not to try update them
 
@@ -200,7 +199,6 @@ class UpdateCommand extends Command
         $this->composer->updateLock();
 
         // 7. IDEA: Optionally commit and push to git repo
-
 
         return true;
     }
