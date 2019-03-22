@@ -5,6 +5,7 @@ namespace OFFLINE\Bootstrapper\October\Console;
 use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
+use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\RunsProcess;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -26,6 +27,11 @@ class UpdateCommand extends Command
      * @var Artisan
      */
     protected $artisan;
+
+    /**
+     * @var Composer
+     */
+    protected $composer;
 
     /**
      * @var PluginManager
@@ -55,6 +61,7 @@ class UpdateCommand extends Command
         $this->pluginManager = new PluginManager();
         $this->themeManager = new ThemeManager();
         $this->artisan = new Artisan();
+        $this->composer = new Composer();
 
         $this->setPhp();
 
@@ -176,7 +183,9 @@ class UpdateCommand extends Command
 
         // 6. Run `composer update` to update all composer packages
 
-        // 7. Optionally commit and push to git repo
+        $this->composer->updateLock();
+
+        // 7. IDEA: Optionally commit and push to git repo
 
 
         return true;

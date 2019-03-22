@@ -3,6 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Manager;
 
 use OFFLINE\Bootstrapper\October\Util\Artisan;
+use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
 
 /**
@@ -18,6 +19,11 @@ class BaseManager
     protected $artisan;
 
     /**
+     * @var Composer
+     */
+    protected $composer;
+
+    /**
      * @var string
      */
     protected $php;
@@ -25,6 +31,8 @@ class BaseManager
     public function __construct()
     {
         $this->artisan = new Artisan();
+
+        $this->artisan = new Composer();
 
         $this->setPhp();
     }
