@@ -71,6 +71,18 @@ trait ManageDirectory
     }
 
     /**
+     * Checks if a directory is empty.
+     *
+     * @param $themeDir
+     *
+     * @return bool
+     */
+    public function isEmpty($themeDir)
+    {
+        return count(glob($themeDir . '/*')) === 0;
+    }
+
+    /**
      * Returns current working directory, mimic of `pwd` console command
      * 
      * @return string current path

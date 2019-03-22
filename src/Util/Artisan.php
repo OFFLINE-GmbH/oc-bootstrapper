@@ -31,14 +31,10 @@ class Artisan
 
     public function call(string $command)
     {
-        $exitCode = (new Process($this->php . " artisan plugin:install {$vendor}.{$plugin}"))->run();
+        $exitCode = (new Process($this->php . " artisan " . $command))->run();
 
         if ($exitCode !== $this::EXIT_CODE_OK) {
-            throw new RuntimeException(
-                sprintf('Error while installing plugin %s via artisan. Is your database set up correctly?',
-                    $vendor . '.' . $plugin
-                )
-            );
+            throw new RuntimeException("Error running \"{$this->php} artisan {$command}\" command");
         }
     }
 }

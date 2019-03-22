@@ -52,11 +52,11 @@ class UpdateCommand extends Command
      */
     public function __construct($name = null)
     {
-        $this->setPhp();
-
         $this->pluginManager = new PluginManager();
         $this->themeManager = new ThemeManager();
         $this->artisan = new Artisan();
+
+        $this->setPhp();
 
         parent::__construct($name);
     }
@@ -66,7 +66,10 @@ class UpdateCommand extends Command
      */
     public function setPhp(string $php = 'php')
     {
+        //IDEA: simple observer for changing the php version
         $this->php = $php;
+        $this->artisan->setPhp($php);
+        $this->pluginManager->setPhp($php);
     }
 
     /**
@@ -116,7 +119,6 @@ class UpdateCommand extends Command
 
         if (!empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
-            $this->artisan->setPhp($php);
         }
 
         $this->runProcess($this->php . ' october install', 'Installation failed!');
@@ -149,11 +151,13 @@ class UpdateCommand extends Command
 
         // 3. Run `php artisan october:update`, which updates core and marketplace plugins / themes
 
-        $exitCode = (new Process($this->php . " artisan plugin:install {$vendor}.{$plugin}"))->run();
+        $this->artisan->call('october:update');
 
         // 4. Git clone all plugins and themes again
 
         // 5. Run `php artisan october:up` to migrate all versions of plugins
+
+        $this->artisan->call('october:up');
 
         // 6. Run `composer update` to update all composer packages
 

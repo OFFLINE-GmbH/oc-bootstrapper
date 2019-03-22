@@ -2,6 +2,9 @@
 
 namespace OFFLINE\Bootstrapper\October\Manager;
 
+use OFFLINE\Bootstrapper\October\Util\Artisan;
+use OFFLINE\Bootstrapper\October\Util\Git;
+
 /**
  * Plugin manager class
  */
@@ -16,7 +19,7 @@ class PluginManager extends BaseManager
      *
      * @return array array containing $vendor, $pluginName[, $remote[, $branch]]
      */
-    public function parsePluginDeclaration(string $pluginDeclaration): array
+    public function parseDeclaration(string $pluginDeclaration): array
     {
         preg_match("/([^\.]+)\.([^ #]+)(?: ?\(([^\#)]+)(?:#([^\)]+)?)?)?/", $pluginDeclaration, $matches);
 
@@ -43,14 +46,40 @@ class PluginManager extends BaseManager
      */
     public function createVendorDir($vendor)
     {
-        $pluginDir = $this->pwd() . implode(DS, ['plugins', $vendor]);
+        $vendor = strtolower($vendor);
+
+        $vendorDir = $this->pwd() . implode(DS, ['plugins', $vendor]);
+
+        if (is_dir($vendorDir)) {
+            return 'Dir already created';
+        }
+
+        return $this->mkdir($vendorDir);
+    }
+
+    public function createDir(string $pluginDeclaration)
+    {
+        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+
+        $vendor = strtolower($vendor);
+        $plugin = strtolower($plugin);
+
+        $pluginDir = $this->pwd() . implode(DS, ['plugins', $vendor, $plugin]);
+
+        $vendorDir = $this->createVendorDir($vendor);
+
+        $pluginDir = $vendorDir . DS . $plugin;
+
+        if (is_dir($pluginDir)) {
+            return 'Dir already created';
+        }
 
         return $this->mkdir($pluginDir);
     }
 
-    public function removePluginDir(string $pluginDeclaration)
+    public function removeDir(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parsePluginDeclaration($pluginDeclaration);
+        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
         $vendor = strtolower($vendor);
         $plugin = strtolower($plugin);
 
@@ -61,9 +90,65 @@ class PluginManager extends BaseManager
 
     public function getPluginDir(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parsePluginDeclaration($pluginDeclaration);
+        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
         $pluginDir = $this->pwd() . implode(DS, ['plugins', $vendor, $plugin]);
         return $pluginDir;
+    }
+
+    public function install(string $pluginDeclaration)
+    {
+        list($vendor, $plugin, $remote, $branch) = $this->parse($pluginDeclaration);
+
+        $this->write('<info> - ' . $vendor . '.' . $plugin . '</info>');
+
+        $vendor = strtolower($vendor);
+        $plugin = strtolower($plugin);
+
+        $pluginDir = $this->createDir($pluginDeclaration);
+
+        if (!$this->isEmpty($pluginDir)) {
+            throw new RuntimeException("<error> - Plugin directory not empty. Aborting. </error>");
+        }
+
+        if ($remote === false) {
+            return $this->installViaArtisan($pluginDeclaration);
+        }
+
+        $repo = Git::repo($pluginDir);
+        try {
+            $repo->cloneFrom($remote, $pluginDir);
+            if ($branch !== false) {
+                $this->write('<comment>   -> ' . sprintf('Checkout "%s" ...', $branch) . '</comment>');
+                $repo->checkout($branch);
+            }
+        } catch (RuntimeException $e) {
+            throw new RuntimeException('<error> - ' . 'Error while cloning plugin repo: ' . $e->getMessage() . '</error>');
+        }
+    }
+
+    /**
+     * Installs a plugin via artisan command.
+     *
+     * @param string plugin declaration string
+     *
+     * @return string
+     * @throws RuntimeException
+     */
+    public function installViaArtisan(string $pluginDeclaration)
+    {
+        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+
+        try {
+            $this->artisan->call("plugin:install {$vendor}.{$plugin}");
+        } catch (RuntimeException $e) {
+            throw new RuntimeException(
+                sprintf('Error while installing plugin %s via artisan. Is your database set up correctly?',
+                    $vendor . '.' . $plugin
+                )
+            );
+        }
+
+        return "${vendor}.${plugin} installed";
     }
 
 }

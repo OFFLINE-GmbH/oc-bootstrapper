@@ -15,7 +15,7 @@ class ThemeManager extends BaseManager
      *
      * @return array array $theme[, remote]
      */
-    protected function parseThemeDeclaration(string $theme): array
+    protected function parseDeclaration(string $theme): array
     {
         preg_match("/([^ ]+)(?: ?\(([^\)]+))?/", $theme, $matches);
 
@@ -28,9 +28,9 @@ class ThemeManager extends BaseManager
         return $matches;
     }
 
-    public function removeThemeDir(string $themeDeclaration)
+    public function removeDir(string $themeDeclaration)
     {
-        list($theme, $remote) = $this->parseThemeDeclaration($themeConfig);
+        list($theme, $remote) = $this->parseDeclaration($themeConfig);
 
         $themeDir = $this->pwd() . DS . implode(DS, ['themes', $theme]);
 
