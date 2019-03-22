@@ -120,11 +120,11 @@ class UpdateCommand extends Command
             return $this->write($e->message);
         }
 
-        // 1. Run `october install` command, which will install all plugins and themes that are not installed yet
-
         if (!empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
+
+        // 1. Run `october install` command, which will install all plugins and themes that are not installed yet
 
         $this->write("<info>Installing new plugins</info>");
         $this->runProcess($this->php . ' october install', 'Installation failed!');
