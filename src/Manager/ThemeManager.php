@@ -13,13 +13,13 @@ class ThemeManager extends BaseManager
      * Parse the theme's name and remote path out of the
      * given theme declaration.
      *
-     * @param $theme theme declaration like Theme (Remote)
+     * @param $themeDeclaration theme declaration like Theme (Remote)
      *
      * @return array array $theme[, remote]
      */
-    public function parseDeclaration(string $theme): array
+    public function parseDeclaration(string $themeDeclaration): array
     {
-        preg_match("/([^ ]+)(?: ?\(([^\)]+))?/", $theme, $matches);
+        preg_match("/([^ ]+)(?: ?\(([^\)]+))?/", $themeDeclaration, $matches);
 
         array_shift($matches);
 
@@ -72,14 +72,14 @@ class ThemeManager extends BaseManager
     {
         list($theme, $remote) = $this->parseDeclaration($themeDeclaration);
 
-        if ($remote === false) {
-            return $this->installViaArtisan($theme);
-        }
-
         $themeDir = $this->createDir($themeDeclaration);
 
         if (!$this->isEmpty($themeDir)) {
             throw new RuntimeException("<error> - Theme directory not empty. Aborting. </error>");
+        }
+
+        if ($remote === false) {
+            return $this->installViaArtisan($theme);
         }
 
         $repo = Git::repo($themeDir);

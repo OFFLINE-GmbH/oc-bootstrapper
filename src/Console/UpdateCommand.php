@@ -151,9 +151,9 @@ class UpdateCommand extends Command
         if ($themeConfig) {
             list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
 
-            $this->write("<info>Removing ${theme} theme</info>");
-
             if ($remote) {
+                $this->write("<info>Removing ${theme} theme</info>");
+
                 $this->themeManager->removeDir($themeConfig);
             }
         }
@@ -180,9 +180,9 @@ class UpdateCommand extends Command
         if ($themeConfig) {
             list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
 
-            $this->write("<info>Reinstalling ${theme} theme</info>");
-
             if ($remote) {
+                $this->write("<info>Reinstalling ${theme} theme</info>");
+
                 $this->themeManager->install($themeConfig);
             }
         }
