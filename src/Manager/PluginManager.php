@@ -51,7 +51,7 @@ class PluginManager extends BaseManager
         $vendorDir = $this->pwd() . implode(DS, ['plugins', $vendor]);
 
         if (is_dir($vendorDir)) {
-            return 'Dir already created';
+            return $vendorDir;
         }
 
         return $this->mkdir($vendorDir);
@@ -64,14 +64,12 @@ class PluginManager extends BaseManager
         $vendor = strtolower($vendor);
         $plugin = strtolower($plugin);
 
-        $pluginDir = $this->pwd() . implode(DS, ['plugins', $vendor, $plugin]);
-
         $vendorDir = $this->createVendorDir($vendor);
 
-        $pluginDir = $vendorDir . DS . $plugin;
+        $pluginDir = $this->getDirPath($pluginDeclaration);
 
         if (is_dir($pluginDir)) {
-            return 'Dir already created';
+            return $pluginDir;
         }
 
         return $this->mkdir($pluginDir);
@@ -88,7 +86,7 @@ class PluginManager extends BaseManager
         $this->rmdir($pluginDir);
     }
 
-    public function getPluginDir(string $pluginDeclaration)
+    public function getDirPath(string $pluginDeclaration)
     {
         list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
         $pluginDir = $this->pwd() . implode(DS, ['plugins', $vendor, $plugin]);
@@ -124,6 +122,8 @@ class PluginManager extends BaseManager
         } catch (RuntimeException $e) {
             throw new RuntimeException('<error> - ' . 'Error while cloning plugin repo: ' . $e->getMessage() . '</error>');
         }
+
+        $this->removeGitRepo($pluginDir);
     }
 
     /**
@@ -148,7 +148,7 @@ class PluginManager extends BaseManager
             );
         }
 
-        return "${vendor}.${plugin} installed";
+        return "${vendor}.${plugin} plugin installed";
     }
 
 }

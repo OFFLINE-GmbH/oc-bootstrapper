@@ -70,6 +70,7 @@ class UpdateCommand extends Command
         $this->php = $php;
         $this->artisan->setPhp($php);
         $this->pluginManager->setPhp($php);
+        $this->themeManager->setPhp($php);
     }
 
     /**
@@ -131,7 +132,7 @@ class UpdateCommand extends Command
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parsePluginDeclaration($pluginConfig);
 
             if (!empty($remote)) {
-                $this->pluginManager->removePluginDir($pluginConfig);
+                $this->pluginManager->removeDir($pluginConfig);
             }
         }
 
@@ -142,7 +143,6 @@ class UpdateCommand extends Command
             $themeConfig = false;
         }
         if ($themeConfig) {
-            $themeConfig = $this->config->cms['theme'];
             list($theme, $remote) = $this->themeManager->parseThemeDeclaration($themeConfig);
             if ($remote) {
                 $this->themeManager->removeThemeDir($themeConfig);
@@ -154,6 +154,21 @@ class UpdateCommand extends Command
         $this->artisan->call('october:update');
 
         // 4. Git clone all plugins and themes again
+
+        foreach ($pluginsConfigs as $pluginConfig) {
+            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parsePluginDeclaration($pluginConfig);
+
+            if (!empty($remote)) {
+                $this->pluginManager->install($pluginConfig);
+            }
+        }
+
+        if ($themeConfig) {
+            list($theme, $remote) = $this->themeManager->parseThemeDeclaration($themeConfig);
+            if ($remote) {
+                $this->themeManager->install($themeConfig);
+            }
+        }
 
         // 5. Run `php artisan october:up` to migrate all versions of plugins
 
