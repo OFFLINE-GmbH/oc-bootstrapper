@@ -32,6 +32,10 @@ The following steps will be taken care of:
 
 Works on Windows via Ubuntu Bash or Git Bash.
 
+## Example project
+
+Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of oc-bootstrapper.
+
 
 ## Installation
 
