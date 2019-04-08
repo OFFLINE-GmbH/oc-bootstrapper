@@ -106,11 +106,7 @@ class UpdateCommand extends Command
     {
         $this->prepareEnv($input, $output);
 
-        try {
-            $this->makeConfig();
-        } catch (RuntimeException $e) {
-            return $this->write($e->message);
-        }
+        $this->makeConfig();
 
         if (!empty($php = $input->getOption('php'))) {
             $this->setPhp($php);

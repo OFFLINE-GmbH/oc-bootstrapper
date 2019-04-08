@@ -2,7 +2,6 @@
 
 namespace OFFLINE\Bootstrapper\October\Installer;
 
-
 use OFFLINE\Bootstrapper\October\Util\Git;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
@@ -41,7 +40,7 @@ class ThemeInstaller extends BaseInstaller
         $themeDir = getcwd() . DS . implode(DS, ['themes', $theme]);
         $this->mkdir($themeDir);
 
-        if ( ! $this->isEmpty($themeDir)) {
+        if (! $this->isEmpty($themeDir)) {
             $this->write(sprintf('<comment>-> Theme "%s" is already installed. Skipping.</comment>', $theme));
 
             return;

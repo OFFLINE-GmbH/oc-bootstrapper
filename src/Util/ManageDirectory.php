@@ -10,7 +10,75 @@ use Symfony\Component\Process\Process;
  */
 trait ManageDirectory
 {
+    /**
+     * Copy file from sourceFile to targetFile
+     *
+     * @param string $sourceFile
+     * @param string $targetFile
+     */
+    public function copy($sourceFile, $targetFile)
+    {
+        $sourceFile = $this->path($sourceFile);
+        $targetFile = $this->path($targetFile);
 
+        copy($sourceFile, $targetFile);
+
+        if (!$this->fileExists($targetFile)) {
+            throw new RuntimeException('File ' . $targetFile . ' could not be created');
+        }
+
+        return true;
+    }
+
+    /**
+     * Touch file
+     *
+     * @param string $file relative or absolute path of the file to create
+     */
+    public function touch($file)
+    {
+        return touch($this->path($file));
+    }
+
+    /**
+     * Check if file exists
+     *
+     * @param string $file relative or absolute path of the file to check existence
+     *
+     * @return bool
+     */
+    public function fileExists($file)
+    {
+        return file_exists($this->path($file));
+    }
+
+    /**
+     * Get absolute path of the file
+     *
+     * @param string $file relative or absolute path of the file
+     *
+     * @return string path of the file
+     */
+    public function path($file)
+    {
+        $relative = false;
+
+        $file = trim($file);
+
+        $windows = strpos($this->pwd(), '/', 0) === false;
+
+        if (!$windows && $file[0] !== '/') {
+            $relative = true;
+        } elseif ($windows && !preg_match('/^[^*?"<>|:]*$/', $file)) {
+            $relative = true;
+        }
+
+        if ($relative) {
+            $file = $this->pwd() . $file;
+        }
+
+        return $file;
+    }
 
     /**
      * Delete a file. Fallback to OS native rm command if the file to be deleted is write protected.
@@ -64,7 +132,7 @@ trait ManageDirectory
      */
     public function mkdir($dir)
     {
-        if ( ! @mkdir($dir) && ! is_dir($dir)) {
+        if (! @mkdir($dir) && ! is_dir($dir)) {
             throw new RuntimeException('Could not create directory: ' . $dir);
         }
 
@@ -85,7 +153,7 @@ trait ManageDirectory
 
     /**
      * Returns current working directory, mimic of `pwd` console command
-     * 
+     *
      * @return string current path
      */
     public function pwd()
