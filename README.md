@@ -146,9 +146,9 @@ october update
 The command will:
 
 1. Run `october install` command, which will install all plugins and themes that are not installed yet
-2. Remove every plugin / theme that has git repo specified in october.yaml, for `october:update` command not to try update them
-3. Run `php artisan october:update`, which updates core and marketplace plugins / themes
-4. Git clone all plugins and themes again
+2. Remove every plugin that has git repo specified in october.yaml, for `october:update` command not to try update them
+3. Run `php artisan october:update`, which updates core and marketplace plugins
+4. Git clone all plugins again
 5. Run `php artisan october:up` to migrate all versions of plugins
 6. Run `composer update` to update all composer packages
  

@@ -3,7 +3,6 @@
 namespace OFFLINE\Bootstrapper\October\Console;
 
 use OFFLINE\Bootstrapper\October\Manager\PluginManager;
-use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
 use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\RunsProcess;
@@ -41,11 +40,6 @@ class UpdateCommand extends Command
     protected $pluginManager;
 
     /**
-     * @var ThemeManager
-     */
-    protected $themeManager;
-
-    /**
      * @var string
      */
     protected $php;
@@ -56,7 +50,6 @@ class UpdateCommand extends Command
     public function __construct($name = null)
     {
         $this->pluginManager = new PluginManager();
-        $this->themeManager = new ThemeManager();
         $this->artisan = new Artisan();
         $this->composer = new Composer();
 
@@ -74,7 +67,6 @@ class UpdateCommand extends Command
         $this->php = $php;
         $this->artisan->setPhp($php);
         $this->pluginManager->setPhp($php);
-        $this->themeManager->setPhp($php);
     }
 
     /**
@@ -129,7 +121,7 @@ class UpdateCommand extends Command
         $this->write("<info>Installing new plugins</info>");
         $this->runProcess($this->php . ' october install', 'Installation failed!');
 
-        // 2. Remove every plugin / theme that has git repo specified in october.yaml, for `october:update` command not to try update them
+        // 2. Remove every plugin that has git repo specified in october.yaml, for `october:update` command not to try update them
 
         $pluginsConfigs = $this->config->plugins;
 
@@ -142,30 +134,14 @@ class UpdateCommand extends Command
             }
         }
 
-        try {
-            $themeConfig = $this->config->cms['theme'];
-        } catch (\RuntimeException $e) {
-            // No theme set
-            $themeConfig = false;
-        }
-        if ($themeConfig) {
-            list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
+        $this->write("<info>Cleared private plugins</info>");
 
-            if ($remote) {
-                $this->write("<info>Removing ${theme} theme</info>");
-
-                $this->themeManager->removeDir($themeConfig);
-            }
-        }
-
-        $this->write("<info>Cleared private plugins and theme</info>");
-
-        // 3. Run `php artisan october:update`, which updates core and marketplace plugins / themes
+        // 3. Run `php artisan october:update`, which updates core and marketplace plugins
 
         $this->write("<info>Running artisan october:update</info>");
         $this->artisan->call('october:update');
 
-        // 4. Git clone all plugins and themes again
+        // 4. Git clone all plugins again
 
         $this->write("<info>Reinstalling plugins:</info>");
 
@@ -174,16 +150,6 @@ class UpdateCommand extends Command
 
             if (!empty($remote)) {
                 $this->pluginManager->install($pluginConfig);
-            }
-        }
-
-        if ($themeConfig) {
-            list($theme, $remote) = $this->themeManager->parseDeclaration($themeConfig);
-
-            if ($remote) {
-                $this->write("<info>Reinstalling ${theme} theme</info>");
-
-                $this->themeManager->install($themeConfig);
             }
         }
 
@@ -214,6 +180,5 @@ class UpdateCommand extends Command
     {
         $this->setOutput($output);
         $this->pluginManager->setOutput($output);
-        $this->themeManager->setOutput($output);
     }
 }
