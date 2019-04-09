@@ -1,7 +1,7 @@
 # Bootstrapper for October CMS
 
 `oc-bootstrapper` is a simple script that enables you to bootstrap an October CMS installation
-with custom plugins and custom themes. You simply describe your setup in a config file and run
+with custom plugins and custom theme. You simply describe your setup in a config file and run
 the install command.
  
  `oc-bootstrapper` enables you to install plugins and themes from your own git repo. 
@@ -32,10 +32,11 @@ The following steps will be taken care of:
 
 Works on Windows via Ubuntu Bash or Git Bash.
 
-## Example project
+## Project's repo
 
-Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of oc-bootstrapper.
+While using `oc-bootstrapper` it is a good idea to keep `october.yaml`, project's theme and project's plugins (those that are not shared among other projects) in project's repo.
 
+Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of `oc-bootstrapper`.
 
 ## Installation
 
