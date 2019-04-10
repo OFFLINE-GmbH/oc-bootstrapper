@@ -109,7 +109,7 @@ class UpdateCommand extends Command
         try {
             $this->makeConfig();
         } catch (RuntimeException $e) {
-            return $this->write($e->message);
+            return $this->write($e->getMessage());
         }
 
         if (!empty($php = $input->getOption('php'))) {
