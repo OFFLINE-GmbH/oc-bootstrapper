@@ -96,9 +96,6 @@ git:
     deployment: false
     
     bareRepo: true          # Exclude everything except themes and custom plugins in git  
-    excludePlugins: false   # Even exclude plugins from your repo. Private plugins will be
-                            # checked out again during each "install" run. Be careful!
-                            # Manual changes to these plugins will be overwritten.        
 
 plugins:
     - Rainlab.Pages
@@ -150,7 +147,7 @@ october update
 The command will:
 
 1. Run `october install` command, which will install all plugins and themes that are not installed yet
-2. Remove every plugin that has git repo specified in october.yaml, for `october:update` command not to try update them
+2. Remove every plugin that has git repo specified in october.yaml since `october:update` will not try to update them
 3. Run `php artisan october:update`, which updates core and marketplace plugins
 4. Git clone all plugins again
 5. Run `php artisan october:up` to migrate all versions of plugins
@@ -182,18 +179,6 @@ If you don't want to have the complete October source code in your repository se
   
   > If you want to deploy a bare repo please read the section `SSH deployments with bare repos` below.
   
-#### `excludePlugins`
-
-By default every private plugin will be cloned only once and is then added to your `.gitignore` file. In the end your bare repo includes your theme and all your custom and private plugins. If you wish to only include your theme and no plugin data at all you can set `excludePlugins` to true.
-
-If you run `october install` in an existing project (let's say during deployment) all private plugin directories will get remove from your local disk and are checked out via git again so you'll get the latest version. 
-
-If you don't want a plugin to be checked out on every `october install` run you can add the following line to your `.gitignore` file. If such a line is found the plugin will not be touched after the first checkout.
-
-```
-# vendor.plugin
-# offline.sitesearch 
-```
 
 #### Get up and running after `git clone`
 
