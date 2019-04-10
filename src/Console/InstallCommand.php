@@ -2,25 +2,26 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
-use OFFLINE\Bootstrapper\October\Manager\PluginManager;
-use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
+use OFFLINE\Bootstrapper\October\Util\CliIO;
 use OFFLINE\Bootstrapper\October\Config\Setup;
-use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
-use OFFLINE\Bootstrapper\October\Installer\DeploymentInstaller;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
+use Symfony\Component\Console\Command\Command;
 use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\Gitignore;
-use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
-use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
-use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
-use OFFLINE\Bootstrapper\October\Util\CliIO;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
+use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
+use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
+use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
+use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Console\Exception\RuntimeException;
+use OFFLINE\Bootstrapper\October\Deployment\DeploymentFactory;
+use OFFLINE\Bootstrapper\October\Installer\DeploymentInstaller;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * Class InstallCommand
@@ -182,10 +183,15 @@ class InstallCommand extends Command
         $this->artisan->call('october:up');
 
         $this->output->writeln('<info>Setting up deployments...</info>');
+        $deployment = false;
         try {
-            (new DeploymentInstaller($this->config, $this->gitignore, $this->output, $this->php))->install($this->force);
+            $deployment = $this->config->git['deployment'];
         } catch (\RuntimeException $e) {
-            $this->output->writeln("<error>${e}</error>");
+        }
+
+        if ($deployment) {
+            $deploymentObj = DeploymentFactory::createDeployment($deployment);
+            $deploymentObj->install($this->force);
         }
 
         $this->output->writeln('<info>Creating .gitignore...</info>');
