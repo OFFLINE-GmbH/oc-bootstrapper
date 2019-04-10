@@ -2,9 +2,11 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
+use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
 use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
 use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\Gitignore;
 use OFFLINE\Bootstrapper\October\Util\RunsProcess;
 use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
 use OFFLINE\Bootstrapper\October\Util\CliIO;
@@ -38,6 +40,11 @@ class UpdateCommand extends Command
      * @var PluginManager
      */
     protected $pluginManager;
+
+    /**
+     * @var Gitignore
+     */
+    protected $gitignore;
 
     /**
      * @var string
@@ -119,7 +126,13 @@ class UpdateCommand extends Command
         // 1. Run `october install` command, which will install all plugins and themes that are not installed yet
 
         $this->write("<info>Installing new plugins</info>");
-        $this->runProcess($this->php . ' october install', 'Installation failed!');
+        $this->gitignore = new Gitignore(getcwd() . DS . '.gitignore');
+
+        try {
+            (new PluginInstaller($this->config, $this->gitignore, $this->output, $this->php))->install();
+        } catch (\RuntimeException $e) {
+            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
+        }
 
         // 2. Remove every plugin that has git repo specified in october.yaml, for `october:update` command not to try update them
 
