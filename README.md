@@ -36,12 +36,14 @@ Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-G
 
 ## Installation
 
-```composer global require offline/oc-bootstrapper``` 
+```bash
+composer global require offline/oc-bootstrapper
+``` 
 
 You can now run `october` from your command line.
 
 ```bash
-$ october
+$ october -v
 October CMS Bootstrapper version 0.5.0
 ```
 
@@ -122,14 +124,17 @@ If no repo is defined the plugins are loaded from the October Marketplace.
 ```yaml
 # Install a plugin from the official October Marketplace
 - OFFLINE.Mall 
+
 # Install a plugin from a git repository. The plugin will be cloned
 # into your local repository and become part of it. You can change the
 # plugin and modify it to your needs. It won't be checked out again (no updates).
 - OFFLINE.Mall (https://github.com/OFFLINE-GmbH/oc-mall-plugin.git)
+
 # The ^ marks this plugin as updateable. It will be removed and checked out again
 # during each call to `october install`. Local changes will be overwritten.
 # This plugin will stay up to date with the changes of your original plugin repo.
 - ^OFFLINE.Mall (https://github.com/OFFLINE-GmbH/oc-mall-plugin.git)
+
 # Install a specific branch of a plugin. Keep it up-to-date.
 - ^OFFLINE.Mall (https://github.com/OFFLINE-GmbH/oc-mall-plugin.git#develop)
 ```
@@ -155,7 +160,8 @@ october install --help
 
 #### Install additional plugins
 
-If at any point in time you need to install additional plugins, simply add them to your `october.yaml` and rerun `october install`. Missing plugins will be installed.
+If at any point in time you need to install additional plugins, simply add them to your `october.yaml` and re-run 
+`october install`. Missing plugins will be installed.
 
   
 
@@ -180,12 +186,23 @@ The command will update all plugins, the October CMS core and all composer depen
 
 Set the `deployment` option to `false` if you don't want to setup deployments.
 
+#### Setup
+
+You can use `oc-bootstrapper` with any kind of deployment software. You need to setup the following steps:
+
+1. Connect to the target server (via SSH)
+1. Install composer and oc-bootstrapper
+1. Run `october install`
+
+You can run this "script" for each push to your repository. The `october install` command will
+only install what is missing from the target server.
+
 
 #### Example setup for GitLab CI
 
 To initialize a project with GitLab CI support set the `deployment` option in your config file to `gitlab`.
 
-This will setup a `.gitlab-ci.yml` and a `Envoy.blade.php`. 
+This will setup a [`.gitlab-ci.yml`](templates/gitlab-ci.yml) and a [`Envoy.blade.php`](templates/Envoy.blade.php). 
 
 1. Create a SSH key pair to log in to your deployment target server
 1. Create a `SSH_PRIVATE_KEY` variable in your GitLab CI settings that contains the created private key
@@ -193,7 +210,7 @@ This will setup a `.gitlab-ci.yml` and a `Envoy.blade.php`.
 1. Push to your repository. GitLab will run the example `.gitlab-ci.yml` configuration
 
 
-#### Cronjob to commit changes from prod into git
+### Cronjob to commit changes from prod into git
 
 If a deployed website is edited by a customer directly on the prod server you might want to commit
  those changes back to your git repository. 
