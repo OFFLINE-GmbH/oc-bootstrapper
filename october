@@ -11,4 +11,5 @@ if (file_exists(__DIR__.'/../../autoload.php')) {
 $app = new Symfony\Component\Console\Application('October CMS Bootstrapper', '0.4.4');
 $app->add(new \OFFLINE\Bootstrapper\October\Console\InitCommand);
 $app->add(new \OFFLINE\Bootstrapper\October\Console\InstallCommand);
+$app->add(new \OFFLINE\Bootstrapper\October\Console\UpdateCommand);
 $app->run();

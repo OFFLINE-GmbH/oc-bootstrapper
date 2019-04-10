@@ -138,6 +138,23 @@ Use the `--help` flag to see all available options.
 ```
 october install --help 
 ```
+
+### Update October CMS
+
+If you want to update the installation you can run
+
+```
+october update
+```
+
+The command will:
+
+1. Run `october install` command, which will install all plugins and themes that are not installed yet
+2. Remove every plugin that has git repo specified in october.yaml, for `october:update` command not to try update them
+3. Run `php artisan october:update`, which updates core and marketplace plugins
+4. Git clone all plugins again
+5. Run `php artisan october:up` to migrate all versions of plugins
+6. Run `composer update` to update all composer packages
  
 #### Use a custom php binary
 
@@ -237,10 +254,6 @@ git clone your-central-templates-repo.git .
 git branch --set-upstream-to=origin/master master
 git pull # Make sure this works without any user interaction
 ```
-
-## ToDo
-
-- [ ] Update command to update private plugins
 
 ## Troubleshooting
 
