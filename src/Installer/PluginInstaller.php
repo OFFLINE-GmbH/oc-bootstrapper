@@ -35,9 +35,6 @@ class PluginInstaller extends BaseInstaller
         }
 
         $privatePluginInstalled = false;
-        $isBare                 = isset($this->config->git['bareRepo'])
-            ? (bool)$this->config->git['bareRepo']
-            : false;
 
         foreach ($config as $plugin) {
 
@@ -52,11 +49,9 @@ class PluginInstaller extends BaseInstaller
 
             if ( ! $this->isEmpty($pluginDir)) {
                 if ($this->handleExistingPlugin(
-                        $remote,
                         $vendor,
                         $plugin,
                         $pluginDir,
-                        $isBare,
                         $update
                     ) === false
                 ) {
@@ -83,7 +78,7 @@ class PluginInstaller extends BaseInstaller
 
             (new Process($this->php . " artisan plugin:refresh {$vendor}.{$plugin}"))->run();
 
-            if ($isBare && $update === false) {
+            if ($update === false) {
                 $this->gitignore->addPlugin($vendor, $plugin);
             }
 
@@ -99,9 +94,9 @@ class PluginInstaller extends BaseInstaller
         return true;
     }
 
-    protected function handleExistingPlugin($remote, $vendor, $plugin, $pluginDir, $isBare, $update)
+    protected function handleExistingPlugin($vendor, $plugin, $pluginDir, $update)
     {
-        if (($remote === false || $isBare === false) && $update === false) {
+        if ($update === false) {
             $this->write('<comment>   -> ' . sprintf('Plugin "%s.%s" already installed. Skipping.',
                     $vendor, $plugin) . '</comment>');
 

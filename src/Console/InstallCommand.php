@@ -211,8 +211,7 @@ class InstallCommand extends Command
             return $target;
         }
 
-        $file     = $this->config->git['bareRepo'] ? 'gitignore.bare' : 'gitignore';
-        $template = $this->getTemplate($file);
+        $template = $this->getTemplate('gitignore');
 
         copy($template, $target);
 
