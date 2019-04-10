@@ -57,8 +57,8 @@ class UpdateCommand extends Command
     public function __construct($name = null)
     {
         $this->pluginManager = new PluginManager();
-        $this->artisan = new Artisan();
-        $this->composer = new Composer();
+        $this->artisan       = new Artisan();
+        $this->composer      = new Composer();
 
         $this->setPhp();
 
@@ -79,8 +79,8 @@ class UpdateCommand extends Command
     /**
      * Configure the command options.
      *
-     * @throws InvalidArgumentException
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -99,8 +99,8 @@ class UpdateCommand extends Command
     /**
      * Execute the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      *
      * @return mixed
      * @throws \Symfony\Component\Process\Exception\RuntimeException
@@ -119,13 +119,13 @@ class UpdateCommand extends Command
             return $this->write($e->getMessage());
         }
 
-        if (!empty($php = $input->getOption('php'))) {
+        if ( ! empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
 
         // 1. Run `october install` command, which will install all plugins and themes that are not installed yet
 
-        $this->write("<info>Installing new plugins</info>");
+        $this->write('<info>Installing new plugins</info>');
         $this->gitignore = new Gitignore(getcwd() . DS . '.gitignore');
 
         try {
@@ -134,50 +134,44 @@ class UpdateCommand extends Command
             $output->writeln('<comment>' . $e->getMessage() . '</comment>');
         }
 
-        // 2. Remove every plugin that has git repo specified in october.yaml, for `october:update` command not to try update them
-
+        // 2. Remove every plugin that has git repo specified in october.yaml, since the  `october:update`
+        // will not be able to update them.
         $pluginsConfigs = $this->config->plugins;
 
-        $this->write("<info>Removing private plugins</info>");
+        $this->write('<info>Removing private plugins</info>');
         foreach ($pluginsConfigs as $pluginConfig) {
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
 
-            if (!empty($remote)) {
+            if ( ! empty($remote)) {
                 $this->pluginManager->removeDir($pluginConfig);
             }
         }
 
-        $this->write("<info>Cleared private plugins</info>");
+        $this->write('<info>Cleared private plugins</info>');
 
         // 3. Run `php artisan october:update`, which updates core and marketplace plugins
-
-        $this->write("<info>Running artisan october:update</info>");
+        $this->write('<info>Running artisan october:update</info>');
         $this->artisan->call('october:update');
 
         // 4. Git clone all plugins again
-
-        $this->write("<info>Reinstalling plugins:</info>");
+        $this->write('<info>Reinstalling plugins:</info>');
 
         foreach ($pluginsConfigs as $pluginConfig) {
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
 
-            if (!empty($remote)) {
+            if ( ! empty($remote)) {
                 $this->pluginManager->install($pluginConfig);
             }
         }
 
         // 5. Run `php artisan october:up` to migrate all versions of plugins
-
-        $this->write("<info>Migrating all unmigrated versions</info>");
+        $this->write('<info>Migrating all unmigrated versions</info>');
 
         $this->artisan->call('october:up');
 
         // 6. Run `composer update` to update all composer packages
-
-        $this->write("<info>Running composer update</info>");
+        $this->write('<info>Running composer update</info>');
         $this->composer->updateLock();
-
-        // 7. IDEA: Optionally commit and push to git repo
 
         return true;
     }
@@ -185,8 +179,9 @@ class UpdateCommand extends Command
     /**
      * Prepare the environment
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return void
      */
     protected function prepareEnv(InputInterface $input, OutputInterface $output)
