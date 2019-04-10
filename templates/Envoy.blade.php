@@ -1,4 +1,3 @@
-
 @setup
     // Deployment configuration ----------
     $project      = 'example.com';
