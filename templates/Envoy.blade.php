@@ -28,28 +28,28 @@
     php artisan -v october:up
 
     ## START UPDATE CHECK
-        LOCK_FILE=".last-update-check"
-        NOW=$(date +%s)
-        LAST_CHECK=$( [ -f $LOCK_FILE ] && cat $LOCK_FILE || echo 0 )
-        SECONDS_SINCE=$(expr $NOW - $LAST_CHECK)
+    LOCK_FILE=".last-update-check"
+    NOW=$(date +%s)
+    LAST_CHECK=$( [ -f $LOCK_FILE ] && cat $LOCK_FILE || echo 0 )
+    SECONDS_SINCE=$(expr $NOW - $LAST_CHECK)
 
-        if [ "$SECONDS_SINCE" -gt "86400" ]; then
-            HOSTNAME=$( hostname )
-            GIT=$( which git )
+    if [ "$SECONDS_SINCE" -gt "86400" ]; then
+        HOSTNAME=$( hostname )
+        GIT=$( which git )
 
-            $PHP composer.phar self-update
-            php ./vendor/bin/october update
+        $PHP composer.phar self-update
+        php ./vendor/bin/october update
 
-            if [[ -n $(git status -s) ]]; then
-                $GIT add --all .
-                $GIT commit -m "[ci skip] oc-bootstrapper updated October CMS ({{ $project }})"
-                $GIT push origin master
-            fi
-
-            echo $NOW > $LOCK_FILE
-        else
-            echo "Skipping update check (last check was $SECONDS_SINCE seconds ago)"
+        if [[ -n $(git status -s) ]]; then
+            $GIT add --all .
+            $GIT commit -m "[ci skip] oc-bootstrapper updated October CMS ({{ $project }})"
+            $GIT push origin master
         fi
+
+        echo $NOW > $LOCK_FILE
+    else
+        echo "Skipping update check (last check was $SECONDS_SINCE seconds ago)"
+    fi
     ## END UPDATE CHECK
 
     git status -s
