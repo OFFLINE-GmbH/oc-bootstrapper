@@ -112,12 +112,9 @@ class UpdateCommand extends Command
             $this->setPhp($php);
         }
 
-        // 1. Run `october install` command, which will install all plugins and themes that are not installed yet
 
         $this->write("<info>Installing new plugins</info>");
         $this->runProcess($this->php . ' october install', 'Installation failed!');
-
-        // 2. Remove every plugin that has git repo specified in october.yaml, for `october:update` command not to try update them
 
         $pluginsConfigs = $this->config->plugins;
 
@@ -131,15 +128,12 @@ class UpdateCommand extends Command
         }
 
         $this->write("<info>Cleared private plugins</info>");
-
-        // 3. Run `php artisan october:update`, which updates core and marketplace plugins
-
         $this->write("<info>Running artisan october:update</info>");
         $this->artisan->call('october:update');
 
         // 4. Git clone all plugins again
 
-        $this->write("<info>Reinstalling plugins:</info>");
+        $this->write('<info>Reinstalling plugins:</info>');
 
         foreach ($pluginsConfigs as $pluginConfig) {
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
@@ -149,18 +143,12 @@ class UpdateCommand extends Command
             }
         }
 
-        // 5. Run `php artisan october:up` to migrate all versions of plugins
-
-        $this->write("<info>Migrating all unmigrated versions</info>");
+        $this->write('<info>Migrating all unmigrated versions</info>');
 
         $this->artisan->call('october:up');
 
-        // 6. Run `composer update` to update all composer packages
-
-        $this->write("<info>Running composer update</info>");
+        $this->write('<info>Running composer update</info>');
         $this->composer->updateLock();
-
-        // 7. IDEA: Optionally commit and push to git repo
 
         return true;
     }

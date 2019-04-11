@@ -142,13 +142,13 @@ trait ManageDirectory
     /**
      * Checks if a directory is empty.
      *
-     * @param $themeDir
+     * @param $dir
      *
      * @return bool
      */
-    public function isEmpty($themeDir)
+    public function isEmpty($dir)
     {
-        return count(glob($themeDir . '/*')) === 0;
+        return count(glob($dir . '/*')) === 0;
     }
 
     /**
@@ -159,5 +159,15 @@ trait ManageDirectory
     public function pwd()
     {
         return getcwd() . DS;
+    }
+
+    /**
+     * Removes .git Directories.
+     *
+     * @param $path
+     */
+    public function removeGitRepo($path)
+    {
+        $this->rmdir($path . DS . '.git');
     }
 }

@@ -9,7 +9,7 @@ use OFFLINE\Bootstrapper\October\Util\Git;
  * Plugin manager class
  */
 class PluginManager extends BaseManager
-{ 
+{
 
    /**
      * Parse the Vendor, Plugin and Remote values out of the
@@ -59,7 +59,7 @@ class PluginManager extends BaseManager
 
     public function createDir(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+        list($update, $vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
 
         $vendor = strtolower($vendor);
         $plugin = strtolower($plugin);
@@ -77,7 +77,7 @@ class PluginManager extends BaseManager
 
     public function removeDir(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+        list($update, $vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
         $vendor = strtolower($vendor);
         $plugin = strtolower($plugin);
 
@@ -88,7 +88,7 @@ class PluginManager extends BaseManager
 
     public function getDirPath(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+        list($update, $vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
 
         $vendor = strtolower($vendor);
         $plugin = strtolower($plugin);
@@ -98,16 +98,23 @@ class PluginManager extends BaseManager
         return $pluginDir;
     }
 
+    public function isInstalled(string $pluginDeclaration)
+    {
+        $pluginDir = $this->getDirPath($pluginDeclaration);
+
+        return $this->isEmpty($pluginDir);
+    }
+
     public function install(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+        list($update, $vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
 
-        $this->write('<info> - ' . $vendor . '.' . $plugin . '</info>');
+        $this->write('- ' . $vendor . '.' . $plugin);
 
         $pluginDir = $this->createDir($pluginDeclaration);
 
         if (!$this->isEmpty($pluginDir)) {
-            throw new RuntimeException("<error> - Plugin directory not empty. Aborting. </error>");
+            throw new RuntimeException("Plugin directory not empty. Aborting.");
         }
 
         if ($remote === false) {
@@ -118,14 +125,20 @@ class PluginManager extends BaseManager
         try {
             $repo->cloneFrom($remote, $pluginDir);
             if ($branch !== false) {
-                $this->write('<comment>   -> ' . sprintf('Checkout "%s" ...', $branch) . '</comment>');
+                $this->write('   -> ' . sprintf('Checkout "%s" ...', $branch), 'comment');
                 $repo->checkout($branch);
             }
         } catch (RuntimeException $e) {
-            throw new RuntimeException('<error> - ' . 'Error while cloning plugin repo: ' . $e->getMessage() . '</error>');
+            throw new RuntimeException('Error while cloning plugin repo: ' . $e->getMessage());
         }
 
-        $this->removeGitRepo($pluginDir);
+        $this->artisan->call("plugin:refresh {$vendor}.{$plugin}");
+
+        if ($update === false) {
+            $this->gitignore->addPlugin($vendor, $plugin);
+        }
+
+        $this->removeGitRepo($this->getDirPath($pluginDeclaration));
     }
 
     /**
@@ -138,13 +151,14 @@ class PluginManager extends BaseManager
      */
     public function installViaArtisan(string $pluginDeclaration)
     {
-        list($vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
+        list($update, $vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
 
         try {
             $this->artisan->call("plugin:install {$vendor}.{$plugin}");
         } catch (RuntimeException $e) {
             throw new RuntimeException(
-                sprintf('Error while installing plugin %s via artisan. Is your database set up correctly?',
+                sprintf(
+                    'Error while installing plugin %s via artisan. Is your database set up correctly?',
                     $vendor . '.' . $plugin
                 )
             );
@@ -152,5 +166,4 @@ class PluginManager extends BaseManager
 
         return "${vendor}.${plugin} plugin installed";
     }
-
 }

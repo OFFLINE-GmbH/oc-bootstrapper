@@ -31,7 +31,7 @@ trait CliIO
      * @param  OutputInterface  $output
      *
      * @return  self
-     */ 
+     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
@@ -45,7 +45,7 @@ trait CliIO
      * @param  InputInterface  $input
      *
      * @return  self
-     */ 
+     */
     public function setInput(InputInterface $input)
     {
         $this->input = $input;
@@ -59,8 +59,8 @@ trait CliIO
      * @param string $line
      * @return void
      */
-    protected function write($line)
+    protected function write($line, $surround = "info")
     {
-        $this->output->writeln($line);
+        $this->output->writeln("<${surround}> ${line} </${surround}");
     }
 }

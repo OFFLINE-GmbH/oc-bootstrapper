@@ -10,7 +10,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
  */
 trait ConfigMaker
 {
-    // use ManageDirectory;
+    use ManageDirectory;
 
     /**
      * @var
