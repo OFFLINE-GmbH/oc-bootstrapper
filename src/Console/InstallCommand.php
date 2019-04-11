@@ -99,6 +99,16 @@ class InstallCommand extends Command
     }
 
     /**
+     * Set output for all components
+     */
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
+        $this->pluginManager->setOutput($output);
+        $this->themeManager->setOutput($output);
+    }
+
+    /**
      * Configure the command options.
      *
      * @throws InvalidArgumentException
@@ -144,12 +154,10 @@ class InstallCommand extends Command
         }
 
         $this->setOutput($output);
-        $this->pluginManager->setOutput($output);
-        $this->themeManager->setOutput($output);
 
         $this->force = $input->getOption('force');
 
-        $this->firstRun = ! is_dir($this->path('bootstrap')) || $this->force;
+        $this->firstRun = ! $this->dirExists($this->path('bootstrap')) || $this->force;
 
         $this->makeConfig();
 
@@ -162,7 +170,7 @@ class InstallCommand extends Command
         $this->write('Downloading latest October CMS...');
         try {
             (new OctoberCms())->download($this->force);
-        } catch (\LogicException $e) {
+        } catch (LogicException $e) {
             $this->write($e->getMessage(), 'error');
         }
 
@@ -178,7 +186,6 @@ class InstallCommand extends Command
         $this->write('Migrating database...');
         $this->artisan->call('october:up');
 
-        $this->write('Installing Theme...');
         $themeDeclaration = false;
         try {
             $themeDeclaration = $this->config->cms['theme'];
@@ -187,32 +194,34 @@ class InstallCommand extends Command
         }
 
         if ($themeDeclaration) {
+            $this->write('Installing Theme...');
             $this->installTheme($themeDeclaration);
         }
 
-        $this->write('Installing Plugins...');
-        $pluginsConfigs = false;
+        $pluginsDeclarations = false;
         try {
-            $pluginsConfig = $this->config->plugins;
+            $pluginsDeclarations = $this->config->plugins;
         } catch (\RuntimeException $e) {
             $this->write(' - No plugins to install');
         }
 
-        if ($pluginsConfigs) {
-            $this->installPlugins($pluginsConfigs);
+        if ($pluginsDeclarations) {
+            $this->write('Installing Plugins...');
+            $this->installPlugins($pluginsDeclarations);
         }
 
         $this->write('Migrating plugin tables...');
         $this->artisan->call('october:up');
 
-        $this->write('Setting up deployments...');
         $deployment = false;
         try {
             $deployment = $this->config->git['deployment'];
         } catch (\RuntimeException $e) {
+            $this->write(' - No deployments to install');
         }
 
         if ($deployment) {
+            $this->write("Setting up ${deployment} deployment.");
             $deploymentObj = DeploymentFactory::createDeployment($deployment);
             $deploymentObj->install($this->force);
         }
@@ -240,6 +249,12 @@ class InstallCommand extends Command
         return true;
     }
 
+    /**
+     * Handle installing plugins and updating them if possible
+     *
+     * @param array $pluginsDeclarations
+     * @return void
+     */
     public function installPlugins($pluginsDeclarations)
     {
         foreach ($pluginsDeclarations as $pluginDeclaration) {
@@ -249,12 +264,12 @@ class InstallCommand extends Command
             list($update, $vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginDeclaration);
 
             if ($update || !$this->gitignore->hasPluginHeader($vendor, $plugin)) {
-                $this->write(sprintf('Removing "%s.%s" directory to re-download the newest version ...', $vendor, $plugin), 'comment');
+                $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...", 'comment');
 
                 $this->pluginManager->removeDir($pluginDeclaration);
                 $installPlugin = true;
             } else {
-                $this->write(sprintf('Skipping re-downloading of plugin "%s.%s"', $vendor, $plugin), 'comment');
+                $this->write("Skipping re-downloading of ${vendor}.${plugin}", 'comment');
             }
 
             if ($installPlugin) {
@@ -267,7 +282,13 @@ class InstallCommand extends Command
         }
     }
 
-    public function installTheme($themeDeclaration)
+    /**
+     * Install theme
+     *
+     * @param string $themeDeclaration
+     * @return void
+     */
+    public function installTheme(string $themeDeclaration)
     {
         try {
             $this->themeManager->install($themeDeclaration);

@@ -53,6 +53,18 @@ trait ManageDirectory
     }
 
     /**
+     * Check if directory exists
+     *
+     * @param string $dir relative or absolute path of the directory to check existence
+     *
+     * @return bool
+     */
+    public function dirExists($dir)
+    {
+        return is_dir($this->path($dir));
+    }
+
+    /**
      * Get absolute path of the file
      *
      * @param string $file relative or absolute path of the file

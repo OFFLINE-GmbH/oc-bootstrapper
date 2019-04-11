@@ -12,28 +12,37 @@ class PluginManager extends BaseManager
 {
 
    /**
-     * Parse the Vendor, Plugin and Remote values out of the
-     * given plugin declaration.
+     * Parse the plugin declaration values out of the given plugin declaration string
      *
-     * @param string $pluginDeclaration like Vendor.Plugin (Remote)
+     * @param string $pluginDeclaration like ^Vendor.Plugin (Remote)
      *
-     * @return array array containing $vendor, $pluginName[, $remote[, $branch]]
+     * @return array array [bool $update, string $vendor, string $pluginName, string $remote, string $branch]
      */
     public function parseDeclaration(string $pluginDeclaration): array
     {
-        preg_match("/([^\.]+)\.([^ #]+)(?: ?\(([^\#)]+)(?:#([^\)]+)?)?)?/", $pluginDeclaration, $matches);
+        preg_match(
+            "/(?<update>\^)?(?<vendor>[^\.]+)\.(?<plugin>[^ #]+)(?: ?\((?<remote>[^\#)]+)(?:#(?<branch>[^\)]+)?)?)?/",
+            $pluginDeclaration,
+            $matches
+        );
 
         array_shift($matches);
 
-        if (count($matches) < 3) {
-            $matches[2] = false;
+        $matches = array_map('strtolower', $matches);
+
+        if ($matches['update']) {
+            $matches['update'] = true;
+        } else {
+            $matches['update'] = false;
         }
 
-        if (count($matches) < 4) {
-            $matches[3] = false;
-        }
-
-        return $matches;
+        return [
+            $matches['update'] ?? false,
+            $matches['vendor'] ?? '',
+            $matches['plugin'] ?? '',
+            $matches['remote'] ?? '',
+            $matches['branch'] ?? '',
+        ];
     }
 
     /**
