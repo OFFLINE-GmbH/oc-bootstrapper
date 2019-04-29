@@ -190,7 +190,7 @@ class InstallCommand extends Command
         try {
             $themeDeclaration = $this->config->cms['theme'];
         } catch (\RuntimeException $e) {
-            $this->write(' - No theme to install');
+            $this->write('No theme to install');
         }
 
         if ($themeDeclaration) {
@@ -202,7 +202,7 @@ class InstallCommand extends Command
         try {
             $pluginsDeclarations = $this->config->plugins;
         } catch (\RuntimeException $e) {
-            $this->write(' - No plugins to install');
+            $this->write('No plugins to install');
         }
 
         if ($pluginsDeclarations) {
@@ -210,14 +210,11 @@ class InstallCommand extends Command
             $this->installPlugins($pluginsDeclarations);
         }
 
-        $this->write('Migrating plugin tables...');
-        $this->artisan->call('october:up');
-
         $deployment = false;
         try {
             $deployment = $this->config->git['deployment'];
         } catch (\RuntimeException $e) {
-            $this->write(' - No deployments to install');
+            $this->write('No deployments to install');
         }
 
         if ($deployment) {
@@ -263,7 +260,9 @@ class InstallCommand extends Command
 
             list($update, $vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginDeclaration);
 
-            if ($update || !$this->gitignore->hasPluginHeader($vendor, $plugin)) {
+            $this->write((string) $update);
+            $this->write((string) $this->gitignore->hasPluginHeader($vendor, $plugin));
+            if ($pluginInstalled && ($update || !$this->gitignore->hasPluginHeader($vendor, $plugin))) {
                 $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...", 'comment');
 
                 $this->pluginManager->removeDir($pluginDeclaration);
@@ -280,6 +279,9 @@ class InstallCommand extends Command
                 }
             }
         }
+
+        $this->write('Migrating plugin tables...');
+        $this->artisan->call('october:up');
     }
 
     /**

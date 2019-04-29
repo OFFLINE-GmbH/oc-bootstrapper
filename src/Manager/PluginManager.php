@@ -141,8 +141,6 @@ class PluginManager extends BaseManager
             throw new RuntimeException('Error while cloning plugin repo: ' . $e->getMessage());
         }
 
-        $this->artisan->call("plugin:refresh {$vendor}.{$plugin}");
-
         if ($update === false) {
             $this->gitignore->addPlugin($vendor, $plugin);
         }
