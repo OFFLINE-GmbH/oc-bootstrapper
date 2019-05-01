@@ -33,14 +33,15 @@ class OctoberCms
      */
     public function download($force = false)
     {
-        if($this->alreadyInstalled($force)) {
+        if ($this->alreadyInstalled($force)) {
             throw new \LogicException('-> October is already installed. Use --force to reinstall.');
         }
-        
+
         $this->fetchZip()
              ->extract()
              ->fetchHtaccess()
-             ->cleanUp();
+             ->cleanUp()
+             ->setMaster();
 
         return $this;
     }
@@ -48,9 +49,9 @@ class OctoberCms
     /**
      * Download the temporary Zip to the given file.
      *
-     * @throws LogicException
-     * @throws RuntimeException
      * @return $this
+     * @throws RuntimeException
+     * @throws LogicException
      */
     protected function fetchZip()
     {
@@ -89,12 +90,38 @@ class OctoberCms
         return $this;
     }
 
+
+    /**
+     * Since we don't want any unstable updates we fix
+     * the libraries to the master branch.
+     *
+     * @return $this
+     */
+    protected function setMaster()
+    {
+        $json = getcwd() . DS . 'composer.json';
+
+        $contents = file_get_contents($json);
+
+        $contents = preg_replace_callback(
+            '/october\/(?:rain|system|backend|cms)":\s"([^"]+)"/m',
+            function ($treffer) {
+                return str_replace($treffer[1], 'dev-master', $treffer[0]);
+            },
+            $contents
+        );
+
+        file_put_contents($json, $contents);
+
+        return $this;
+    }
+
     /**
      * Remove the Zip file, move folder contents one level up.
      *
-     * @throws LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
      * @return $this
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws LogicException
      */
     protected function cleanUp()
     {

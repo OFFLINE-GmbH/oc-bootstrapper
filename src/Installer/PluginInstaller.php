@@ -35,21 +35,12 @@ class PluginInstaller extends BaseInstaller
         }
 
         $privatePluginInstalled = false;
-        $isBare                 = isset($this->config->git['bareRepo'])
-            ? (bool)$this->config->git['bareRepo']
-            : false;
-
-        $excludePlugins = isset($this->config->git['excludePlugins'])
-            ? (bool)$this->config->git['excludePlugins']
-            : false;
 
         foreach ($config as $plugin) {
 
             $this->write('<info> - ' . $plugin . '</info>');
 
-            list($vendor, $plugin, $remote, $branch) = $this->parse($plugin);
-            $vendor = strtolower($vendor);
-            $plugin = strtolower($plugin);
+            list($update, $vendor, $plugin, $remote, $branch) = $this->parse($plugin);
 
             $vendorDir = $this->createVendorDir($vendor);
             $pluginDir = $vendorDir . DS . $plugin;
@@ -57,15 +48,18 @@ class PluginInstaller extends BaseInstaller
             $this->mkdir($pluginDir);
 
             if ( ! $this->isEmpty($pluginDir)) {
-
-                if ($this->handleExistingPlugin($excludePlugins, $remote, $vendor, $plugin, $pluginDir,
-                        $isBare) === false
+                if ($this->handleExistingPlugin(
+                        $vendor,
+                        $plugin,
+                        $pluginDir,
+                        $update
+                    ) === false
                 ) {
                     continue;
                 }
             }
 
-            if ($remote === false) {
+            if ( ! $remote) {
                 $this->installViaArtisan($vendor, $plugin);
                 continue;
             }
@@ -73,7 +67,7 @@ class PluginInstaller extends BaseInstaller
             $repo = Git::repo($pluginDir);
             try {
                 $repo->cloneFrom($remote, $pluginDir);
-                if ($branch !== false) {
+                if ($branch) {
                     $this->write('<comment>   -> ' . sprintf('Checkout "%s" ...', $branch) . '</comment>');
                     $repo->checkout($branch);
                 }
@@ -82,12 +76,10 @@ class PluginInstaller extends BaseInstaller
                 continue;
             }
 
-            if ($excludePlugins === false) {
-                (new Process($this->php . " artisan plugin:refresh {$vendor}.{$plugin}"))->run();
+            (new Process($this->php . " artisan plugin:refresh {$vendor}.{$plugin}"))->run();
 
-                if ($isBare) {
-                    $this->gitignore->addPlugin($vendor, $plugin);
-                }
+            if ($update === false) {
+                $this->gitignore->addPlugin($vendor, $plugin);
             }
 
             $this->cleanup($pluginDir);
@@ -102,9 +94,9 @@ class PluginInstaller extends BaseInstaller
         return true;
     }
 
-    protected function handleExistingPlugin($excludePlugins, $remote, $vendor, $plugin, $pluginDir, $isBare)
+    protected function handleExistingPlugin($vendor, $plugin, $pluginDir, $update)
     {
-        if ($excludePlugins === false || $remote === false || $isBare === false) {
+        if ($update === false) {
             $this->write('<comment>   -> ' . sprintf('Plugin "%s.%s" already installed. Skipping.',
                     $vendor, $plugin) . '</comment>');
 
@@ -113,13 +105,13 @@ class PluginInstaller extends BaseInstaller
 
         // Remove any existing local version of the private plugin so it can be checked out via git again
         if ($this->gitignore->hasPluginHeader($vendor, $plugin)) {
-            $this->write('<comment>   -> ' . sprintf('Plugin "%s.%s" found in .gitignore. Skipping redownload of newest version ...',
+            $this->write('<comment>   -> ' . sprintf('Plugin "%s.%s" found in .gitignore. Skipping re-download of newest version ...',
                     $vendor, $plugin) . '</comment>');
 
             return false;
         }
 
-        $this->write('<comment>   -> ' . sprintf('Removing "%s" to redownload the newest version ...',
+        $this->write('<comment>   -> ' . sprintf('Removing "%s" to re-download the newest version ...',
                 $pluginDir) . '</comment>');
 
         $this->rmdir($pluginDir);
@@ -138,20 +130,30 @@ class PluginInstaller extends BaseInstaller
      */
     protected function parse($plugin)
     {
-        // Vendor.Plugin (Remote)
-        preg_match("/([^\.]+)\.([^ #]+)(?: ?\(([^\#)]+)(?:#([^\)]+)?)?)?/", $plugin, $matches);
+        // ^Vendor.Plugin (Remote)
+        preg_match(
+            "/(?<update>\^)?(?<vendor>[^\.]+)\.(?<plugin>[^ #]+)(?: ?\((?<remote>[^\#)]+)(?:#(?<branch>[^\)]+)?)?)?/",
+            $plugin,
+            $matches
+        );
 
         array_shift($matches);
 
-        if (count($matches) < 3) {
-            $matches[2] = false;
+        $matches = array_map('strtolower', $matches);
+
+        if ($matches['update']) {
+            $matches['update'] = true;
+        } else {
+            $matches['update'] = false;
         }
 
-        if (count($matches) < 4) {
-            $matches[3] = false;
-        }
-
-        return $matches;
+        return [
+            $matches['update'] ?? false,
+            $matches['vendor'] ?? '',
+            $matches['plugin'] ?? '',
+            $matches['remote'] ?? '',
+            $matches['branch'] ?? '',
+        ];
     }
 
     /**

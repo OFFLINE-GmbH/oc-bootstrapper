@@ -1,23 +1,19 @@
 # Bootstrapper for October CMS
 
-`oc-bootstrapper` is a simple script that enables you to bootstrap an October CMS installation
-with custom plugins and custom themes. You simply describe your setup in a config file and run
-the install command.
- 
- `oc-bootstrapper` enables you to install plugins and themes from your own git repo. 
+`oc-bootstrapper` is a command line tool that enables you to reconstruct an October CMS installation
+from a single configuration file.
 
-The following steps will be taken care of:
+It can be used to quickly bootstrap a local development environment for a project or
+to build and update a production installation during a deployment.
 
-1. The latest October CMS gets downloaded from github and gets installed
-2. All composer dependencies are installed
-3. Relevant config entries are moved to a `.env` file for easy customization
-4. Sensible configuration defaults for your `prod` environment get pre-set
-5. Your database gets migrated
-6. All demo data gets removed
-7. Your selected theme gets downloaded and installed
-8. All your plugins get downloaded and installed 
-9. A .gitignore file gets created 
-10. A push to deploy setup gets initialized for you 
+
+## Features
+
+* Installs and updates private and public plugins (via Git or Marketplace)
+* Makes sure only necessary files are in your git repo by intelligently managing your `.gitignore` file
+* Built in support for GitLab CI deployments
+* Built in support for shared configuration file templates
+* Sets sensible configuration defaults using `.env` files for production and development environments
 
 ## Dependencies
 
@@ -28,20 +24,27 @@ The following steps will be taken care of:
 
 * Ubuntu 15.10
 * Ubuntu 16.04
+* Ubuntu 18.04
 * OSX 10.11 (El Capitan)
 
-Works on Windows via Ubuntu Bash or Git Bash.
+Works on Windows via `Ubuntu Bash` or `Git Bash`.
+
+## Example project
+
+Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of oc-bootstrapper.
 
 
 ## Installation
 
-```composer global require offline/oc-bootstrapper``` 
+```bash
+composer global require offline/oc-bootstrapper
+``` 
 
 You can now run `october` from your command line.
 
 ```bash
-$ october
-October CMS Bootstrapper version 0.2.0
+$ october -v
+October CMS Bootstrapper version 0.5.0
 ```
 
 ### Docker image
@@ -58,7 +61,7 @@ docker run offlinegmbh/oc-bootstrapper composer -v
 
 ### Initialize your project
 
-Use the `october init` command to create a new project with a config file:
+Use the `october init` command to create a new empty project with a config file:
 
 ```sh
 october init myproject.com
@@ -83,18 +86,13 @@ cms:
 
 database:
     connection: mysql
-    username: homestead
-    password: secret
+    username: root
+    password: 
     database: bootstrapper
-    host: 192.168.10.10
+    host: localhost
 
 git:
-    deployment: false
-    
-    bareRepo: true          # Exclude everything except themes and custom plugins in git  
-    excludePlugins: false   # Even exclude plugins from your repo. Private plugins will be
-                            # checked out again during each "install" run. Be careful!
-                            # Manual changes to these plugins will be overwritten.        
+    deployment: gitlab
 
 plugins:
     - Rainlab.Pages
@@ -102,7 +100,8 @@ plugins:
     - Indikator.Backend
     - OFFLINE.SiteSearch
     - OFFLINE.ResponsiveImages
-    - OFFLINE.Indirect (https://github.com/OFFLINE-GmbH/oc-indirect-plugin.git)
+    - OFFLINE.GDPR (https://github.com/OFFLINE-GmbH/oc-gdpr-plugin.git)
+    - ^OFFLINE.Mall (https://github.com/OFFLINE-GmbH/oc-mall-plugin.git#develop)
     # - Vendor.Private (user@remote.git)
     # - Vendor.PrivateCustomBranch (user@remote.git#branch)
 
@@ -120,10 +119,34 @@ mail:
 append your repo's address in `()` to tell `oc-bootstrapper` to check it out for you.
 If no repo is defined the plugins are loaded from the October Marketplace.
 
+##### Examples
+
+```yaml
+# Install a plugin from the official October Marketplace
+- OFFLINE.Mall 
+
+# Install a plugin from a git repository. The plugin will be cloned
+# into your local repository and become part of it. You can change the
+# plugin and modify it to your needs. It won't be checked out again (no updates).
+- OFFLINE.Mall (https://github.com/OFFLINE-GmbH/oc-mall-plugin.git)
+
+# The ^ marks this plugin as updateable. It will be removed and checked out again
+# during each call to `october install`. Local changes will be overwritten.
+# This plugin will stay up to date with the changes of your original plugin repo.
+- ^OFFLINE.Mall (https://github.com/OFFLINE-GmbH/oc-mall-plugin.git)
+
+# Install a specific branch of a plugin. Keep it up-to-date.
+- ^OFFLINE.Mall (https://github.com/OFFLINE-GmbH/oc-mall-plugin.git#develop)
+```
+
 
 ### Install October CMS
 
 When you are done editing your configuration file, simply run `october install` to install October. 
+`oc-bootstrapper` will take care of setting everything up for you. You can run this command locally
+after checking out a project repository or during deployment.
+
+This command is *idempotent*, it will only install what is missing on subsequent calls. 
 
 ```
 october install 
@@ -134,7 +157,14 @@ Use the `--help` flag to see all available options.
 ```
 october install --help 
 ```
- 
+
+#### Install additional plugins
+
+If at any point in time you need to install additional plugins, simply add them to your `october.yaml` and re-run 
+`october install`. Missing plugins will be installed.
+
+  
+
 #### Use a custom php binary
 
 Via the `--php` flag you can specify a custom php binary to be used for the installation commands:
@@ -142,67 +172,45 @@ Via the `--php` flag you can specify a custom php binary to be used for the inst
 ```
 october install --php=/usr/local/bin/php72
 ```
+### Update October CMS
 
-#### Install additional plugins
+If you want to update the installation you can run
 
-If at any point in time you need to install additional plugins, simply add them to your `october.yaml` and rerun `october install`. Missing plugins will be installed.
+```
+october update
+```
 
-### Change config
-
-To change your installation's configuration, simply edit the `.env` file in your project root. 
-When deploying to production, make sure to edit your `.env.production` template file and rename it to `.env`.  
-
-### Bare repos
-
-If you don't want to have the complete October source code in your repository set the `bareRepo`
- option to `true`.
+The command will update all plugins, the October CMS core and all composer dependencies.
  
- This will set up a `.gitignore` file that excludes everything except your `theme` directory and all the **manually installed** plugins in your `plugins` directory.
-  
-  > If you want to deploy a bare repo please read the section `SSH deployments with bare repos` below.
-  
-#### `excludePlugins`
-
-By default every private plugin will be cloned only once and is then added to your `.gitignore` file. In the end your bare repo includes your theme and all your custom and private plugins. If you wish to only include your theme and no plugin data at all you can set `excludePlugins` to true.
-
-If you run `october install` in an existing project (let's say during deployment) all private plugin directories will get remove from your local disk and are checked out via git again so you'll get the latest version. 
-
-If you don't want a plugin to be checked out on every `october install` run you can add the following line to your `.gitignore` file. If such a line is found the plugin will not be touched after the first checkout.
-
-```
-# vendor.plugin
-# offline.sitesearch 
-```
-
-#### Get up and running after `git clone`
-
-After cloning a bare repo for the first time, simply run `october install`. October CMS and all missing plugins will get installed locally on your machine. 
-  
 ### SSH deployments
 
 Set the `deployment` option to `false` if you don't want to setup deployments.
 
-Currently `oc-bootstrapper` supports a simple setup to deploy a project on push via GitLab CI. To automatically create all needed files, simply set the `deployment` option to `gitlab`.
+#### Setup
 
-Support for other CI systems is added on request.
+You can use `oc-bootstrapper` with any kind of deployment software. You need to setup the following steps:
 
- #### SSH deployments with bare repos
-  
-  If you use SSH deployments with a bare repo, make sure to  run `./vendor/bin/october install` in your deployment script to install the October source code and all of your plugins . If the October source code is already available it won't be downloaded again.
+1. Connect to the target server (via SSH)
+1. Install composer and oc-bootstrapper
+1. Run `october install`
 
-If you use the provided GitLab deployment via Envoy make sure to simply uncomment [this line](https://github.com/OFFLINE-GmbH/oc-bootstrapper/blob/fd45b66580f4b1af24880a3b331635a7654cf4ed/templates/Envoy.blade.php#L17).
-  
-  It is important that you list every installed plugin in your `october.yaml` file. Otherwise the plugins won't be available after deployment.
-  
-#### GitLab CI with Envoy
+You can run this "script" for each push to your repository. The `october install` command will
+only install what is missing from the target server.
 
-If you use the gitlab deployment option the `.gitlab-ci.yml` and `Envoy.blade.php` files are created for you.
 
-Change the variables inside the `Envoy.blade.php` to fit your needs. You have to create a Pipeline Variable in GitLab called `SSH_PRIVATE_KEY` that contains your private key. Add your public key to the target server.
+#### Example setup for GitLab CI
 
-If you push to your GitLab server and CI builds are enabled, your private key is added to the `ssh-agent` inside the Docker container and the tasks from `Envoy.blade.php` will be executed on your target server. 
+To initialize a project with GitLab CI support set the `deployment` option in your config file to `gitlab`.
 
-##### Cronjob to commit changes from prod into git
+This will setup a [`.gitlab-ci.yml`](templates/gitlab-ci.yml) and a [`Envoy.blade.php`](templates/Envoy.blade.php). 
+
+1. Create a SSH key pair to log in to your deployment target server
+1. Create a `SSH_PRIVATE_KEY` variable in your GitLab CI settings that contains the created private key
+1. Edit the `Envoy.blade.php` script to fit your needs
+1. Push to your repository. GitLab will run the example `.gitlab-ci.yml` configuration
+
+
+### Cronjob to commit changes from prod into git
 
 If a deployed website is edited by a customer directly on the prod server you might want to commit
  those changes back to your git repository. 
@@ -233,26 +241,3 @@ git clone your-central-templates-repo.git .
 git branch --set-upstream-to=origin/master master
 git pull # Make sure this works without any user interaction
 ```
-
-## ToDo
-
-- [ ] Update command to update private plugins
-
-## Troubleshooting
-
-### Fix cURL error 60 on Windows using XAMPP
-
-If you are working with XAMPP on Windows you will most likely get the following error during `october install`:
-
-    cURL error 60: SSL certificate problem: unable to get local issuer certificate
-    
-You can fix this error by executing the following steps.
-
-1. Download the `cacert.pem` file from [VersatilityWerks](https://gist.github.com/VersatilityWerks/5719158/download)
-2. Extract the `cacert.pem` to the `php` folder in your xampp directory (eg. `c:\xampp\php`)
-3. Edit your `php.ini` (`C:\xampp\php\php.ini`). Add the following line.
-
-   `curl.cainfo = "\xampp\php\cacert.pem"`
-
-`october install` should work now as expected.
-
