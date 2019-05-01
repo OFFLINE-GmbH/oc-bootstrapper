@@ -126,23 +126,19 @@ class PluginManager extends BaseManager
             throw new RuntimeException("Plugin directory not empty. Aborting.");
         }
 
-        if ($remote === false) {
+        if ($remote === '') {
             return $this->installViaArtisan($pluginDeclaration);
         }
 
         $repo = Git::repo($pluginDir);
         try {
             $repo->cloneFrom($remote, $pluginDir);
-            if ($branch !== false) {
+            if ($branch !== '') {
                 $this->write('   -> ' . sprintf('Checkout "%s" ...', $branch), 'comment');
                 $repo->checkout($branch);
             }
         } catch (RuntimeException $e) {
             throw new RuntimeException('Error while cloning plugin repo: ' . $e->getMessage());
-        }
-
-        if ($update === false) {
-            $this->gitignore->addPlugin($vendor, $plugin);
         }
 
         $this->removeGitRepo($this->getDirPath($pluginDeclaration));

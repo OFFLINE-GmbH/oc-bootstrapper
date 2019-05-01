@@ -29,7 +29,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class InstallCommand extends Command
 {
-    use ConfigMaker, UsesTemplate, CliIO, ManageDirectory;
+    use ConfigMaker, UsesTemplate, CliIO;
     
     /**
     * @var Gitignore
@@ -260,8 +260,6 @@ class InstallCommand extends Command
 
             list($update, $vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginDeclaration);
 
-            $this->write((string) $update);
-            $this->write((string) $this->gitignore->hasPluginHeader($vendor, $plugin));
             if ($pluginInstalled && ($update || !$this->gitignore->hasPluginHeader($vendor, $plugin))) {
                 $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...", 'comment');
 
@@ -277,6 +275,10 @@ class InstallCommand extends Command
                 } catch (RuntimeException $e) {
                     $this->write($e->getMessage(), 'error');
                 }
+            }
+
+            if ($update === false) {
+                $this->gitignore->addPlugin($vendor, $plugin);
             }
         }
 
@@ -335,8 +337,7 @@ class InstallCommand extends Command
             return $target;
         }
 
-        $file     = $this->config->git['bareRepo'] ? 'gitignore.bare' : 'gitignore';
-        $template = $this->getTemplate($file);
+        $template = $this->getTemplate('gitignore');
 
         $this->copy($template, $target);
 

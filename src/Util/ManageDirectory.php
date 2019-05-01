@@ -125,6 +125,10 @@ trait ManageDirectory
      */
     public function rmdir($dir)
     {
+        if (!$this->dirExists($dir)) {
+            return true;
+        }
+
         $entries = array_diff(scandir($dir), ['.', '..']);
         foreach ($entries as $entry) {
             $path = $dir . DS . $entry;

@@ -29,7 +29,7 @@ to build and update a production installation during a deployment.
 
 Works on Windows via `Ubuntu Bash` or `Git Bash`.
 
-## Project's repo
+## Example project
 
 While using `oc-bootstrapper` it is a good idea to keep `october.yaml`, project's theme and project's plugins (those that are not shared among other projects) in project's repo.
 

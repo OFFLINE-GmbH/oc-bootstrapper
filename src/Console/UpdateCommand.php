@@ -5,6 +5,7 @@ namespace OFFLINE\Bootstrapper\October\Console;
 use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
 use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\Gitignore;
 use OFFLINE\Bootstrapper\October\Util\RunsProcess;
 use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
 use OFFLINE\Bootstrapper\October\Util\CliIO;
@@ -72,8 +73,8 @@ class UpdateCommand extends Command
     /**
      * Configure the command options.
      *
-     * @throws InvalidArgumentException
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -92,8 +93,8 @@ class UpdateCommand extends Command
     /**
      * Execute the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      *
      * @return mixed
      * @throws \Symfony\Component\Process\Exception\RuntimeException
@@ -156,7 +157,7 @@ class UpdateCommand extends Command
     /**
      * Prepare the environment
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      * @return void
      */
