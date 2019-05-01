@@ -8,7 +8,6 @@ use OFFLINE\Bootstrapper\October\Deployment\DeploymentInterface;
 
 /**
  * Static factory to create deployments
- * @package OFFLINE\Bootstrapper\October\BaseInstaller
  */
 final class DeploymentFactory
 {

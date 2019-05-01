@@ -8,7 +8,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
  * Deployment interface
- * @package OFFLINE\Bootstrapper\October\BaseInstaller
  */
 interface Deployment
 {

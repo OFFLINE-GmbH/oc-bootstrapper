@@ -20,7 +20,6 @@ use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use OFFLINE\Bootstrapper\October\Deployment\DeploymentFactory;
-use OFFLINE\Bootstrapper\October\Installer\DeploymentInstaller;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
