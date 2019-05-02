@@ -334,8 +334,14 @@ class InstallCommand extends Command
         if ($this->fileExists($target)) {
             return $target;
         }
+        
+        $templateName = 'gitignore';
 
-        $template = $this->getTemplate('gitignore');
+        if ($this->config->git['bareRepo']) {
+            $templateName .= '.bare';
+        }
+
+        $template = $this->getTemplate($templateName);
 
         $this->copy($template, $target);
 
