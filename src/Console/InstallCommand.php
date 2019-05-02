@@ -264,12 +264,11 @@ class InstallCommand extends Command
 
                 $this->pluginManager->removeDir($pluginDeclaration);
                 $installPlugin = true;
-            } else {
-                $this->write("Skipping re-downloading of ${vendor}.${plugin}", 'comment');
             }
 
             if ($installPlugin) {
                 try {
+                    $this->write('- ' . $vendor . '.' . $plugin);
                     $this->pluginManager->install($pluginDeclaration);
                 } catch (RuntimeException $e) {
                     $this->write($e->getMessage(), 'error');
