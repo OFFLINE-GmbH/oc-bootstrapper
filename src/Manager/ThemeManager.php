@@ -3,6 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Manager;
 
 use OFFLINE\Bootstrapper\October\Util\Git;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * Plugin manager class
