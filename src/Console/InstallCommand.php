@@ -107,6 +107,7 @@ class InstallCommand extends Command
         $this->output = $output;
         $this->pluginManager->setOutput($output);
         $this->themeManager->setOutput($output);
+        $this->composer->setOutput($output);
     }
 
     /**
@@ -286,13 +287,15 @@ class InstallCommand extends Command
                 if ($pluginInstalled && $remote) {
                     $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...",
                         'comment');
+
+                    $this->pluginManager->removeDir($pluginDeclaration);
+                    $installPlugin = true;
+                }
+                else {
+                    $installPlugin = false;
+                    $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
                 }
 
-                $this->pluginManager->removeDir($pluginDeclaration);
-                $installPlugin = true;
-            } else {
-                $installPlugin = false;
-                $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
             }
 
             if ($installPlugin) {
