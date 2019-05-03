@@ -212,6 +212,11 @@ class InstallCommand extends Command
             }
         }
 
+        if($this->config->projectID){
+            $this->write('Setting Project ID...');
+            $this->artisan->call('october:util set project --projectId='.$this->config->projectID);
+        }
+
         $pluginsDeclarations = [];
         try {
             $pluginsDeclarations = $this->config->plugins;
