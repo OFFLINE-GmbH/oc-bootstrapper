@@ -46,14 +46,4 @@ class BaseManager
         $this->php = $php;
         $this->artisan->setPhp($php);
     }
-
-    /**
-     * Removes .git Directories.
-     *
-     * @param $path
-     */
-    public function removeGitRepo($path)
-    {
-        $this->rmdir($path . DS . '.git');
-    }
 }

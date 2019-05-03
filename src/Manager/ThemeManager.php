@@ -3,6 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Manager;
 
 use OFFLINE\Bootstrapper\October\Util\Git;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * Plugin manager class
@@ -75,7 +76,7 @@ class ThemeManager extends BaseManager
         $themeDir = $this->createDir($themeDeclaration);
 
         if (!$this->isEmpty($themeDir)) {
-            throw new RuntimeException("<error> - Theme directory not empty. Aborting. </error>");
+            throw new RuntimeException("Theme directory not empty. Aborting.");
         }
 
         if ($remote === false) {
@@ -114,5 +115,4 @@ class ThemeManager extends BaseManager
 
         return "${theme} theme installed";
     }
-
 }

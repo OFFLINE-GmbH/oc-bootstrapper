@@ -2,7 +2,7 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
-use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
+use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
 use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\Gitignore;
@@ -36,9 +36,9 @@ class UpdateCommand extends Command
     protected $composer;
 
     /**
-     * @var Gitignore
+     * @var PluginManager
      */
-    protected $gitignore;
+    protected $pluginManager;
 
     /**
      * @var string
@@ -50,7 +50,8 @@ class UpdateCommand extends Command
      */
     public function __construct($name = null)
     {
-        $this->artisan  = new Artisan();
+        $this->pluginManager = new PluginManager();
+        $this->artisan = new Artisan();
         $this->composer = new Composer();
 
         $this->setPhp();
@@ -66,6 +67,7 @@ class UpdateCommand extends Command
         //IDEA: simple observer for changing the php version
         $this->php = $php;
         $this->artisan->setPhp($php);
+        $this->pluginManager->setPhp($php);
     }
 
     /**
@@ -105,38 +107,44 @@ class UpdateCommand extends Command
     {
         $this->prepareEnv($input, $output);
 
-        try {
-            $this->makeConfig();
-        } catch (RuntimeException $e) {
-            $this->write($e->getMessage());
+        $this->makeConfig();
 
-            return;
-        }
-
-        if ( ! empty($php = $input->getOption('php'))) {
+        if (!empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
 
-        $this->write('<info>Installing new plugins</info>');
-        $this->gitignore = new Gitignore(getcwd() . DS . '.gitignore');
 
-        $pluginInstaller = new PluginInstaller(
-            $this->config,
-            $this->gitignore,
-            $this->output,
-            $this->php
-        );
+        $this->write("<info>Installing new plugins</info>");
+        $this->runProcess($this->php . ' october install', 'Installation failed!');
 
-        try {
-            $pluginInstaller->install();
-        } catch (\RuntimeException $e) {
-            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
+        $pluginsConfigs = $this->config->plugins;
+
+        $this->write("<info>Removing private plugins</info>");
+        foreach ($pluginsConfigs as $pluginConfig) {
+            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
+
+            if (!empty($remote)) {
+                $this->pluginManager->removeDir($pluginConfig);
+            }
         }
 
-        $this->write('<info>Running artisan october:update</info>');
+        $this->write("<info>Cleared private plugins</info>");
+        $this->write("<info>Running artisan october:update</info>");
         $this->artisan->call('october:update');
 
-        $this->write('<info>Running database migrations</info>');
+        // 4. Git clone all plugins again
+
+        $this->write('<info>Reinstalling plugins:</info>');
+
+        foreach ($pluginsConfigs as $pluginConfig) {
+            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
+
+            if (!empty($remote)) {
+                $this->pluginManager->install($pluginConfig);
+            }
+        }
+
+        $this->write('<info>Migrating all unmigrated versions</info>');
 
         $this->artisan->call('october:up');
 
@@ -151,11 +159,11 @@ class UpdateCommand extends Command
      *
      * @param InputInterface  $input
      * @param OutputInterface $output
-     *
      * @return void
      */
     protected function prepareEnv(InputInterface $input, OutputInterface $output)
     {
         $this->setOutput($output);
+        $this->pluginManager->setOutput($output);
     }
 }

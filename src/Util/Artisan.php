@@ -34,7 +34,7 @@ class Artisan
 
     public function call(string $command)
     {
-        $exitCode = (new Process($this->php . " artisan " . $command))->run();
+        $exitCode = (new Process($this->php . " artisan " . $command))->setTimeout(3600)->run();
 
         if ($exitCode !== $this->exitCodeOk) {
             throw new RuntimeException("Error running \"{$this->php} artisan {$command}\" command");

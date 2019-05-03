@@ -29,9 +29,8 @@ trait CliIO
      * Set the value of output
      *
      * @param  OutputInterface  $output
-     *
      * @return  self
-     */ 
+     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
@@ -43,9 +42,8 @@ trait CliIO
      * Set the value of input
      *
      * @param  InputInterface  $input
-     *
      * @return  self
-     */ 
+     */
     public function setInput(InputInterface $input)
     {
         $this->input = $input;
@@ -57,10 +55,11 @@ trait CliIO
      * Writes new line to output
      *
      * @param string $line
+     * @param string $surround html tag to surround the message
      * @return void
      */
-    protected function write($line)
+    protected function write($line, $surround = "info")
     {
-        $this->output->writeln($line);
+        $this->output->writeln("<${surround}>${line}</${surround}>");
     }
 }

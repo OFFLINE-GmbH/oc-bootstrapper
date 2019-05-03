@@ -31,8 +31,9 @@ Works on Windows via `Ubuntu Bash` or `Git Bash`.
 
 ## Example project
 
-Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of oc-bootstrapper.
+While using `oc-bootstrapper` it is a good idea to keep `october.yaml`, project's theme and project's plugins (those that are not shared among other projects) in project's repo.
 
+Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of `oc-bootstrapper`.
 
 ## Installation
 
