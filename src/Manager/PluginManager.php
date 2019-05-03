@@ -112,7 +112,7 @@ class PluginManager extends BaseManager
     {
         $pluginDir = $this->getDirPath($pluginDeclaration);
 
-        return $this->isEmpty($pluginDir);
+        return ! $this->isEmpty($pluginDir);
     }
 
     public function install(string $pluginDeclaration)
