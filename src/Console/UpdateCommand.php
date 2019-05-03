@@ -2,20 +2,20 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
+use InvalidArgumentException;
+use LogicException;
+use OFFLINE\Bootstrapper\October\Exceptions\PluginExistsException;
 use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
-use OFFLINE\Bootstrapper\October\Util\Composer;
-use OFFLINE\Bootstrapper\October\Util\Gitignore;
-use OFFLINE\Bootstrapper\October\Util\RunsProcess;
-use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
 use OFFLINE\Bootstrapper\October\Util\CliIO;
+use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
+use OFFLINE\Bootstrapper\October\Util\RunsProcess;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\LogicException;
 
 /**
  * Class UpdateCommand
@@ -51,8 +51,8 @@ class UpdateCommand extends Command
     public function __construct($name = null)
     {
         $this->pluginManager = new PluginManager();
-        $this->artisan = new Artisan();
-        $this->composer = new Composer();
+        $this->artisan       = new Artisan();
+        $this->composer      = new Composer();
 
         $this->setPhp();
 
@@ -97,11 +97,12 @@ class UpdateCommand extends Command
      * @param OutputInterface $output
      *
      * @return mixed
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      * @throws LogicException
      * @throws RuntimeException
      * @throws InvalidArgumentException
+     * @throws PluginExistsException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -109,13 +110,11 @@ class UpdateCommand extends Command
 
         $this->makeConfig();
 
-        if (!empty($php = $input->getOption('php'))) {
+        if ( ! empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
 
-
         $this->write("<info>Installing new plugins</info>");
-        $this->runProcess($this->php . ' october install', 'Installation failed!');
 
         $pluginsConfigs = $this->config->plugins;
 
@@ -123,7 +122,7 @@ class UpdateCommand extends Command
         foreach ($pluginsConfigs as $pluginConfig) {
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
 
-            if (!empty($remote)) {
+            if ( ! empty($remote)) {
                 $this->pluginManager->removeDir($pluginConfig);
             }
         }
@@ -139,7 +138,7 @@ class UpdateCommand extends Command
         foreach ($pluginsConfigs as $pluginConfig) {
             list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
 
-            if (!empty($remote)) {
+            if ( ! empty($remote)) {
                 $this->pluginManager->install($pluginConfig);
             }
         }
@@ -159,6 +158,7 @@ class UpdateCommand extends Command
      *
      * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return void
      */
     protected function prepareEnv(InputInterface $input, OutputInterface $output)

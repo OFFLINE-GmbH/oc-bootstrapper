@@ -3,8 +3,8 @@
 namespace OFFLINE\Bootstrapper\October\Manager;
 
 use OFFLINE\Bootstrapper\October\Util\Artisan;
-use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\CliIO;
+use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
 
 /**

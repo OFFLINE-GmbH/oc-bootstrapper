@@ -2,23 +2,26 @@
 
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
+use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
  * Deployment interface
  */
-interface Deployment
+interface DeploymentInterface
 {
     /**
      * Install the deployment setup
      *
      * @param boolean $force parameter to enforce installing even if installed
-     * @throws LogicException
+     *
+     * @return void
      * @throws RuntimeException
      * @throws InvalidArgumentException
-     * @return void
+     * @throws DeploymentExistsException
+     * @throws LogicException
      */
     public function install($force = false);
 }

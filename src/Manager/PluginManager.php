@@ -2,9 +2,9 @@
 
 namespace OFFLINE\Bootstrapper\October\Manager;
 
+use OFFLINE\Bootstrapper\October\Exceptions\PluginExistsException;
 use OFFLINE\Bootstrapper\October\Util\Git;
-use OFFLINE\Bootstrapper\October\Util\Artisan;
-use Symfony\Component\Console\Exception\RuntimeException;
+use RuntimeException;
 
 /**
  * Plugin manager class
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 class PluginManager extends BaseManager
 {
 
-   /**
+    /**
      * Parse the plugin declaration values out of the given plugin declaration string
      *
      * @param string $pluginDeclaration like ^Vendor.Plugin (Remote)
@@ -112,17 +112,19 @@ class PluginManager extends BaseManager
     {
         $pluginDir = $this->getDirPath($pluginDeclaration);
 
-        return !$this->isEmpty($pluginDir);
+        return $this->isEmpty($pluginDir);
     }
 
     public function install(string $pluginDeclaration)
     {
         list($update, $vendor, $plugin, $remote, $branch) = $this->parseDeclaration($pluginDeclaration);
 
+        $this->write('- ' . $vendor . '.' . $plugin);
+
         $pluginDir = $this->createDir($pluginDeclaration);
 
-        if (!$this->isEmpty($pluginDir)) {
-            throw new RuntimeException("Plugin directory not empty. Aborting.");
+        if ( ! $this->isEmpty($pluginDir)) {
+            throw new PluginExistsException("Plugin %s is already installed.");
         }
 
         if ($remote === '') {
@@ -160,8 +162,9 @@ class PluginManager extends BaseManager
         } catch (RuntimeException $e) {
             throw new RuntimeException(
                 sprintf(
-                    'Error while installing plugin %s via artisan. Is your database set up correctly?',
-                    $vendor . '.' . $plugin
+                    "Error while installing plugin %s via artisan:\n\n%s",
+                    $vendor . '.' . $plugin,
+                    $e->getMessage()
                 )
             );
         }

@@ -2,9 +2,7 @@
 
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
-use OFFLINE\Bootstrapper\October\Deployment\Gitlab;
 use Symfony\Component\Console\Exception\RuntimeException;
-use OFFLINE\Bootstrapper\October\Deployment\DeploymentInterface;
 
 /**
  * Static factory to create deployments

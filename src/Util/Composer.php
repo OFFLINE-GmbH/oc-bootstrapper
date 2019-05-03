@@ -3,7 +3,9 @@
 namespace OFFLINE\Bootstrapper\October\Util;
 
 
-use Symfony\Component\Process\Process;
+use InvalidArgumentException;
+use LogicException;
+use RuntimeException;
 
 /**
  * Class Composer
@@ -11,6 +13,7 @@ use Symfony\Component\Process\Process;
  */
 class Composer
 {
+    use RunsProcess;
 
     /**
      * @var string
@@ -43,70 +46,78 @@ class Composer
      * Composer install
      *
      * @return void
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws LogicException
      */
     public function install()
     {
-        (new Process($this->composer . ' install --no-scripts --no-interaction --prefer-dist'))
-            ->setTimeout(3600)
-            ->run();
+        $this->runProcess(
+            $this->composer . ' install --no-scripts --no-interaction --prefer-dist',
+            'Failed to run composer install',
+            3600
+        );
     }
 
     /**
      * Composer update --lock
      *
      * @return void
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws LogicException
      */
     public function updateLock()
     {
-        (new Process($this->composer . ' update --no-scripts --no-interaction --prefer-dist --lock'))
-            ->setTimeout(3600)
-            ->run();
+        $this->runProcess(
+            $this->composer . ' update --no-scripts --no-interaction --prefer-dist --lock',
+            'Failed to run composer update',
+            3600
+        );
     }
 
     /**
      * Composer require (if not already there)
      *
      * @return void
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws LogicException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     public function addDependency($package)
     {
         // If the package is already installed don't add it again
         $slashed = str_replace('/', '\/', $package);
-        if(preg_grep('/' . $slashed . '/', file(getcwd() . DS . 'composer.json'))) {
+        if (preg_grep('/' . $slashed . '/', file(getcwd() . DS . 'composer.json'))) {
             return true;
         }
 
         $package = escapeshellarg($package);
 
-        (new Process($this->composer . ' require ' . $package . ' --no-interaction'))
-            ->setTimeout(3600)
-            ->run();
+        $this->runProcess(
+            $this->composer . ' require ' . $package . ' --no-interaction',
+            'Failed to add composer dependency',
+            3600
+        );
     }
 
     /**
      * Composer require <package> <version>
      *
      * @return void
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws LogicException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     public function requireVersion($package, $version)
     {
         $package = escapeshellarg($package);
         $version = escapeshellarg($version);
 
-        (new Process($this->composer . ' require ' . $package . ' ' . $version . ' --no-interaction'))
-            ->setTimeout(3600)
-            ->run();
+        $this->runProcess(
+            $this->composer . ' require ' . $package . ' ' . $version . ' --no-interaction',
+            'Failed to add  specific composer dependency',
+            3600
+        );
     }
 }

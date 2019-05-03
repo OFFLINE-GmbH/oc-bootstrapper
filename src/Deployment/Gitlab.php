@@ -2,8 +2,7 @@
 
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
-use OFFLINE\Bootstrapper\October\Deployment\DeploymentBase;
-use OFFLINE\Bootstrapper\October\Deployment\DeploymentInterface;
+use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
 
 /**
  * GitLab deployment
@@ -15,8 +14,8 @@ class Gitlab extends DeploymentBase implements DeploymentInterface
      */
     public function install($force = false)
     {
-        if (! $this->force && $this->fileExists('.gitlab-ci.yml')) {
-            return $this->write('<comment>-> Deployment is already set up. Use --force to overwrite</comment>');
+        if ( ! $force && $this->fileExists('.gitlab-ci.yml')) {
+            throw new DeploymentExistsException('-> Deployment is already set up. Use --force to overwrite');
         }
 
         $this->copy($this->getTemplate('gitlab-ci.yml'), '.gitlab-ci.yml');

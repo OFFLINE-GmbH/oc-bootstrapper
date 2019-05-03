@@ -2,11 +2,11 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
-use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
+use InvalidArgumentException;
 use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
+use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,8 +22,8 @@ class InitCommand extends Command
     /**
      * Configure the command options.
      *
-     * @throws InvalidArgumentException
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -36,11 +36,11 @@ class InitCommand extends Command
     /**
      * Execute the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      *
-     * @throws RuntimeException
      * @return mixed
+     * @throws RuntimeException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

@@ -2,6 +2,8 @@
 
 namespace OFFLINE\Bootstrapper\October\Util;
 
+use LogicException;
+use RuntimeException;
 use Symfony\Component\Process\Process;
 
 trait RunsProcess
@@ -14,16 +16,17 @@ trait RunsProcess
      * @param $errorMessage
      *
      * @return bool
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws RuntimeException
+     * @throws LogicException
      */
-    protected function runProcess($command, $errorMessage)
+    protected function runProcess($command, $errorMessage, $timeout = 30)
     {
-
-        $process = (new Process($command));
+        $process = new Process($command);
+        $process->setTimeout($timeout);
+        $process->enableOutput();
         $exitCode = $process->run();
 
-        return $this->checkProcessResult($exitCode, $errorMessage);
+        return $this->checkProcessResult($exitCode, $errorMessage, $process->getOutput());
     }
 
     /**
@@ -34,10 +37,10 @@ trait RunsProcess
      *
      * @return bool
      */
-    protected function checkProcessResult($exitCode, $message)
+    protected function checkProcessResult($exitCode, $message, $output)
     {
         if ($exitCode !== 0) {
-            $this->output->writeln('<error>' . $message . '</error>');
+            $this->output->writeln('<error>' . $message . ': ' . $output . '</error>');
 
             return false;
         }

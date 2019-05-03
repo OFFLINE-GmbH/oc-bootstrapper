@@ -2,25 +2,27 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
-use OFFLINE\Bootstrapper\October\Util\CliIO;
+use InvalidArgumentException;
+use LogicException;
 use OFFLINE\Bootstrapper\October\Config\Setup;
-use OFFLINE\Bootstrapper\October\Util\Artisan;
-use Symfony\Component\Console\Command\Command;
-use OFFLINE\Bootstrapper\October\Util\Composer;
-use OFFLINE\Bootstrapper\October\Util\Gitignore;
-use Symfony\Component\Console\Input\InputOption;
-use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
-use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
-use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
-use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
-use OFFLINE\Bootstrapper\October\Manager\PluginManager;
-use Symfony\Component\Process\Exception\LogicException;
-use Symfony\Component\Console\Exception\RuntimeException;
 use OFFLINE\Bootstrapper\October\Deployment\DeploymentFactory;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
+use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
+use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
+use OFFLINE\Bootstrapper\October\Exceptions\ThemeExistsException;
+use OFFLINE\Bootstrapper\October\Manager\PluginManager;
+use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
+use OFFLINE\Bootstrapper\October\Util\Artisan;
+use OFFLINE\Bootstrapper\October\Util\CliIO;
+use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
+use OFFLINE\Bootstrapper\October\Util\Gitignore;
+use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
+use RuntimeException;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 /**
  * Class InstallCommand
@@ -29,12 +31,12 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 class InstallCommand extends Command
 {
     use ConfigMaker, UsesTemplate, CliIO;
-    
+
     /**
-    * @var Gitignore
-    */
+     * @var Gitignore
+     */
     protected $gitignore;
-    
+
     /**
      * @var bool
      */
@@ -76,9 +78,9 @@ class InstallCommand extends Command
     public function __construct($name = null)
     {
         $this->pluginManager = new PluginManager();
-        $this->themeManager = new ThemeManager();
-        $this->artisan = new Artisan();
-        $this->composer = new Composer();
+        $this->themeManager  = new ThemeManager();
+        $this->artisan       = new Artisan();
+        $this->composer      = new Composer();
 
         $this->setPhp();
 
@@ -110,8 +112,8 @@ class InstallCommand extends Command
     /**
      * Configure the command options.
      *
-     * @throws InvalidArgumentException
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -136,19 +138,19 @@ class InstallCommand extends Command
     /**
      * Execute the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      *
      * @return mixed
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      * @throws LogicException
      * @throws RuntimeException
      * @throws InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (! class_exists('ZipArchive')) {
+        if ( ! class_exists('ZipArchive')) {
             throw new RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
 
@@ -160,7 +162,7 @@ class InstallCommand extends Command
 
         $this->makeConfig();
 
-        if (!empty($php = $input->getOption('php'))) {
+        if ( ! empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
 
@@ -169,8 +171,12 @@ class InstallCommand extends Command
         $this->write('Downloading latest October CMS...');
         try {
             (new OctoberCms())->download($this->force);
-        } catch (LogicException $e) {
+        } catch (\LogicException $e) {
+            $this->write($e->getMessage(), 'comment');
+        } catch (Throwable $e) {
             $this->write($e->getMessage(), 'error');
+
+            return false;
         }
 
         $this->write('Installing composer dependencies...');
@@ -188,19 +194,27 @@ class InstallCommand extends Command
         $themeDeclaration = false;
         try {
             $themeDeclaration = $this->config->cms['theme'];
-        } catch (\RuntimeException $e) {
-            $this->write('No theme to install');
+        } catch (RuntimeException $e) {
+            $this->write('No theme to install', 'comment');
         }
 
         if ($themeDeclaration) {
             $this->write('Installing Theme...');
-            $this->installTheme($themeDeclaration);
+            try {
+                $this->themeManager->install($themeDeclaration);
+            } catch (ThemeExistsException $e) {
+                $this->write($e->getMessage(), 'comment');
+            } catch (Throwable $e) {
+                $this->write('Failed to install theme: ' . $e->getMessage(), 'error');
+
+                return false;
+            }
         }
 
-        $pluginsDeclarations = false;
+        $pluginsDeclarations = [];
         try {
             $pluginsDeclarations = $this->config->plugins;
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->write('No plugins to install');
         }
 
@@ -212,14 +226,22 @@ class InstallCommand extends Command
         $deployment = false;
         try {
             $deployment = $this->config->git['deployment'];
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->write('No deployments to install');
         }
 
         if ($deployment) {
             $this->write("Setting up ${deployment} deployment.");
-            $deploymentObj = DeploymentFactory::createDeployment($deployment);
-            $deploymentObj->install($this->force);
+            try {
+                $deploymentObj = DeploymentFactory::createDeployment($deployment);
+                $deploymentObj->install($this->force);
+            } catch (DeploymentExistsException $e) {
+                $this->write($e->getMessage(), 'comment');
+            } catch (Throwable $e) {
+                $this->write($e->getMessage(), 'error');
+
+                return false;
+            }
         }
 
         $this->write('Creating .gitignore...');
@@ -249,29 +271,36 @@ class InstallCommand extends Command
      * Handle installing plugins and updating them if possible
      *
      * @param array $pluginsDeclarations
+     *
      * @return void
      */
     public function installPlugins($pluginsDeclarations)
     {
         foreach ($pluginsDeclarations as $pluginDeclaration) {
             $pluginInstalled = $this->pluginManager->isInstalled($pluginDeclaration);
-            $installPlugin = !$pluginInstalled;
+            $installPlugin   = ! $pluginInstalled;
 
             list($update, $vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginDeclaration);
 
-            if ($pluginInstalled && ($update || !$this->gitignore->hasPluginHeader($vendor, $plugin))) {
-                $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...", 'comment');
+            if ($pluginInstalled && ($update || ! $this->gitignore->hasPluginHeader($vendor, $plugin))) {
+                if ($pluginInstalled && $remote) {
+                    $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...",
+                        'comment');
+                }
 
                 $this->pluginManager->removeDir($pluginDeclaration);
                 $installPlugin = true;
+            } else {
+                $installPlugin = false;
+                $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
             }
 
             if ($installPlugin) {
                 try {
-                    $this->write('- ' . $vendor . '.' . $plugin);
                     $this->pluginManager->install($pluginDeclaration);
-                } catch (RuntimeException $e) {
+                } catch (Throwable $e) {
                     $this->write($e->getMessage(), 'error');
+                    continue;
                 }
             }
 
@@ -282,21 +311,6 @@ class InstallCommand extends Command
 
         $this->write('Migrating plugin tables...');
         $this->artisan->call('october:up');
-    }
-
-    /**
-     * Install theme
-     *
-     * @param string $themeDeclaration
-     * @return void
-     */
-    public function installTheme(string $themeDeclaration)
-    {
-        try {
-            $this->themeManager->install($themeDeclaration);
-        } catch (RuntimeException $e) {
-            $this->write($e->getMessage(), 'error');
-        }
     }
 
     /**
@@ -334,7 +348,7 @@ class InstallCommand extends Command
         if ($this->fileExists($target)) {
             return $target;
         }
-        
+
         $templateName = 'gitignore';
 
         if ($this->config->git['bareRepo']) {
@@ -347,7 +361,7 @@ class InstallCommand extends Command
 
         return $target;
     }
-    
+
     /**
      * Copy the README template.
      *
@@ -361,7 +375,7 @@ class InstallCommand extends Command
 
     protected function cleanup()
     {
-        if (! $this->firstRun) {
+        if ( ! $this->firstRun) {
             return;
         }
 
@@ -379,7 +393,7 @@ class InstallCommand extends Command
         // If SQLite database does not exist, create it
         if ($this->config->database['connection'] === 'sqlite') {
             $path = $this->config->database['database'];
-            if (! $this->fileExists($path) && is_dir(dirname($path))) {
+            if ( ! $this->fileExists($path) && is_dir(dirname($path))) {
                 $this->write("Creating $path ...");
                 $this->touchFile($path);
             }

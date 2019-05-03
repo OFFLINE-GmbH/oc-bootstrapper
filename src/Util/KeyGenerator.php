@@ -3,6 +3,8 @@
 namespace OFFLINE\Bootstrapper\October\Util;
 
 
+use RuntimeException;
+
 /**
  * Class KeyGenerator
  * @package OFFLINE\Bootstrapper\October\Util
@@ -11,17 +13,18 @@ class KeyGenerator
 {
     /**
      * Generate the application's key.
-     * 
+     *
      * @param int $length
      *
      * @return string
+     * @throws \Exception
      */
     public function generate($length = 32)
     {
         $string = '';
         while (($len = strlen($string)) < $length) {
-            $size  = $length - $len;
-            $bytes = $this->randomBytes($size);
+            $size   = $length - $len;
+            $bytes  = $this->randomBytes($size);
             $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
 
@@ -34,6 +37,7 @@ class KeyGenerator
      * @param int $length
      *
      * @return string
+     * @throws \Exception
      */
     private function randomBytes($length = 32)
     {
@@ -43,6 +47,10 @@ class KeyGenerator
             $bytes = random_bytes($length);
         } elseif (function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes($length, $strong);
+        }
+
+        if ($bytes === false) {
+            throw new RuntimeException('Failed to generate random bytes.');
         }
 
         return $bytes;

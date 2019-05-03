@@ -2,9 +2,8 @@
 
 namespace OFFLINE\Bootstrapper\October\Util;
 
+use RuntimeException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\RuntimeException;
-use OFFLINE\Bootstrapper\October\Util\CliIO;
 
 /**
  * Class Artisan
@@ -34,10 +33,14 @@ class Artisan
 
     public function call(string $command)
     {
-        $exitCode = (new Process($this->php . " artisan " . $command))->setTimeout(3600)->run();
+        $proc = new Process($this->php . " artisan " . $command);
+        $proc->enableOutput();
+        $exitCode = $proc->run();
 
         if ($exitCode !== $this->exitCodeOk) {
-            throw new RuntimeException("Error running \"{$this->php} artisan {$command}\" command");
+            throw new RuntimeException(
+                sprintf("Error running \"{$this->php} artisan {$command}\" command: %s", $proc->getOutput())
+            );
         }
     }
 }
