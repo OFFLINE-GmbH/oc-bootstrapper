@@ -212,9 +212,9 @@ class InstallCommand extends Command
             }
         }
 
-        if($this->config->project){
+        if ($this->config->project) {
             $this->write('Setting Project ID...');
-            $this->artisan->call('october:util set project --projectId='.$this->config->project);
+            $this->artisan->call('october:util set project --projectId=' . $this->config->project);
         }
 
         $pluginsDeclarations = [];
@@ -295,12 +295,10 @@ class InstallCommand extends Command
 
                     $this->pluginManager->removeDir($pluginDeclaration);
                     $installPlugin = true;
-                }
-                else {
+                } else {
                     $installPlugin = false;
                     $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
                 }
-
             }
 
             if ($installPlugin) {
