@@ -4,7 +4,8 @@ RUN apk add --no-cache \
                 curl \
                 curl-dev \
         libcurl \
-        libssl1.0 \
+        libzip-dev \
+        libssl1.1 \
         libxml2-dev     \
     && rm -rf /var/cache/apk/*
 
