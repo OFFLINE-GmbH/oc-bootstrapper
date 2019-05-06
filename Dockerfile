@@ -1,20 +1,20 @@
 FROM composer:latest
 
 RUN apk add --no-cache \
-                curl \
-                curl-dev \
-        libcurl \
-        libssl1.1 \
-        libxml2-dev     \
+    curl \
+    curl-dev \
+    libcurl \
+    libssl1.1 \
+    libxml2-dev \
+    libzip-dev \
     && rm -rf /var/cache/apk/*
 
-
-RUN docker-php-ext-install pdo
-RUN docker-php-ext-install pdo_mysql
-RUN docker-php-ext-install curl
-RUN docker-php-ext-install xml
-RUN docker-php-ext-install zip
-RUN docker-php-ext-install posix
+RUN docker-php-ext-install pdo \
+    pdo_mysql \
+    curl \
+    xml \
+    zip \
+    posix
 
 RUN mkdir /tmp/bootstrapper /build
 
@@ -32,5 +32,3 @@ WORKDIR /build
 
 ENTRYPOINT []
 CMD ["/tmp/bootstrapper/october"]
-
-
