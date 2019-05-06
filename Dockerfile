@@ -16,19 +16,15 @@ RUN docker-php-ext-install pdo \
     zip \
     posix
 
-RUN mkdir /tmp/bootstrapper /build
+RUN mkdir /composer
 
-RUN composer global require --prefer-dist laravel/envoy --no-interaction
+WORKDIR /composer
 
-ADD . /tmp/bootstrapper
+RUN composer require --prefer-dist laravel/envoy --no-interaction
+RUN composer require --prefer-dist offline/oc-bootstrapper --no-interaction
 
-WORKDIR /tmp/bootstrapper
-RUN composer install --no-interaction --prefer-dist
-
-RUN ln -s /tmp/bootstrapper/october /usr/bin/october
-RUN ln -s /tmp/vendor/bin/envoy /usr/bin/envoy
-
-WORKDIR /build
+RUN ln -s /composer/vendor/bin/october /usr/bin/october
+RUN ln -s /composer/vendor/bin/envoy /usr/bin/envoy
 
 ENTRYPOINT []
-CMD ["/tmp/bootstrapper/october"]
+CMD ["/composer/vendor/bin/october"]
