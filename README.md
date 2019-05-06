@@ -181,8 +181,15 @@ If you want to update the installation you can run
 ```
 october update
 ```
+### Push changes to remote git repo
 
-The command will update all plugins, the October CMS core and all composer dependencies.
+To push local changes to the current git remote run 
+
+```
+october push
+```
+
+This command can be run as cron job to keep your git repo up-to-date with changes on production.
  
 ### SSH deployments
 
