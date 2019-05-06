@@ -3,8 +3,8 @@
 namespace OFFLINE\Bootstrapper\October\Manager;
 
 use OFFLINE\Bootstrapper\October\Util\Artisan;
-use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\CliIO;
+use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
 
 /**
@@ -45,15 +45,5 @@ class BaseManager
     {
         $this->php = $php;
         $this->artisan->setPhp($php);
-    }
-
-    /**
-     * Removes .git Directories.
-     *
-     * @param $path
-     */
-    public function removeGitRepo($path)
-    {
-        $this->rmdir($path . DS . '.git');
     }
 }

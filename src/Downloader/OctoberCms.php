@@ -28,8 +28,8 @@ class OctoberCms
      * @param bool $force
      *
      * @return $this
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws RuntimeException
+     * @throws LogicException
      */
     public function download($force = false)
     {
@@ -120,7 +120,7 @@ class OctoberCms
      * Remove the Zip file, move folder contents one level up.
      *
      * @return $this
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws RuntimeException
      * @throws LogicException
      */
     protected function cleanUp()

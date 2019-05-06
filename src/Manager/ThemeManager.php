@@ -2,7 +2,9 @@
 
 namespace OFFLINE\Bootstrapper\October\Manager;
 
+use OFFLINE\Bootstrapper\October\Exceptions\ThemeExistsException;
 use OFFLINE\Bootstrapper\October\Util\Git;
+use RuntimeException;
 
 /**
  * Plugin manager class
@@ -67,6 +69,7 @@ class ThemeManager extends BaseManager
      * @throws InvalidArgumentException
      * @throws \RuntimeException
      * @throws \LogicException
+     * @throws ThemeExistsException
      */
     public function install(string $themeDeclaration)
     {
@@ -74,8 +77,8 @@ class ThemeManager extends BaseManager
 
         $themeDir = $this->createDir($themeDeclaration);
 
-        if (!$this->isEmpty($themeDir)) {
-            throw new RuntimeException("<error> - Theme directory not empty. Aborting. </error>");
+        if ( ! $this->isEmpty($themeDir)) {
+            throw new ThemeExistsException("-> Theme is already installed. Skipping.");
         }
 
         if ($remote === false) {
@@ -114,5 +117,4 @@ class ThemeManager extends BaseManager
 
         return "${theme} theme installed";
     }
-
 }

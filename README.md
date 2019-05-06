@@ -31,8 +31,9 @@ Works on Windows via `Ubuntu Bash` or `Git Bash`.
 
 ## Example project
 
-Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of oc-bootstrapper.
+While using `oc-bootstrapper` it is a good idea to keep `october.yaml`, project's theme and project's plugins (those that are not shared among other projects) in project's repo.
 
+Take a look at the [OFFLINE-GmbH/octobertricks.com](https://github.com/OFFLINE-GmbH/octobertricks.com) repo to see an example setup of `oc-bootstrapper`.
 
 ## Installation
 
@@ -83,6 +84,7 @@ cms:
     theme: name (user@remote.git)
     edgeUpdates: false
     enableSafeMode: false
+    # project: XXXX            # Marketplace project ID
 
 database:
     connection: mysql
@@ -179,8 +181,15 @@ If you want to update the installation you can run
 ```
 october update
 ```
+### Push changes to remote git repo
 
-The command will update all plugins, the October CMS core and all composer dependencies.
+To push local changes to the current git remote run 
+
+```
+october push
+```
+
+This command can be run as cron job to keep your git repo up-to-date with changes on production.
  
 ### SSH deployments
 
@@ -215,8 +224,8 @@ This will setup a [`.gitlab-ci.yml`](templates/gitlab-ci.yml) and a [`Envoy.blad
 If a deployed website is edited by a customer directly on the prod server you might want to commit
  those changes back to your git repository. 
  
-To do this, simply create a cronjob that executes `git.cron.sh` every X minutes. This script will commit all changes
-to your git repo automatically.
+To do this, simply create a cronjob that executes `october push` every X minutes. This command will commit all changes
+to your git repo automatically with message `[ci skip] Added changes from $hostname`.
 
 ### File templates
 

@@ -3,7 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Util;
 
 use OFFLINE\Bootstrapper\October\Config\Yaml;
-use Symfony\Component\Console\Exception\RuntimeException;
+use RuntimeException;
 
 /**
  * Config maker trait

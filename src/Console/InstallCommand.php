@@ -2,23 +2,27 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
+use InvalidArgumentException;
+use LogicException;
 use OFFLINE\Bootstrapper\October\Config\Setup;
-use OFFLINE\Bootstrapper\October\Config\Yaml;
+use OFFLINE\Bootstrapper\October\Deployment\DeploymentFactory;
 use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
-use OFFLINE\Bootstrapper\October\Installer\DeploymentInstaller;
-use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
-use OFFLINE\Bootstrapper\October\Installer\ThemeInstaller;
+use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
+use OFFLINE\Bootstrapper\October\Exceptions\ThemeExistsException;
+use OFFLINE\Bootstrapper\October\Manager\PluginManager;
+use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
+use OFFLINE\Bootstrapper\October\Util\Artisan;
+use OFFLINE\Bootstrapper\October\Util\CliIO;
 use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
 use OFFLINE\Bootstrapper\October\Util\Gitignore;
-use OFFLINE\Bootstrapper\October\Util\RunsProcess;
 use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\LogicException;
+use Throwable;
 
 /**
  * Class InstallCommand
@@ -26,34 +30,91 @@ use Symfony\Component\Process\Exception\LogicException;
  */
 class InstallCommand extends Command
 {
-    use UsesTemplate, RunsProcess;
+    use ConfigMaker, UsesTemplate, CliIO;
 
-    /**
-     * @var
-     */
-    public $config;
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
     /**
      * @var Gitignore
      */
     protected $gitignore;
+
     /**
      * @var bool
      */
     protected $firstRun;
+
+    /**
+     * @var bool
+     */
+    protected $force;
+
+    /**
+     * @var PluginManager
+     */
+    protected $pluginManager;
+
+    /**
+     * @var ThemeManager
+     */
+    protected $themeManager;
+
+    /**
+     * @var Artisan
+     */
+    protected $artisan;
+
+    /**
+     * @var Composer
+     */
+    protected $composer;
+
     /**
      * @var string
      */
     protected $php;
 
     /**
+     * @inheritdoc
+     */
+    public function __construct($name = null)
+    {
+        $this->pluginManager = new PluginManager();
+        $this->themeManager  = new ThemeManager();
+        $this->artisan       = new Artisan();
+        $this->composer      = new Composer();
+
+        $this->setPhp();
+
+        parent::__construct($name);
+    }
+
+    /**
+     * Set PHP version to be used in console commands
+     */
+    public function setPhp(string $php = 'php')
+    {
+        //IDEA: simple observer for changing the php version
+        $this->php = $php;
+        $this->artisan->setPhp($php);
+        $this->pluginManager->setPhp($php);
+        $this->themeManager->setPhp($php);
+    }
+
+    /**
+     * Set output for all components
+     */
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
+        $this->pluginManager->setOutput($output);
+        $this->themeManager->setOutput($output);
+        $this->composer->setOutput($output);
+    }
+
+    /**
      * Configure the command options.
      *
-     * @throws InvalidArgumentException
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -78,12 +139,12 @@ class InstallCommand extends Command
     /**
      * Execute the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      *
      * @return mixed
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      * @throws LogicException
      * @throws RuntimeException
      * @throws InvalidArgumentException
@@ -94,85 +155,168 @@ class InstallCommand extends Command
             throw new RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
 
-        $force     = $input->getOption('force');
-        $this->php = $input->getOption('php') ?: 'php';
+        $this->setOutput($output);
 
-        $this->firstRun = ! is_dir(getcwd() . DS . 'bootstrap') || $force;
+        $this->force = $input->getOption('force');
 
-        $this->output = $output;
+        $this->firstRun = ! $this->dirExists($this->path('bootstrap')) || $this->force;
 
-        $configFile = getcwd() . DS . 'october.yaml';
-        if ( ! file_exists($configFile)) {
-            return $output->writeln('<comment>october.yaml not found. Run october init first.</comment>');
+        $this->makeConfig();
+
+        if ( ! empty($php = $input->getOption('php'))) {
+            $this->setPhp($php);
         }
 
-        $this->config    = new Yaml($configFile);
         $this->gitignore = new Gitignore($this->getGitignore());
 
-        $output->writeln('<info>Downloading latest October CMS...</info>');
+        $this->write('Downloading latest October CMS...');
         try {
-            (new OctoberCms())->download($force);
+            (new OctoberCms())->download($this->force);
         } catch (\LogicException $e) {
-            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
+            $this->write($e->getMessage(), 'comment');
+        } catch (Throwable $e) {
+            $this->write($e->getMessage(), 'error');
+
+            return false;
         }
 
-        $output->writeln('<info>Installing composer dependencies...</info>');
-        (new Composer())->install();
-        (new Composer())->addDependency('offline/oc-bootstrapper');
+        $this->write('Installing composer dependencies...');
+        $this->composer->install();
+        $this->composer->addDependency('offline/oc-bootstrapper');
 
-        $output->writeln('<info>Setting up config files...</info>');
-        $this->writeConfig($force);
+        $this->write('Setting up config files...');
+        $this->writeConfig($this->force);
 
         $this->prepareDatabase();
 
-        $output->writeln('<info>Migrating database...</info>');
-        $this->runProcess($this->php . ' artisan october:up', 'Migrations failed!');
+        $this->write('Migrating database...');
+        $this->artisan->call('october:up');
 
-        $output->writeln('<info>Installing Theme...</info>');
+        $themeDeclaration = false;
         try {
-            (new ThemeInstaller($this->config, $this->gitignore, $this->output, $this->php))->install();
-        } catch (\RuntimeException $e) {
-            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
+            $themeDeclaration = $this->config->cms['theme'];
+        } catch (RuntimeException $e) {
+            $this->write('No theme to install', 'comment');
         }
 
-        $output->writeln('<info>Installing Plugins...</info>');
-        try {
-            (new PluginInstaller($this->config, $this->gitignore, $this->output, $this->php))->install();
-        } catch (\RuntimeException $e) {
-            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
+        if ($themeDeclaration) {
+            $this->write('Installing Theme...');
+            try {
+                $this->themeManager->install($themeDeclaration);
+            } catch (ThemeExistsException $e) {
+                $this->write($e->getMessage(), 'comment');
+            } catch (Throwable $e) {
+                $this->write('Failed to install theme: ' . $e->getMessage(), 'error');
+
+                return false;
+            }
         }
 
-        $output->writeln('<info>Migrating plugin tables...</info>');
-        $this->runProcess($this->php . ' artisan october:up', 'Plugin migrations failed!');
-
-        $output->writeln('<info>Setting up deployments...</info>');
-        try {
-            (new DeploymentInstaller($this->config, $this->gitignore, $this->output, $this->php))->install($force);
-        } catch (\RuntimeException $e) {
-            $output->writeln("<error>${e}</error>");
+        if (array_key_exists('project', $this->config->cms)) {
+            $this->write('Setting Project ID...');
+            $this->artisan->call('october:util set project --projectId=' . $this->config->cms['project']);
         }
 
-        $output->writeln('<info>Creating .gitignore...</info>');
+        $pluginsDeclarations = [];
+        try {
+            $pluginsDeclarations = $this->config->plugins;
+        } catch (RuntimeException $e) {
+            $this->write('No plugins to install');
+        }
+
+        if ($pluginsDeclarations) {
+            $this->write('Installing Plugins...');
+            $this->installPlugins($pluginsDeclarations);
+        }
+
+        $deployment = false;
+        try {
+            $deployment = $this->config->git['deployment'];
+        } catch (RuntimeException $e) {
+            $this->write('No deployments to install');
+        }
+
+        if ($deployment) {
+            $this->write("Setting up ${deployment} deployment.");
+            try {
+                $deploymentObj = DeploymentFactory::createDeployment($deployment);
+                $deploymentObj->install($this->force);
+            } catch (DeploymentExistsException $e) {
+                $this->write($e->getMessage(), 'comment');
+            } catch (Throwable $e) {
+                $this->write($e->getMessage(), 'error');
+
+                return false;
+            }
+        }
+
+        $this->write('Creating .gitignore...');
         $this->gitignore->write();
 
         if ($this->firstRun) {
-            $output->writeln('<info>Removing demo data...</info>');
-            $this->runProcess($this->php . ' artisan october:fresh', 'Failed to remove demo data!');
+            $this->write('Removing demo data...');
+            $this->artisan->call('october:fresh');
 
-            $output->writeln('<info>Creating README...</info>');
-            $this->readme();
+            $this->write('Creating README...');
+            $this->copyReadme();
 
-            $output->writeln('<info>Cleaning up...</info>');
+            $this->write('Cleaning up...');
             $this->cleanup();
         }
 
-        $output->writeln('<info>Clearing cache...</info>');
-        $this->runProcess($this->php . ' artisan clear-compiled', 'Failed to clear compiled files!');
-        $this->runProcess($this->php . ' artisan cache:clear', 'Failed to clear cache!');
+        $this->write('Clearing cache...');
+        $this->artisan->call('clear-compiled');
+        $this->artisan->call('cache:clear');
 
-        $output->writeln('<comment>Application ready! Build something amazing.</comment>');
+        $this->write('Application ready! Build something amazing.', 'comment');
 
         return true;
+    }
+
+    /**
+     * Handle installing plugins and updating them if possible
+     *
+     * @param array $pluginsDeclarations
+     *
+     * @return void
+     */
+    public function installPlugins($pluginsDeclarations)
+    {
+        foreach ($pluginsDeclarations as $pluginDeclaration) {
+            $pluginInstalled = $this->pluginManager->isInstalled($pluginDeclaration);
+            $installPlugin   = ! $pluginInstalled;
+
+            list($update, $vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginDeclaration);
+
+            if ($pluginInstalled && ($update || ! $this->gitignore->hasPluginHeader($vendor, $plugin))) {
+                if ($pluginInstalled && $remote) {
+                    $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...",
+                        'comment');
+
+                    $this->pluginManager->removeDir($pluginDeclaration);
+                    $installPlugin = true;
+                } else {
+                    $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
+                    $installPlugin = false;
+                }
+            }
+
+            if ($installPlugin) {
+                try {
+                    $this->pluginManager->install($pluginDeclaration);
+                } catch (Throwable $e) {
+                    $this->write($e->getMessage(), 'error');
+                    continue;
+                }
+            }
+
+            if ($update === false) {
+                $this->gitignore->addPlugin($vendor, $plugin);
+            }
+        }
+
+        $this->write('Migrating plugin tables...');
+        $this->artisan->call('october:up');
     }
 
     /**
@@ -191,29 +335,35 @@ class InstallCommand extends Command
             return;
         }
 
-        if ((file_exists(getcwd() . DS . '.env') && $force === false)) {
-            return $this->output->writeln('<comment>-> Configuration already set up. Use --force to regenerate.</comment>');
+        if ($this->fileExists('.env') && $force === false) {
+            return $this->write('-> Configuration already set up. Use --force to regenerate.', 'comment');
         }
 
         $setup->env();
-
     }
 
     /**
-     * Get the .gitignore template.
+     * Get the .gitignore or create it using template.
      *
      * @return string
      */
     protected function getGitignore()
     {
-        $target = getcwd() . DS . '.gitignore';
-        if (file_exists($target)) {
+        $target = $this->path('.gitignore');
+
+        if ($this->fileExists($target)) {
             return $target;
         }
 
-        $template = $this->getTemplate('gitignore');
+        $templateName = 'gitignore';
 
-        copy($template, $target);
+        if ($this->config->git['bareRepo']) {
+            $templateName .= '.bare';
+        }
+
+        $template = $this->getTemplate($templateName);
+
+        $this->copy($template, $target);
 
         return $target;
     }
@@ -223,10 +373,10 @@ class InstallCommand extends Command
      *
      * @return void
      */
-    protected function readme()
+    protected function copyReadme()
     {
         $template = $this->getTemplate('README.md');
-        copy($template, getcwd() . DS . 'README.md');
+        $this->copy($template, 'README.md');
     }
 
     protected function cleanup()
@@ -237,7 +387,7 @@ class InstallCommand extends Command
 
         $remove = ['CONTRIBUTING.md', 'CHANGELOG.md', 'ISSUE_TEMPLATE.md'];
         foreach ($remove as $file) {
-            @unlink(getcwd() . DS . $file);
+            $this->unlink(($this->path($file)));
         }
     }
 
@@ -249,9 +399,9 @@ class InstallCommand extends Command
         // If SQLite database does not exist, create it
         if ($this->config->database['connection'] === 'sqlite') {
             $path = $this->config->database['database'];
-            if ( ! file_exists($path) && is_dir(dirname($path))) {
-                $this->output->writeln("<info>Creating $path ...</info>");
-                touch($path);
+            if ( ! $this->fileExists($path) && is_dir(dirname($path))) {
+                $this->write("Creating $path ...");
+                $this->touchFile($path);
             }
         }
     }

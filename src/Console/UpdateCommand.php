@@ -2,20 +2,20 @@
 
 namespace OFFLINE\Bootstrapper\October\Console;
 
-use OFFLINE\Bootstrapper\October\Installer\PluginInstaller;
+use InvalidArgumentException;
+use LogicException;
+use OFFLINE\Bootstrapper\October\Exceptions\PluginExistsException;
+use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Util\Artisan;
-use OFFLINE\Bootstrapper\October\Util\Composer;
-use OFFLINE\Bootstrapper\October\Util\Gitignore;
-use OFFLINE\Bootstrapper\October\Util\RunsProcess;
-use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
 use OFFLINE\Bootstrapper\October\Util\CliIO;
+use OFFLINE\Bootstrapper\October\Util\Composer;
+use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
+use OFFLINE\Bootstrapper\October\Util\RunsProcess;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\LogicException;
 
 /**
  * Class UpdateCommand
@@ -36,9 +36,9 @@ class UpdateCommand extends Command
     protected $composer;
 
     /**
-     * @var Gitignore
+     * @var PluginManager
      */
-    protected $gitignore;
+    protected $pluginManager;
 
     /**
      * @var string
@@ -50,8 +50,9 @@ class UpdateCommand extends Command
      */
     public function __construct($name = null)
     {
-        $this->artisan  = new Artisan();
-        $this->composer = new Composer();
+        $this->pluginManager = new PluginManager();
+        $this->artisan       = new Artisan();
+        $this->composer      = new Composer();
 
         $this->setPhp();
 
@@ -66,6 +67,7 @@ class UpdateCommand extends Command
         //IDEA: simple observer for changing the php version
         $this->php = $php;
         $this->artisan->setPhp($php);
+        $this->pluginManager->setPhp($php);
     }
 
     /**
@@ -95,48 +97,53 @@ class UpdateCommand extends Command
      * @param OutputInterface $output
      *
      * @return mixed
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      * @throws LogicException
      * @throws RuntimeException
      * @throws InvalidArgumentException
+     * @throws PluginExistsException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->prepareEnv($input, $output);
 
-        try {
-            $this->makeConfig();
-        } catch (RuntimeException $e) {
-            $this->write($e->getMessage());
-
-            return;
-        }
+        $this->makeConfig();
 
         if ( ! empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
 
-        $this->write('<info>Installing new plugins</info>');
-        $this->gitignore = new Gitignore(getcwd() . DS . '.gitignore');
+        $this->write("<info>Installing new plugins</info>");
 
-        $pluginInstaller = new PluginInstaller(
-            $this->config,
-            $this->gitignore,
-            $this->output,
-            $this->php
-        );
+        $pluginsConfigs = $this->config->plugins;
 
-        try {
-            $pluginInstaller->install();
-        } catch (\RuntimeException $e) {
-            $output->writeln('<comment>' . $e->getMessage() . '</comment>');
+        $this->write("<info>Removing private plugins</info>");
+        foreach ($pluginsConfigs as $pluginConfig) {
+            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
+
+            if ( ! empty($remote)) {
+                $this->pluginManager->removeDir($pluginConfig);
+            }
         }
 
-        $this->write('<info>Running artisan october:update</info>');
+        $this->write("<info>Cleared private plugins</info>");
+        $this->write("<info>Running artisan october:update</info>");
         $this->artisan->call('october:update');
 
-        $this->write('<info>Running database migrations</info>');
+        // 4. Git clone all plugins again
+
+        $this->write('<info>Reinstalling plugins:</info>');
+
+        foreach ($pluginsConfigs as $pluginConfig) {
+            list($vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginConfig);
+
+            if ( ! empty($remote)) {
+                $this->pluginManager->install($pluginConfig);
+            }
+        }
+
+        $this->write('<info>Migrating all unmigrated versions</info>');
 
         $this->artisan->call('october:up');
 
@@ -157,5 +164,6 @@ class UpdateCommand extends Command
     protected function prepareEnv(InputInterface $input, OutputInterface $output)
     {
         $this->setOutput($output);
+        $this->pluginManager->setOutput($output);
     }
 }

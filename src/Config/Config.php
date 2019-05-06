@@ -1,4 +1,5 @@
 <?php
+
 namespace OFFLINE\Bootstrapper\October\Config;
 
 
