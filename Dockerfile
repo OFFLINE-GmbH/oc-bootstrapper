@@ -1,4 +1,4 @@
-FROM composer:latest
+FROM arm32v7/composer:latest
 
 RUN apk add --no-cache \
     curl \
