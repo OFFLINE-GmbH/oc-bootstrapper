@@ -84,6 +84,7 @@ cms:
     theme: name (user@remote.git)
     edgeUpdates: false
     enableSafeMode: false
+    # project: XXXX            # Marketplace project ID
 
 database:
     connection: mysql
