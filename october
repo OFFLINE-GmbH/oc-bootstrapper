@@ -12,4 +12,5 @@ $app = new Symfony\Component\Console\Application('October CMS Bootstrapper', '0.
 $app->add(new \OFFLINE\Bootstrapper\October\Console\InitCommand);
 $app->add(new \OFFLINE\Bootstrapper\October\Console\InstallCommand);
 $app->add(new \OFFLINE\Bootstrapper\October\Console\UpdateCommand);
+$app->add(new \OFFLINE\Bootstrapper\October\Console\PushCommand);
 $app->run();

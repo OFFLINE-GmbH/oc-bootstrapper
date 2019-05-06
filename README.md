@@ -217,8 +217,8 @@ This will setup a [`.gitlab-ci.yml`](templates/gitlab-ci.yml) and a [`Envoy.blad
 If a deployed website is edited by a customer directly on the prod server you might want to commit
  those changes back to your git repository. 
  
-To do this, simply create a cronjob that executes `git.cron.sh` every X minutes. This script will commit all changes
-to your git repo automatically.
+To do this, simply create a cronjob that executes `october push` every X minutes. This command will commit all changes
+to your git repo automatically with message `[ci skip] Added changes from $hostname`.
 
 ### File templates
 

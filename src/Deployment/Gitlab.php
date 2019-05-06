@@ -20,6 +20,5 @@ class Gitlab extends DeploymentBase implements DeploymentInterface
 
         $this->copy($this->getTemplate('gitlab-ci.yml'), '.gitlab-ci.yml');
         $this->copy($this->getTemplate('Envoy.blade.php'), 'Envoy.blade.php');
-        $this->copy($this->getTemplate('git.cron.sh'), 'git.cron.sh');
     }
 }
