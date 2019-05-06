@@ -6,6 +6,7 @@ namespace OFFLINE\Bootstrapper\October\Util;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class Composer
@@ -21,12 +22,27 @@ class Composer
     protected $composer;
 
     /**
+     * @var OutputInterface
+     */
+    protected $output;
+
+
+    /**
      * Run Composer commands.
      */
     public function __construct()
     {
         $this->composer = $this->findComposer();
     }
+
+    /**
+     * @param OutputInterface $output
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
+    }
+
 
     /**
      * Get the composer command for the environment.

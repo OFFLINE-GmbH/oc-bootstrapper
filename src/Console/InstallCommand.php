@@ -107,6 +107,7 @@ class InstallCommand extends Command
         $this->output = $output;
         $this->pluginManager->setOutput($output);
         $this->themeManager->setOutput($output);
+        $this->composer->setOutput($output);
     }
 
     /**
@@ -211,6 +212,11 @@ class InstallCommand extends Command
             }
         }
 
+        if($this->config->project){
+            $this->write('Setting Project ID...');
+            $this->artisan->call('october:util set project --projectId='.$this->config->project);
+        }
+
         $pluginsDeclarations = [];
         try {
             $pluginsDeclarations = $this->config->plugins;
@@ -286,13 +292,15 @@ class InstallCommand extends Command
                 if ($pluginInstalled && $remote) {
                     $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...",
                         'comment');
+
+                    $this->pluginManager->removeDir($pluginDeclaration);
+                    $installPlugin = true;
+                }
+                else {
+                    $installPlugin = false;
+                    $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
                 }
 
-                $this->pluginManager->removeDir($pluginDeclaration);
-                $installPlugin = true;
-            } else {
-                $installPlugin = false;
-                $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
             }
 
             if ($installPlugin) {
