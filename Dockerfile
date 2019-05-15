@@ -1,36 +1,30 @@
 FROM composer:latest
 
 RUN apk add --no-cache \
-                curl \
-                curl-dev \
-        libcurl \
-        libssl1.0 \
-        libxml2-dev     \
+    curl \
+    curl-dev \
+    libcurl \
+    libssl1.1 \
+    libxml2-dev \
+    libzip-dev \
     && rm -rf /var/cache/apk/*
 
+RUN docker-php-ext-install pdo \
+    pdo_mysql \
+    curl \
+    xml \
+    zip \
+    posix
 
-RUN docker-php-ext-install pdo
-RUN docker-php-ext-install pdo_mysql
-RUN docker-php-ext-install curl
-RUN docker-php-ext-install xml
-RUN docker-php-ext-install zip
-RUN docker-php-ext-install posix
+RUN mkdir /composer
 
-RUN mkdir /tmp/bootstrapper /build
+WORKDIR /composer
 
-RUN composer global require --prefer-dist laravel/envoy --no-interaction
+RUN composer global require --prefer-dist hirak/prestissimo --no-interaction
+RUN composer require --prefer-dist laravel/envoy offline/oc-bootstrapper --no-interaction
 
-ADD . /tmp/bootstrapper
-
-WORKDIR /tmp/bootstrapper
-RUN composer install --no-interaction --prefer-dist
-
-RUN ln -s /tmp/bootstrapper/october /usr/bin/october
-RUN ln -s /tmp/vendor/bin/envoy /usr/bin/envoy
-
-WORKDIR /build
+RUN ln -s /composer/vendor/bin/october /usr/bin/october
+RUN ln -s /composer/vendor/bin/envoy /usr/bin/envoy
 
 ENTRYPOINT []
-CMD ["/tmp/bootstrapper/october"]
-
-
+CMD ["/composer/vendor/bin/october"]

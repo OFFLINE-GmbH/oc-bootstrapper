@@ -35,6 +35,7 @@ class Artisan
     {
         $proc = new Process($this->php . " artisan " . $command);
         $proc->enableOutput();
+        $proc->setTimeout(3600);
         $exitCode = $proc->run();
 
         if ($exitCode !== $this->exitCodeOk) {

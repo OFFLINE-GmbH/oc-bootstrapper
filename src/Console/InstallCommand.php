@@ -310,7 +310,7 @@ class InstallCommand extends Command
                 }
             }
 
-            if ($update === false) {
+            if ($update === false && $remote) {
                 $this->gitignore->addPlugin($vendor, $plugin);
             }
         }
