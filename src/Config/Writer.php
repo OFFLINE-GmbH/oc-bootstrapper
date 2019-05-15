@@ -94,7 +94,7 @@ class Writer
 
         copy($this->env, $file);
 
-        $this->replaceLine('APP_KEY', 'APP_KEY=Change me!!!', $file);
+        $this->replaceLine('APP_KEY', 'APP_KEY=Change_me!!!', $file);
         $this->replaceLine('DB_USERNAME', 'DB_USERNAME=', $file);
         $this->replaceLine('DB_PASSWORD', 'DB_PASSWORD=', $file);
 
@@ -112,7 +112,7 @@ class Writer
 
         copy($this->env, $file);
 
-        $this->replaceLine('APP_KEY', 'APP_KEY=Change me!!!', $file);
+        $this->replaceLine('APP_KEY', 'APP_KEY=Change_me!!!', $file);
         $this->replaceLine('APP_ENV', 'APP_ENV=production', $file);
         $this->replaceLine('APP_DEBUG', 'APP_DEBUG=false', $file);
         $this->replaceLine('APP_URL', 'APP_URL=https://', $file);
