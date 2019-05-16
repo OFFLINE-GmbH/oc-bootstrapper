@@ -296,7 +296,7 @@ class InstallCommand extends Command
                     $this->pluginManager->removeDir($pluginDeclaration);
                     $installPlugin = true;
                 } else {
-                    $this->write("-> Skipping re-downloading of ${vendor}.${plugin}", 'comment');
+                    $this->write("-> Skipping re-download of ${vendor}.${plugin}", 'comment');
                     $installPlugin = false;
                 }
             }

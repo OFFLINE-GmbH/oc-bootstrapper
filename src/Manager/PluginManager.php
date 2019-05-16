@@ -29,8 +29,6 @@ class PluginManager extends BaseManager
 
         array_shift($matches);
 
-        $matches = array_map('strtolower', $matches);
-
         if ($matches['update']) {
             $matches['update'] = true;
         } else {
