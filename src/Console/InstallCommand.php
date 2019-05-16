@@ -401,7 +401,7 @@ class InstallCommand extends Command
             $path = $this->config->database['database'];
             if ( ! $this->fileExists($path) && is_dir(dirname($path))) {
                 $this->write("Creating $path ...");
-                $this->touchFile($path);
+                touch($path);
             }
         }
     }
