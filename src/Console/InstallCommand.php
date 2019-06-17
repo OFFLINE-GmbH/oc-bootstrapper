@@ -17,7 +17,6 @@ use OFFLINE\Bootstrapper\October\Util\Composer;
 use OFFLINE\Bootstrapper\October\Util\ConfigMaker;
 use OFFLINE\Bootstrapper\October\Util\Gitignore;
 use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
-use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,7 +30,7 @@ use Throwable;
  */
 class InstallCommand extends Command
 {
-    use ConfigMaker, UsesTemplate, CliIO, ManageDirectory;
+    use ConfigMaker, UsesTemplate, CliIO;
 
     /**
      * @var Gitignore
