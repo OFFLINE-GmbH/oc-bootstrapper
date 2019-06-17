@@ -18,9 +18,6 @@ trait ManageDirectory
      */
     public function copy($sourceFile, $targetFile)
     {
-        $sourceFile = $this->path($sourceFile);
-        $targetFile = $this->path($targetFile);
-
         copy($sourceFile, $targetFile);
 
         if ( ! $this->fileExists($targetFile)) {
@@ -37,7 +34,7 @@ trait ManageDirectory
      */
     public function touch($file)
     {
-        return touch($this->path($file));
+        return touch(realpath($file));
     }
 
     /**
@@ -49,7 +46,19 @@ trait ManageDirectory
      */
     public function fileExists($file)
     {
-        return file_exists($this->path($file));
+        return file_exists(realpath($file));
+    }
+
+    /**    
+     * Get the absolute path of the file.
+     *    
+     * @param string $file relative or absolute path of the file    
+     *    
+     * @return string path of the file    
+     */    
+    public function path($file)
+    {
+        return realpath($file) ?: $file;
     }
 
     /**
@@ -61,35 +70,7 @@ trait ManageDirectory
      */
     public function dirExists($dir)
     {
-        return is_dir($this->path($dir));
-    }
-
-    /**
-     * Get absolute path of the file
-     *
-     * @param string $file relative or absolute path of the file
-     *
-     * @return string path of the file
-     */
-    public function path($file)
-    {
-        $relative = false;
-
-        $file = trim($file);
-
-        $windows = strpos($this->pwd(), '/', 0) === false;
-
-        if ( ! $windows && $file[0] !== '/') {
-            $relative = true;
-        } elseif ($windows && ! preg_match('/^[^*?"<>|:]*$/', $file)) {
-            $relative = true;
-        }
-
-        if ($relative) {
-            $file = $this->pwd() . $file;
-        }
-
-        return $file;
+        return is_dir(realpath($dir));
     }
 
     /**

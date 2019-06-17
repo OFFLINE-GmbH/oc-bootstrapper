@@ -37,7 +37,7 @@
         HOSTNAME=$( hostname )
         GIT=$( which git )
 
-        $PHP composer.phar self-update
+        php composer.phar self-update
         php ./vendor/bin/october update
 
         if [[ -n $(git status -s) ]]; then
