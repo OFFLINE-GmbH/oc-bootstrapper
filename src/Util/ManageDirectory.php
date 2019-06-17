@@ -49,6 +49,18 @@ trait ManageDirectory
         return file_exists(realpath($file));
     }
 
+    /**    
+     * Get the absolute path of the file.
+     *    
+     * @param string $file relative or absolute path of the file    
+     *    
+     * @return string path of the file    
+     */    
+    public function path($file)
+    {
+        return realpath($file) ?: $file;
+    }
+
     /**
      * Check if directory exists
      *
