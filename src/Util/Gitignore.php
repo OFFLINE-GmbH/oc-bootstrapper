@@ -55,6 +55,9 @@ class Gitignore
             return;
         }
 
+        $vendor = strtolower($vendor);
+        $plugin = strtolower($plugin);
+
         $this->newLine();
         $this->add($header);
         $this->add('!plugins/' . $vendor);
@@ -73,6 +76,4 @@ class Gitignore
     {
         return sprintf("# %s.%s", $vendor, $plugin);
     }
-
-
 }
