@@ -34,7 +34,8 @@ class Gitignore
     public function hasLine($line)
     {
         foreach ($this->contents as $entry) {
-            $entry = str_replace("\n", '', $entry);
+            $entry = str_replace(["\n", "\r"], '', $entry);
+            $line  = str_replace(["\n", "\r"], '', $line);
             if (strtolower($line) === strtolower($entry)) {
                 return true;
             }
