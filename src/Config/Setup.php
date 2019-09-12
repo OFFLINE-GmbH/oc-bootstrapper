@@ -83,7 +83,7 @@ class Setup
             'APP_ENV'         => 'dev',
             '',
             'CMS_SAFE_MODE'   => $this->getSafeMode(),
-            'CMS_DISABLE_CORE_UPDATES' => (bool)$this->config->cms['disableCoreUpdates'] ? 'true' : 'false',
+            'CMS_DISABLE_CORE_UPDATES' => (isset($this->config->cms['disableCoreUpdates']) && $this->config->cms['disableCoreUpdates'] === true) ? 'true' : 'false',
             '',
             'DB_CONNECTION'   => $this->config->database['connection'],
             'DB_HOST'         => $this->config->database['host'],
@@ -162,7 +162,7 @@ class Setup
     {
         $values = [
             'enableSafeMode' => "env('CMS_SAFE_MODE', " . $this->getSafeMode() . ')',
-            'disableCoreUpdates' => "env('CMS_DISABLE_CORE_UPDATES', true)",
+            'disableCoreUpdates' => "env('CMS_DISABLE_CORE_UPDATES', false)",
         ];
 
         $this->writer->write('cms', $values);
