@@ -83,6 +83,7 @@ app:
 cms:
     theme: name (user@remote.git)
     edgeUpdates: false
+    disableCoreUpdates: false
     enableSafeMode: false
     # project: XXXX            # Marketplace project ID
 
