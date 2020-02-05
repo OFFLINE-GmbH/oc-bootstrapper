@@ -180,9 +180,11 @@ class InstallCommand extends Command
             return false;
         }
 
+        $this->write('Patching composer.json...');
+        $this->patchComposerJson();
+
         $this->write('Installing composer dependencies...');
         $this->composer->install();
-        $this->composer->addDependency('offline/oc-bootstrapper');
 
         $this->write('Setting up config files...');
         $this->writeConfig($this->force);
@@ -403,6 +405,38 @@ class InstallCommand extends Command
                 $this->write("Creating $path ...");
                 touch($path);
             }
+        }
+    }
+
+    /**
+     * Add oc-bootstrapper as a local dependency.
+     *
+     * @return void
+     */
+    protected function patchComposerJson()
+    {
+        if ( ! $this->fileExists('composer.json')) {
+            $this->write('Failed to locate composer.json in local directory', 'error');
+
+            return;
+        }
+
+        $structure = json_decode(file_get_contents($this->path('composer.json')));
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->write('Failed to parse composer.json', 'error');
+
+            return;
+        }
+
+        if (isset($structure->config)) {
+            $structure->config->platform->php = '7.2.0'; // Minimum required version by cypresslab/gitelephant
+        }
+
+        $structure->require->{'offline/oc-bootstrapper'} = '^' . VERSION;
+
+        $contents = json_encode($structure, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if (file_put_contents($this->path('composer.json'), $contents) === false) {
+            $this->write('Failed to write new composer.json', 'error');
         }
     }
 }
