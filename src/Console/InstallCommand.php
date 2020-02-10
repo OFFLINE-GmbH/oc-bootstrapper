@@ -428,7 +428,7 @@ class InstallCommand extends Command
             return;
         }
 
-        if (isset($structure->config)) {
+        if (isset($structure->config->platform->php)) {
             $structure->config->platform->php = '7.2.0'; // Minimum required version by cypresslab/gitelephant
         }
 
