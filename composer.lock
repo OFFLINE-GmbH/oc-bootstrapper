@@ -4,33 +4,33 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "75bf406d8fa822f4c85fc00391fda707",
+    "content-hash": "d75f3586974dc89fe75bb2b87d440cac",
     "packages": [
         {
             "name": "cypresslab/gitelephant",
-            "version": "v4.0.1",
+            "version": "V3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matteosister/GitElephant.git",
-                "reference": "48965bb0d83f0a4ee89cb9b09f26fb23e62b43a6"
+                "reference": "7cb780eff8845a45584fe1ff97f730702115862a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matteosister/GitElephant/zipball/48965bb0d83f0a4ee89cb9b09f26fb23e62b43a6",
-                "reference": "48965bb0d83f0a4ee89cb9b09f26fb23e62b43a6",
+                "url": "https://api.github.com/repos/matteosister/GitElephant/zipball/7cb780eff8845a45584fe1ff97f730702115862a",
+                "reference": "7cb780eff8845a45584fe1ff97f730702115862a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.0",
+                "php": ">=7.0.0",
                 "phpcollection/phpcollection": "~0.4",
-                "symfony/filesystem": "~2.8|~3.0|~4.0",
-                "symfony/finder": "~2.8|~3.0|~4.0",
-                "symfony/process": "~2.8|~3.0|~4.0"
+                "symfony/filesystem": "~2.0|~3.0|~4.0",
+                "symfony/finder": "~2.0|~3.0|~4.0",
+                "symfony/process": "~2.0|~3.0|~4.0"
             },
             "require-dev": {
                 "mockery/mockery": "~1.1",
-                "php": ">=7.2.0",
-                "phpunit/phpunit": "~8.0",
+                "php": ">=7.1.0",
+                "phpunit/phpunit": "~7.0",
                 "symfony/var-dumper": "3.*|4.*"
             },
             "type": "library",
@@ -54,7 +54,7 @@
             "keywords": [
                 "git"
             ],
-            "time": "2019-03-28T15:23:23+00:00"
+            "time": "2018-09-21T12:39:22+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -1143,7 +1143,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0.8"
+        "php": ">=7.0.8",
+        "ext-json": "*"
     },
     "platform-dev": []
 }
