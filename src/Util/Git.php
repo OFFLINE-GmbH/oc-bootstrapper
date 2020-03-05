@@ -2,7 +2,6 @@
 
 namespace OFFLINE\Bootstrapper\October\Util;
 
-use GitElephant\GitBinary;
 use GitElephant\Repository;
 
 /**
@@ -17,7 +16,7 @@ class Git
         if (stripos(PHP_OS, 'WIN') === 0) {
             // Use the default `git` command under Windows. This requires the git binary
             // to be added to the PATH environment variable.
-            $binary = new GitBinary('git');
+            $binary = 'git';
         }
 
         return Repository::open($path, $binary);
