@@ -4,60 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8324c621981d45248a3943298db6f969",
+    "content-hash": "cc58d8c9f819ca6789c4ab73961e07e4",
     "packages": [
-        {
-            "name": "cypresslab/gitelephant",
-            "version": "dev-bootstrapper",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/OFFLINE-GmbH/GitElephant.git",
-                "reference": "fd9745dc7cbcabf74364ab8c725a7217a4c080dc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/OFFLINE-GmbH/GitElephant/zipball/fd9745dc7cbcabf74364ab8c725a7217a4c080dc",
-                "reference": "fd9745dc7cbcabf74364ab8c725a7217a4c080dc",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0.0",
-                "phpcollection/phpcollection": "~0.4",
-                "symfony/filesystem": "~2.0|~3.0|~4.0",
-                "symfony/finder": "~2.0|~3.0|~4.0",
-                "symfony/process": "~2.0|~3.0|~4.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "~1.1",
-                "php": ">=7.1.0",
-                "phpunit/phpunit": "~7.0",
-                "symfony/var-dumper": "3.*|4.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "GitElephant": "src/"
-                }
-            },
-            "license": [
-                "LGPL-3.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Matteo Giachino",
-                    "email": "matteog@gmail.com"
-                }
-            ],
-            "description": "An abstraction layer for git written in PHP",
-            "homepage": "http://gitelephant.cypresslab.net/",
-            "keywords": [
-                "git"
-            ],
-            "support": {
-                "source": "https://github.com/OFFLINE-GmbH/GitElephant/tree/bootstrapper"
-            },
-            "time": "2020-03-10T06:58:26+00:00"
-        },
         {
             "name": "guzzlehttp/guzzle",
             "version": "6.5.2",
@@ -246,6 +194,56 @@
                 "url"
             ],
             "time": "2019-07-01T23:21:34+00:00"
+        },
+        {
+            "name": "offline/gitelephant",
+            "version": "V3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/OFFLINE-GmbH/GitElephant.git",
+                "reference": "f02f33dd2964bb1801231698db9d4e8e4840d98f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/OFFLINE-GmbH/GitElephant/zipball/f02f33dd2964bb1801231698db9d4e8e4840d98f",
+                "reference": "f02f33dd2964bb1801231698db9d4e8e4840d98f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0",
+                "phpcollection/phpcollection": "~0.4",
+                "symfony/filesystem": "~2.0|~3.0|~4.0",
+                "symfony/finder": "~2.0|~3.0|~4.0",
+                "symfony/process": "~2.0|~3.0|~4.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~1.1",
+                "php": ">=7.1.0",
+                "phpunit/phpunit": "~7.0",
+                "symfony/var-dumper": "3.*|4.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "GitElephant": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Matteo Giachino",
+                    "email": "matteog@gmail.com"
+                }
+            ],
+            "description": "An abstraction layer for git written in PHP",
+            "homepage": "http://gitelephant.cypresslab.net/",
+            "keywords": [
+                "git"
+            ],
+            "time": "2020-03-10T07:20:45+00:00"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -1141,9 +1139,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "cypresslab/gitelephant": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
