@@ -16,7 +16,7 @@
   "require": {
     "php": ">=7.0.8",
     "guzzlehttp/guzzle": "~6.0",
-    "cypresslab/gitelephant": "^3.0.0",
+    "cypresslab/gitelephant": "dev-bootstrapper",
     "symfony/console": "~3.0|~4.0",
     "symfony/process": "~3.0|~4.0",
     "symfony/filesystem": "~3.0|~4.0",
@@ -25,6 +25,12 @@
   },
   "bin": [
     "october"
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/OFFLINE-GmbH/GitElephant"
+    }
   ],
   "require-dev": {
     "symfony/var-dumper": "~3.0|~4.0"
