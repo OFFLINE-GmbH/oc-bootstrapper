@@ -133,6 +133,13 @@ class InstallCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Specify the path to a custom PHP binary',
                 'php'
+            )
+            ->addOption(
+                'templates-from',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Specify from where to fetch template files (git remote)',
+                ''
             );
     }
 
@@ -160,6 +167,11 @@ class InstallCommand extends Command
         $this->force = $input->getOption('force');
 
         $this->firstRun = ! $this->dirExists($this->path('bootstrap')) || $this->force;
+
+        if ($input->getOption('templates-from')) {
+            $remote = $input->getOption('templates-from');
+            $this->fetchTemplateFiles($remote);
+        }
 
         $this->makeConfig();
 

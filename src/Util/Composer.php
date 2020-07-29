@@ -118,6 +118,20 @@ class Composer
     }
 
     /**
+     * Returns Composer's home directory.
+     *
+     */
+    public function getHome()
+    {
+        $result = $this->runProcessWithOutput(
+            $this->composer . ' config --global data-dir',
+            'Failed to get composer data-dir',
+            3600
+        );
+        return trim($result);
+    }
+
+    /**
      * Composer require <package> <version>
      *
      * @return void

@@ -29,11 +29,25 @@ trait RunsProcess
         return $this->checkProcessResult($exitCode, $errorMessage, $process->getOutput());
     }
 
+    protected function runProcessWithOutput($command, $errorMessage, $timeout = 30)
+    {
+        $process = new Process($command);
+        $process->setTimeout($timeout);
+        $process->enableOutput();
+        $exitCode = $process->run();
+
+        $this->checkProcessResult($exitCode, $errorMessage, $process->getOutput());
+
+        return $process->getOutput();
+    }
+
     /**
      * Checks the result of a process.
      *
      * @param $exitCode
      * @param $message
+     *
+     * @param $output
      *
      * @return bool
      */
