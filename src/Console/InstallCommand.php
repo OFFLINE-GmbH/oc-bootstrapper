@@ -6,8 +6,10 @@ use InvalidArgumentException;
 use LogicException;
 use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Deployment\DeploymentFactory;
+use OFFLINE\Bootstrapper\October\DevEnvironment\DevEnvFactory;
 use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
 use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
+use OFFLINE\Bootstrapper\October\Exceptions\DevEnvExistsException;
 use OFFLINE\Bootstrapper\October\Exceptions\ThemeExistsException;
 use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
@@ -241,7 +243,7 @@ class InstallCommand extends Command
         if ($deployment) {
             $this->write("Setting up ${deployment} deployment.");
             try {
-                $deploymentObj = DeploymentFactory::createDeployment($deployment);
+                $deploymentObj = DeploymentFactory::createDeployment($deployment, $this->config);
                 $deploymentObj->install($this->force);
             } catch (DeploymentExistsException $e) {
                 $this->write($e->getMessage(), 'comment');

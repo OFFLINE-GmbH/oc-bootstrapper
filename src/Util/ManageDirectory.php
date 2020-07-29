@@ -2,6 +2,7 @@
 
 namespace OFFLINE\Bootstrapper\October\Util;
 
+use OFFLINE\Bootstrapper\October\Config\Yaml;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -28,6 +29,37 @@ trait ManageDirectory
     }
 
     /**
+     * Replaces all placeholder Variables in a file.
+     *
+     * @param $file
+     */
+    public function replaceVars($file, array $config)
+    {
+        $contents = preg_replace_callback('/\%([0-9a-z.]+)\%/', function ($matches) use ($config) {
+            $parseHostname = false;
+            // app.hostname is a special config entry that returns only the host part of the app.url.
+            if ($matches[1] === 'app.hostname') {
+                $matches[1] = 'app.url';
+                $parseHostname = true;
+            }
+            $parts = explode('.', $matches[1]);
+            $value = $config;
+            foreach ($parts as $part) {
+                $value = $value[$part] ?? '';
+            }
+            if (is_array($value)) {
+                throw new \LogicException(sprintf('Placeholder "%s" does not select string value', $matches[1]));
+            }
+            if ($parseHostname) {
+                $value = parse_url($value, PHP_URL_HOST);
+            }
+            return $value;
+        }, file_get_contents($file));
+
+        file_put_contents($file, $contents);
+    }
+
+    /**
      * Touch file
      *
      * @param string $file relative or absolute path of the file to create
@@ -49,13 +81,13 @@ trait ManageDirectory
         return file_exists(realpath($file));
     }
 
-    /**    
+    /**
      * Get the absolute path of the file.
-     *    
-     * @param string $file relative or absolute path of the file    
-     *    
-     * @return string path of the file    
-     */    
+     *
+     * @param string $file relative or absolute path of the file
+     *
+     * @return string path of the file
+     */
     public function path($file)
     {
         return realpath($file) ?: $file;
@@ -91,7 +123,7 @@ trait ManageDirectory
             // If there are write-protected files present (primarily on Windows) we can use
             // the force mode of rm to remove it. PHP itself won't delete write-protected files.
             $command = stripos(PHP_OS, 'WIN') === 0 ? 'rm /f' : 'rm -f';
-            $file    = escapeshellarg($file);
+            $file = escapeshellarg($file);
 
             (new Process($command . ' ' . $file))->setTimeout(60)->run();
         }

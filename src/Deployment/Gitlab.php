@@ -2,12 +2,13 @@
 
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
+use OFFLINE\Bootstrapper\October\DevEnvironment\DevEnvBase;
 use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
 
 /**
  * GitLab deployment
  */
-class Gitlab extends DeploymentBase implements DeploymentInterface
+class Gitlab extends DevEnvBase implements DeploymentInterface
 {
     /**
      * @inheritDoc
@@ -20,5 +21,8 @@ class Gitlab extends DeploymentBase implements DeploymentInterface
 
         $this->copy($this->getTemplate('gitlab-ci.yml'), '.gitlab-ci.yml');
         $this->copy($this->getTemplate('Envoy.blade.php'), 'Envoy.blade.php');
+
+        $this->replaceVars('gitlab-ci.yml', $this->config->toArray());
+        $this->replaceVars('Envoy.blade.php', $this->config->toArray());
     }
 }

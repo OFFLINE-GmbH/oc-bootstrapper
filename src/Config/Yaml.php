@@ -48,4 +48,9 @@ class Yaml implements Config
     {
         return isset($this->config[$name]) ? $this->config[$name] : null;
     }
+
+    public function toArray()
+    {
+        return (array)$this->config;
+    }
 }

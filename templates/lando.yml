@@ -1,0 +1,31 @@
+name: %name%
+recipe: lamp
+excludes:
+- themes/**/node_modules
+
+proxy:
+    mailhog:
+    - mail.%name%.lndo.site
+
+config:
+    webroot: .
+    services:
+        appserver:
+            composer:
+                offline/oc-bootstrapper: ^0.7.5
+            overrides:
+                depends_on: [database]
+            build:
+            - october install
+        mailhog:
+            type: mailhog
+            portforward: true
+            hogfrom:
+            - appserver
+
+tooling:
+    artisan:
+        service: appserver
+        cmd: php artisan
+    october:
+        service: appserver
