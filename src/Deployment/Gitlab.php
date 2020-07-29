@@ -2,13 +2,12 @@
 
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
-use OFFLINE\Bootstrapper\October\DevEnvironment\DevEnvBase;
 use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
 
 /**
  * GitLab deployment
  */
-class Gitlab extends DevEnvBase implements DeploymentInterface
+class Gitlab extends DeploymentBase implements DeploymentInterface
 {
     /**
      * @inheritDoc
