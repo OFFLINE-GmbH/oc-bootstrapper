@@ -17,6 +17,7 @@ config:
                 depends_on: [database]
             build:
             - october install
+            -
         mailhog:
             type: mailhog
             portforward: true
