@@ -128,16 +128,16 @@ EOF;
         }, $contents);
 
         $contents = preg_replace_callback('/^mail:\n(?:^[ ].*\n?)*$/m', function () use ($project) {
-        $mail = <<<EOF
+        return <<<EOF
 mail:
-    host: mail.%s.lndo.site 
+    host: mailhog 
     name: Sender Name
     address: sender@example.tld
-    driver: sendmail
+    driver: smtp
+    port: 1025
+    encryption: ''
 
 EOF;
-
-            return sprintf($mail, $project);
         }, $contents);
 
         file_put_contents($targetOctoberYaml, $contents);
