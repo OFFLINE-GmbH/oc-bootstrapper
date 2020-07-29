@@ -12,12 +12,11 @@ config:
     services:
         appserver:
             composer:
-                offline/oc-bootstrapper: ^0.7.5
+                offline/oc-bootstrapper: ^0.8.0
             overrides:
                 depends_on: [database]
             build:
-            - october install
-            -
+            - october install # --templates-from=git@yourhost:october-cms/oc-bootstrapper-templates.git
         mailhog:
             type: mailhog
             portforward: true

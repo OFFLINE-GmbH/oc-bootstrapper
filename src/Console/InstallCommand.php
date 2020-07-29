@@ -6,10 +6,8 @@ use InvalidArgumentException;
 use LogicException;
 use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Deployment\DeploymentFactory;
-use OFFLINE\Bootstrapper\October\DevEnvironment\DevEnvFactory;
 use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
 use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
-use OFFLINE\Bootstrapper\October\Exceptions\DevEnvExistsException;
 use OFFLINE\Bootstrapper\October\Exceptions\ThemeExistsException;
 use OFFLINE\Bootstrapper\October\Manager\PluginManager;
 use OFFLINE\Bootstrapper\October\Manager\ThemeManager;
@@ -80,9 +78,9 @@ class InstallCommand extends Command
     public function __construct($name = null)
     {
         $this->pluginManager = new PluginManager();
-        $this->themeManager  = new ThemeManager();
-        $this->artisan       = new Artisan();
-        $this->composer      = new Composer();
+        $this->themeManager = new ThemeManager();
+        $this->artisan = new Artisan();
+        $this->composer = new Composer();
 
         $this->setPhp();
 
@@ -135,6 +133,13 @@ class InstallCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Specify the path to a custom PHP binary',
                 'php'
+            )
+            ->addOption(
+                'templates-from',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Specify from where to fetch template files (git remote)',
+                ''
             );
     }
 
@@ -162,6 +167,11 @@ class InstallCommand extends Command
         $this->force = $input->getOption('force');
 
         $this->firstRun = ! $this->dirExists($this->path('bootstrap')) || $this->force;
+
+        if ($input->getOption('templates-from')) {
+            $remote = $input->getOption('templates-from');
+            $this->fetchTemplateFiles($remote);
+        }
 
         $this->makeConfig();
 
@@ -261,6 +271,10 @@ class InstallCommand extends Command
             $this->write('Removing demo data...');
             $this->artisan->call('october:fresh');
 
+            // Make sure the demo data is gone! (october:fresh is unreliable)
+            $this->rrmdir('themes/demo');
+            $this->rrmdir('plugins/demo');
+
             $this->write('Creating README...');
             $this->copyReadme();
 
@@ -288,7 +302,7 @@ class InstallCommand extends Command
     {
         foreach ($pluginsDeclarations as $pluginDeclaration) {
             $pluginInstalled = $this->pluginManager->isInstalled($pluginDeclaration);
-            $installPlugin   = ! $pluginInstalled;
+            $installPlugin = ! $pluginInstalled;
 
             list($update, $vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginDeclaration);
 
@@ -435,6 +449,24 @@ class InstallCommand extends Command
         $contents = json_encode($structure, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if (file_put_contents($this->path('composer.json'), $contents) === false) {
             $this->write('Failed to write new composer.json', 'error');
+        }
+    }
+
+    private function rrmdir(string $dir)
+    {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object !== "." && $object !== "..") {
+                    if (filetype($dir . "/" . $object) === "dir") {
+                        $this->rrmdir($dir . "/" . $object);
+                    } else {
+                        unlink($dir . "/" . $object);
+                    }
+                }
+            }
+            reset($objects);
+            rmdir($dir);
         }
     }
 }

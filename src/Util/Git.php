@@ -12,6 +12,16 @@ class Git
 {
     public static function repo($path)
     {
+        return Repository::open($path, self::getBinary());
+    }
+
+    public static function clone(string $url, string $to)
+    {
+        Repository::createFromRemote($url, $to, self::getBinary());
+    }
+
+    protected static function getBinary()
+    {
         $binary = null;
         if (stripos(PHP_OS, 'WIN') === 0) {
             // Use the default `git` command under Windows. This requires the git binary
@@ -19,6 +29,6 @@ class Git
             $binary = 'git';
         }
 
-        return Repository::open($path, $binary);
+        return $binary;
     }
 }
