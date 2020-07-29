@@ -2,6 +2,7 @@
 
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
+use OFFLINE\Bootstrapper\October\Config\Yaml;
 use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
@@ -9,10 +10,10 @@ use Symfony\Component\Console\Exception\RuntimeException;
  */
 final class DeploymentFactory
 {
-    public static function createDeployment(string $type): DeploymentInterface
+    public static function createDeployment(string $type, Yaml $config): DeploymentInterface
     {
         if (strtolower($type) === 'gitlab') {
-            return new Gitlab();
+            return new Gitlab($config);
         }
 
         throw new RuntimeException('Unknown deployment type given');

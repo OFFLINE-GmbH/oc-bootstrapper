@@ -76,6 +76,7 @@ to suite your needs.
 
 ```yaml
 app:
+    name: my-new-project       # Give the project a unique name
     url: http://october.dev
     locale: en
     debug: true
@@ -96,6 +97,10 @@ database:
 
 git:
     deployment: gitlab
+
+# deployment:            # Automatically configure the Envoy file for GitLab deployments      
+#     user: hostinguser  
+#     server: servername                    
 
 plugins:
     - Rainlab.Pages
@@ -237,6 +242,24 @@ Place the files you want to use as defaults in `~/.config/composer/october`. All
 
 On Windows you can store your files in `%USERPROFILE%/AppData/Roaming/Composer/october/`
 
+### Variable replacements
+
+It is possible to use placeholders in your configuration files which will be replaced by 
+values from your october.yaml configuration:
+
+```php
+// Example Envoy.blade.php
+$url = '%app.url%'; // Will be replaced by the app.url value from your october.yaml file
+```
+
+There is a special placeholder `%app.hostname%` available that will be replaced by the host part
+of your `app.url`:
+
+```ini
+%app.url%      = http://october.dev
+%app.hostname% = october.dev
+``` 
+
 #### File templates from a git repository
 
 If your templates folder is a git repository `oc-bootstrapper` will pull the latest changes for the repo every time 
@@ -251,3 +274,13 @@ git clone your-central-templates-repo.git .
 git branch --set-upstream-to=origin/master master
 git pull # Make sure this works without any user interaction
 ```
+
+
+### Development environments
+
+`oc-bootstrapper` can set up a development environment for you. Currently, only [Lando](https://lando.dev/) is supported
+out of the box.
+
+To enable the Lando integration, run `october init` and select `lando` as a dev environment. A `.lando.yml` file will be placed in your project. 
+ 
+You can now simply run `lando start` to get everything up and running inside a Docker environment created by Lando.

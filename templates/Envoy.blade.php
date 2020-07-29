@@ -1,9 +1,9 @@
 @setup
     // Deployment configuration ----------
-    $project      = 'example.com';
-    $user         = 'hostinguser';
-    $server       = 'servername';
-    $directory    = 'public_html/example.com/';
+    $project      = '%app.hostname%';
+    $user         = '%deployment.user%';
+    $server       = '%deployment.server%';
+    $directory    = 'public_html/%app.hostname%/';
     $slackWebhook = 'https://hooks.slack.com/services/your/slack/webhook/url';
     // -----------------------------------
 
