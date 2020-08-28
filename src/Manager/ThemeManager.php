@@ -92,7 +92,9 @@ class ThemeManager extends BaseManager
             throw new RuntimeException('Error while cloning theme repo: ' . $e->getMessage());
         }
 
-        $this->removeGitRepo($themeDir);
+        if(!$this->isWithGitDirectory()) {
+            $this->removeGitRepo($themeDir);
+        }
 
         return true;
     }
