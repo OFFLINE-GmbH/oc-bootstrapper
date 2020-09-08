@@ -12,7 +12,7 @@ config:
     services:
         appserver:
             composer:
-                offline/oc-bootstrapper: ^0.8.0
+                offline/oc-bootstrapper: ^0.9.0
             overrides:
                 depends_on: [database]
             build:
