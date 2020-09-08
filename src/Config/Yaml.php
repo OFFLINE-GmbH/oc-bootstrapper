@@ -34,7 +34,7 @@ class Yaml implements Config
         try {
             $this->config = $parser->parse(file_get_contents($file));
         } catch (ParseException $e) {
-            throw new \RuntimeException('Unable to parse the YAML string: %s', $e->getMessage());
+            throw new \RuntimeException(sprintf('Unable to parse the YAML string: %s', $e->getMessage()), 100);
         }
     }
 
