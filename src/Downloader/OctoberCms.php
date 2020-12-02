@@ -55,7 +55,7 @@ class OctoberCms
      */
     protected function fetchZip()
     {
-        $response = (new Client)->get('https://github.com/octobercms/october/archive/master.zip');
+        $response = (new Client)->get('https://github.com/octobercms/october/archive/1.0.zip');
         file_put_contents($this->zipFile, $response->getBody());
 
         return $this;
@@ -84,7 +84,7 @@ class OctoberCms
      */
     protected function fetchHtaccess()
     {
-        $contents = file_get_contents('https://raw.githubusercontent.com/octobercms/october/master/.htaccess');
+        $contents = file_get_contents('https://raw.githubusercontent.com/octobercms/october/1.0/.htaccess');
         file_put_contents(getcwd() . DS . '.htaccess', $contents);
 
         return $this;
@@ -106,7 +106,7 @@ class OctoberCms
         $contents = preg_replace_callback(
             '/october\/(?:rain|system|backend|cms)":\s"([^"]+)"/m',
             function ($treffer) {
-                return str_replace($treffer[1], 'dev-master', $treffer[0]);
+                return str_replace($treffer[1], '~1.0', $treffer[0]);
             },
             $contents
         );
@@ -129,7 +129,7 @@ class OctoberCms
         @unlink($this->zipFile);
 
         $directory = getcwd();
-        $source    = $directory . DS . 'october-master';
+        $source    = $directory . DS . 'october-1.0';
 
         (new Process(sprintf('mv %s %s', $source . '/*', $directory)))->run();
         (new Process(sprintf('rm -rf %s', $source)))->run();
