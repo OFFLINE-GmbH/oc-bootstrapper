@@ -164,29 +164,29 @@ class InstallCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ( ! class_exists('ZipArchive')) {
+        if (!class_exists('ZipArchive')) {
             throw new RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
 
         $this->setOutput($output);
-        
+
         $this->force = $input->getOption('force');
-        
-        $this->firstRun = ! $this->dirExists($this->path('bootstrap')) || $this->force;
-        
+
+        $this->firstRun = !$this->dirExists($this->path('bootstrap')) || $this->force;
+
         if ($input->getOption('templates-from')) {
             $remote = $input->getOption('templates-from');
             $this->fetchTemplateFiles($remote);
         }
-        
+
         $this->makeConfig();
-        
-        if ( ! empty($php = $input->getOption('php'))) {
+
+        if (!empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
-        
+
         $this->gitignore = new Gitignore($this->getGitignore());
-        
+
         $this->write('Downloading latest October CMS...');
         try {
             (new OctoberCms())->download($this->force);
@@ -194,24 +194,24 @@ class InstallCommand extends Command
             $this->write($e->getMessage(), 'comment');
         } catch (Throwable $e) {
             $this->write($e->getMessage(), 'error');
-            
+
             return false;
         }
-        
+
         $this->write('Patching composer.json...');
         $this->patchComposerJson();
-        
+
         $this->write('Installing composer dependencies...');
         $this->composer->install();
-        
+
         $this->write('Setting up config files...');
         $this->writeConfig($this->force);
-        
+
         $this->prepareDatabase();
-        
+
         $this->write('Migrating database...');
         $this->artisan->call('october:up');
-        
+
         if (isset($this->config->git['withGitDirectory'])) {
             $this->setWithGitDirectory($this->config->git['withGitDirectory']);
         }
@@ -222,7 +222,7 @@ class InstallCommand extends Command
         } catch (RuntimeException $e) {
             $this->write('No theme to install', 'comment');
         }
-        
+
         if ($themeDeclaration) {
             $this->write('Installing Theme...');
             try {
@@ -312,14 +312,16 @@ class InstallCommand extends Command
     {
         foreach ($pluginsDeclarations as $pluginDeclaration) {
             $pluginInstalled = $this->pluginManager->isInstalled($pluginDeclaration);
-            $installPlugin = ! $pluginInstalled;
+            $installPlugin = !$pluginInstalled;
 
             list($update, $vendor, $plugin, $remote, $branch) = $this->pluginManager->parseDeclaration($pluginDeclaration);
 
-            if ($pluginInstalled && ($update || ! $this->gitignore->hasPluginHeader($vendor, $plugin))) {
+            if ($pluginInstalled && ($update || !$this->gitignore->hasPluginHeader($vendor, $plugin))) {
                 if ($pluginInstalled && $remote) {
-                    $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...",
-                        'comment');
+                    $this->write(
+                        "Removing ${vendor}.${plugin} directory to re-download the newest version...",
+                        'comment'
+                    );
 
                     $this->pluginManager->removeDir($pluginDeclaration);
                     $installPlugin = true;
@@ -409,7 +411,7 @@ class InstallCommand extends Command
 
     protected function cleanup()
     {
-        if ( ! $this->firstRun) {
+        if (!$this->firstRun) {
             return;
         }
 
@@ -427,7 +429,7 @@ class InstallCommand extends Command
         // If SQLite database does not exist, create it
         if ($this->config->database['connection'] === 'sqlite') {
             $path = $this->config->database['database'];
-            if ( ! $this->fileExists($path) && is_dir(dirname($path))) {
+            if (!$this->fileExists($path) && is_dir(dirname($path))) {
                 $this->write("Creating $path ...");
                 touch($path);
             }
@@ -441,7 +443,7 @@ class InstallCommand extends Command
      */
     protected function patchComposerJson()
     {
-        if ( ! $this->fileExists('composer.json')) {
+        if (!$this->fileExists('composer.json')) {
             $this->write('Failed to locate composer.json in local directory', 'error');
 
             return;
