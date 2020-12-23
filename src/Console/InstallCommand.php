@@ -212,8 +212,8 @@ class InstallCommand extends Command
         $this->write('Migrating database...');
         $this->artisan->call('october:up');
 
-        if (isset($this->config->git['withGitDirectory'])) {
-            $this->setWithGitDirectory($this->config->git['withGitDirectory']);
+        if (isset($this->config->git['keepRepo'])) {
+            $this->setWithGitDirectory($this->config->git['keepRepo']);
         }
 
         $themeDeclaration = false;
