@@ -318,7 +318,7 @@ class InstallCommand extends Command
 
             if ($pluginInstalled && ($update || ! $this->gitignore->hasPluginHeader($vendor, $plugin))) {
                 if ($pluginInstalled && $remote) {
-                    $this->write( "Removing ${vendor}.${plugin} directory to re-download the newest version...",
+                    $this->write("Removing ${vendor}.${plugin} directory to re-download the newest version...",
                         'comment');
 
                     $this->pluginManager->removeDir($pluginDeclaration);
@@ -427,7 +427,7 @@ class InstallCommand extends Command
         // If SQLite database does not exist, create it
         if ($this->config->database['connection'] === 'sqlite') {
             $path = $this->config->database['database'];
-            if (!$this->fileExists($path) && is_dir(dirname($path))) {
+            if ( ! $this->fileExists($path) && is_dir(dirname($path))) {
                 $this->write("Creating $path ...");
                 touch($path);
             }
