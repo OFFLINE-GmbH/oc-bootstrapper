@@ -146,11 +146,6 @@ class InstallCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Specify from where to fetch template files (git remote)',
                 ''
-            )->addOption(
-                'with-git-directory',
-                null,
-                InputOption::VALUE_NONE,
-                'Specify whether or not to delete .git directories'
             );
     }
 
@@ -174,25 +169,24 @@ class InstallCommand extends Command
         }
 
         $this->setOutput($output);
-        $this->setWithGitDirectory($input->getOption('with-git-directory'));
-
+        
         $this->force = $input->getOption('force');
-
+        
         $this->firstRun = ! $this->dirExists($this->path('bootstrap')) || $this->force;
-
+        
         if ($input->getOption('templates-from')) {
             $remote = $input->getOption('templates-from');
             $this->fetchTemplateFiles($remote);
         }
-
+        
         $this->makeConfig();
-
+        
         if ( ! empty($php = $input->getOption('php'))) {
             $this->setPhp($php);
         }
-
+        
         $this->gitignore = new Gitignore($this->getGitignore());
-
+        
         $this->write('Downloading latest October CMS...');
         try {
             (new OctoberCms())->download($this->force);
@@ -200,23 +194,27 @@ class InstallCommand extends Command
             $this->write($e->getMessage(), 'comment');
         } catch (Throwable $e) {
             $this->write($e->getMessage(), 'error');
-
+            
             return false;
         }
-
+        
         $this->write('Patching composer.json...');
         $this->patchComposerJson();
-
+        
         $this->write('Installing composer dependencies...');
         $this->composer->install();
-
+        
         $this->write('Setting up config files...');
         $this->writeConfig($this->force);
-
+        
         $this->prepareDatabase();
-
+        
         $this->write('Migrating database...');
         $this->artisan->call('october:up');
+        
+        if (isset($this->config->git['withGitDirectory'])) {
+            $this->setWithGitDirectory($this->config->git['withGitDirectory']);
+        }
 
         $themeDeclaration = false;
         try {
@@ -224,7 +222,7 @@ class InstallCommand extends Command
         } catch (RuntimeException $e) {
             $this->write('No theme to install', 'comment');
         }
-
+        
         if ($themeDeclaration) {
             $this->write('Installing Theme...');
             try {
