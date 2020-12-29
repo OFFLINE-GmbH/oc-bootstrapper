@@ -97,6 +97,7 @@ database:
 
 git:
     deployment: gitlab
+    keepRepo: false       # Keep .git in plugins
 
 # deployment:            # Automatically configure the Envoy file for GitLab deployments      
 #     user: hostinguser  

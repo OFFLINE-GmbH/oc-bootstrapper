@@ -146,11 +146,6 @@ class InstallCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Specify from where to fetch template files (git remote)',
                 ''
-            )->addOption(
-                'with-git-directory',
-                null,
-                InputOption::VALUE_NONE,
-                'Specify whether or not to delete .git directories'
             );
     }
 
@@ -174,7 +169,6 @@ class InstallCommand extends Command
         }
 
         $this->setOutput($output);
-        $this->setWithGitDirectory($input->getOption('with-git-directory'));
 
         $this->force = $input->getOption('force');
 
@@ -217,6 +211,10 @@ class InstallCommand extends Command
 
         $this->write('Migrating database...');
         $this->artisan->call('october:up');
+
+        if (isset($this->config->git['keepRepo'])) {
+            $this->setWithGitDirectory($this->config->git['keepRepo']);
+        }
 
         $themeDeclaration = false;
         try {
