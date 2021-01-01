@@ -150,4 +150,25 @@ class Composer
             3600
         );
     }
+
+    /**
+     * Composer create-project <project> <path> <version>
+     *
+     * @return void
+     * @throws LogicException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    public function createProject($project, $path, $version)
+    {
+        $project = escapeshellarg($project);
+        $path = escapeshellarg($path);
+        $version = escapeshellarg($version);
+
+        $this->runProcess(
+            $this->composer . ' create-project ' . $project . ' ' . $path . ' ' . $version . ' --no-interaction',
+            'Failed to create the composer project',
+            3600
+        );
+    }
 }

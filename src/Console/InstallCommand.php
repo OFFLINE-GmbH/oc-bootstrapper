@@ -181,9 +181,9 @@ class InstallCommand extends Command
 
         $this->gitignore = new Gitignore($this->getGitignore());
 
-        $this->write('Downloading latest October CMS...');
+        $this->write('Installing latest October CMS...');
         try {
-            (new OctoberCms())->download($this->force);
+            (new OctoberCms($this->composer))->install($this->force);
         } catch (\LogicException $e) {
             $this->write($e->getMessage(), 'comment');
         } catch (Throwable $e) {
@@ -194,9 +194,6 @@ class InstallCommand extends Command
 
         $this->write('Patching composer.json...');
         $this->patchComposerJson();
-
-        $this->write('Installing composer dependencies...');
-        $this->composer->install();
 
         $this->write('Setting up config files...');
         $this->writeConfig($this->force);
@@ -242,6 +239,10 @@ class InstallCommand extends Command
             $this->write('Installing Plugins...');
             $this->installPlugins($pluginsDeclarations);
         }
+
+        // Plugins may have composer dependencies, so install them now...
+        $this->write('Installing composer dependencies...');
+        $this->composer->install();
 
         $deployment = false;
         try {
