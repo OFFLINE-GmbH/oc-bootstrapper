@@ -29,6 +29,11 @@ class BaseManager
      */
     protected $php;
 
+    /**
+     * @var bool
+     */
+    protected $withGitDirectory = false;
+
     public function __construct()
     {
         $this->artisan = new Artisan();
@@ -45,5 +50,18 @@ class BaseManager
     {
         $this->php = $php;
         $this->artisan->setPhp($php);
+    }
+
+    /**
+     * Set if remove .git directories or not
+     */
+    public function setWithGitDirectory(bool $withGitDirectory = false)
+    {
+        $this->withGitDirectory = $withGitDirectory;
+    }
+
+    public function isWithGitDirectory(): bool
+    {
+        return $this->withGitDirectory;
     }
 }
