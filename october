@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 define('DS', DIRECTORY_SEPARATOR);
-define('VERSION', '0.9.2');
+define('VERSION', '0.9.3');
 
 if (file_exists(__DIR__.'/../../autoload.php')) {
     require __DIR__.'/../../autoload.php';
