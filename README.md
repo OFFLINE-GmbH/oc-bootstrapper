@@ -58,6 +58,20 @@ docker run offlinegmbh/oc-bootstrapper envoy -v
 docker run offlinegmbh/oc-bootstrapper composer -v
 ```
 
+It is intended to be used with CI pipelines but can also make getting started with an October project 
+even easier as you don't need to install PHP and Composer locally.
+
+You can execute any command in the context of the current working directory by using this docker command:
+
+```bash
+# alias this to "october" for easier access
+docker run -it --rm -v "$(pwd)":/app offlinegmbh/oc-bootstrapper october
+```
+
+Be aware, that this will work great for commands like `october init` as it does not depend on any
+external services. To run `october install` some more plumbing is required so the container can connect
+to your database.
+
 ## Usage
 
 ### Initialize your project
@@ -97,6 +111,7 @@ database:
 
 git:
     deployment: gitlab
+    keepRepo: false       # Keep .git in plugins
 
 # deployment:            # Automatically configure the Envoy file for GitLab deployments      
 #     user: hostinguser  

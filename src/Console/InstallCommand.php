@@ -110,6 +110,12 @@ class InstallCommand extends Command
         $this->composer->setOutput($output);
     }
 
+    public function setWithGitDirectory(bool $withGitDirectory)
+    {
+        $this->pluginManager->setWithGitDirectory($withGitDirectory);
+        $this->themeManager->setWithGitDirectory($withGitDirectory);
+    }
+
     /**
      * Configure the command options.
      *
@@ -205,6 +211,10 @@ class InstallCommand extends Command
 
         $this->write('Migrating database...');
         $this->artisan->call('october:up');
+
+        if (isset($this->config->git['keepRepo'])) {
+            $this->setWithGitDirectory($this->config->git['keepRepo']);
+        }
 
         $themeDeclaration = false;
         try {

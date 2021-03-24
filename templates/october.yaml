@@ -24,6 +24,7 @@ git:
     excludePlugins: false   # Even exclude plugins from your repo. Private plugins will be
                             # checkout out again during each "install" run. Be careful!
                             # Manual changes to these plugins will be overwritten.
+    keepRepo: false         # Keep .git in plugins
 
 # deployment:
 #     user: hostinguser
