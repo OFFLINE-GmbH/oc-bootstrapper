@@ -22,7 +22,7 @@
     cd {{ $directory }}
     git pull
 
-    [ ! -f composer.phar ] && (curl -sS https://getcomposer.org/installer | php)
+    [ ! -f composer.phar ] && (curl -sS https://getcomposer.org/installer | php -- --1)
     php composer.phar install --no-interaction --no-dev --prefer-dist --ignore-platform-reqs
     php ./vendor/bin/october install
     php artisan -v october:up
