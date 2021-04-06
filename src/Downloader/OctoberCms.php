@@ -106,7 +106,7 @@ class OctoberCms
         $contents = preg_replace_callback(
             '/october\/(?:rain|system|backend|cms)":\s"([^"]+)"/m',
             function ($treffer) {
-                return str_replace($treffer[1], '~1.0', $treffer[0]);
+                return str_replace($treffer[1], '1.0.*', $treffer[0]);
             },
             $contents
         );
