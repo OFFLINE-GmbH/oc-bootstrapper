@@ -82,7 +82,7 @@ class Setup
             'APP_KEY'         => (new KeyGenerator())->generate(),
             'APP_ENV'         => 'dev',
             '',
-            'CMS_SAFE_MODE'   => $this->getSafeMode(),
+            'CMS_SAFE_MODE'   => $this->getNullableCmsOption('enableSafeMode'),
             'CMS_DISABLE_CORE_UPDATES' => (isset($this->config->cms['disableCoreUpdates']) && $this->config->cms['disableCoreUpdates'] === true) ? 'true' : 'false',
             '',
             'DB_CONNECTION'   => $this->config->database['connection'],
@@ -109,7 +109,7 @@ class Setup
             'MAIL_NAME'       => '"' . $this->config->mail['name'] . '"',
             'MAIL_ADDRESS'    => $this->config->mail['address'],
             '',
-            'ASSETS_MINIFY'   => $this->config->cms['enableAssetMinify'] ?? 'null',
+            'ASSETS_MINIFY'   => $this->getNullableCmsOption('enableAssetMinify'),
             'ASSETS_CACHE'    => 'false',
             'ROUTES_CACHE'    => 'false',
             'LINK_POLICY'     => 'detect',
@@ -162,7 +162,7 @@ class Setup
     protected function cms()
     {
         $values = [
-            'enableSafeMode' => "env('CMS_SAFE_MODE', " . $this->getSafeMode() . ')',
+            'enableSafeMode' => "env('CMS_SAFE_MODE', " . $this->getNullableCmsOption('enableSafeMode') . ')',
             'disableCoreUpdates' => "env('CMS_DISABLE_CORE_UPDATES', false)",
             'enableAssetMinify' => "env('ASSETS_MINIFY', null)",
         ];
@@ -217,15 +217,15 @@ class Setup
      *
      * @return string
      */
-    protected function getSafeMode()
+    protected function getNullableCmsOption($key)
     {
-        $safeMode = 'null';
-        if (array_key_exists('enableSafeMode', $this->config->cms)) {
-            if ($this->config->cms['enableSafeMode'] !== null) {
-                $safeMode = $this->config->cms['enableSafeMode'] === true ? 'true' : 'false';
+        $option = 'null';
+        if (array_key_exists($key, $this->config->cms)) {
+            if ($this->config->cms[$key] !== null) {
+                $option = $this->config->cms[$key] === true ? 'true' : 'false';
             }
         }
 
-        return $safeMode;
+        return $option;
     }
 }
