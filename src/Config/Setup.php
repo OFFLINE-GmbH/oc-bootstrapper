@@ -109,6 +109,7 @@ class Setup
             'MAIL_NAME'       => '"' . $this->config->mail['name'] . '"',
             'MAIL_ADDRESS'    => $this->config->mail['address'],
             '',
+            'ASSETS_MINIFY'   => $this->config->cms['enableAssetMinify'] ?? 'null',
             'ASSETS_CACHE'    => 'false',
             'ROUTES_CACHE'    => 'false',
             'LINK_POLICY'     => 'detect',
@@ -163,6 +164,7 @@ class Setup
         $values = [
             'enableSafeMode' => "env('CMS_SAFE_MODE', " . $this->getSafeMode() . ')',
             'disableCoreUpdates' => "env('CMS_DISABLE_CORE_UPDATES', false)",
+            'enableAssetMinify' => "env('ASSETS_MINIFY', null)",
         ];
 
         $this->writer->write('cms', $values);

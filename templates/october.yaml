@@ -9,6 +9,7 @@ cms:
     edgeUpdates: false
     disableCoreUpdates: false
     enableSafeMode: false
+    enableAssetMinify: null
 
 database:
     connection: mysql
