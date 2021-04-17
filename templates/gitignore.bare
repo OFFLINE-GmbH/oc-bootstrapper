@@ -9,3 +9,4 @@ composer.phar
 !themes
 !themes/**/*
 !plugins
+!auth.json

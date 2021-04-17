@@ -16,10 +16,30 @@ trait UsesTemplate
      */
     public function getTemplate($file)
     {
-        $dist      = __DIR__ . DS . implode(DS, ['..', '..', 'templates', $file]);
+        $dist = __DIR__ . DS . implode(DS, ['..', '..', 'templates', $file]);
         $overwrite = $this->getTemplateOverridePath($file);
 
         return file_exists($overwrite) ? realpath($overwrite) : realpath($dist);
+    }
+
+    /**
+     * Copies a template file to the current working directory.
+     *
+     * @param $template
+     * @param string $targetName
+     * @return bool
+     */
+    public function copyTemplateToCwd($template, $targetName = '')
+    {
+        $source = $this->getTemplate($template);
+
+        $useFilename = $targetName ?: $template;
+
+        $target = getcwd() . DS . $useFilename;
+
+        copy($source, $target);
+
+        return file_exists($target);
     }
 
     /**
@@ -28,7 +48,7 @@ trait UsesTemplate
     public function updateTemplateFiles()
     {
         $overridePath = $this->getTemplateOverridePath();
-        if ( ! is_dir($overridePath . DS . '.git')) {
+        if (!is_dir($overridePath . DS . '.git')) {
             return;
         }
 
@@ -43,11 +63,11 @@ trait UsesTemplate
     public function fetchTemplateFiles(string $remote)
     {
         $overridePath = $this->getTemplateOverridePath();
-        if ( is_dir($overridePath . DS . '.git')) {
+        if (is_dir($overridePath . DS . '.git')) {
             return $this->updateTemplateFiles();
         }
 
-        if ( ! mkdir($overridePath) && ! is_dir($overridePath)) {
+        if (!mkdir($overridePath) && !is_dir($overridePath)) {
             throw new \RuntimeException(sprintf('Failed to create template directory "%s"', $overridePath));
         }
 

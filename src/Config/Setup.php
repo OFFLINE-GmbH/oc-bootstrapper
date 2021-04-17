@@ -60,6 +60,30 @@ class Setup
     }
 
     /**
+     * Sets a single env variable.
+     * @param $key
+     * @param $value
+     */
+    protected function setEnvVar($key, $value)
+    {
+        $path = base_path('.env');
+        $old = env($key);
+
+        if (is_bool(env($key))) {
+            $old = env($key) ? 'true' : 'false';
+        }
+
+        if (file_exists($path)) {
+            file_put_contents($path, str_replace(
+                "$key=".$old,
+                "$key=".$value,
+                file_get_contents($path)
+            ));
+        }
+    }
+
+
+    /**
      * Write .env files.
      *
      * @param bool $createBackup

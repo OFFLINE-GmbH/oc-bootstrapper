@@ -19,24 +19,29 @@ trait RunsProcess
      * @throws RuntimeException
      * @throws LogicException
      */
-    protected function runProcess($command, $errorMessage, $timeout = 30)
+    protected function runProcess($command, $errorMessage, $timeout = 60)
     {
         $process = new Process($command);
         $process->setTimeout($timeout);
         $process->enableOutput();
         $exitCode = $process->run();
 
-        return $this->checkProcessResult($exitCode, $errorMessage, $process->getOutput());
+        $output = $process->getErrorOutput() ?: $process->getOutput();
+
+
+        return $this->checkProcessResult($exitCode, $errorMessage, $output);
     }
 
-    protected function runProcessWithOutput($command, $errorMessage, $timeout = 30)
+    protected function runProcessWithOutput($command, $errorMessage, $timeout = 60)
     {
         $process = new Process($command);
         $process->setTimeout($timeout);
         $process->enableOutput();
         $exitCode = $process->run();
 
-        $this->checkProcessResult($exitCode, $errorMessage, $process->getOutput());
+        $output = $process->getErrorOutput() ?: $process->getOutput();
+
+        $this->checkProcessResult($exitCode, $errorMessage, $output);
 
         return $process->getOutput();
     }
@@ -54,7 +59,7 @@ trait RunsProcess
     protected function checkProcessResult($exitCode, $message, $output)
     {
         if ($exitCode !== 0) {
-            $this->output->writeln('<error>' . $message . ': ' . $output . '</error>');
+            $this->output->writeln('<error>' . $message . ': ' . trim($output) . '</error>');
 
             return false;
         }

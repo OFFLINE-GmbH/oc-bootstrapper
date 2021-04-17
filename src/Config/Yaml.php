@@ -9,6 +9,13 @@ use Symfony\Component\Yaml\Parser;
 /**
  * Class Yaml
  * @package OFFLINE\Bootstrapper\October\Config
+ * @property array app
+ * @property ?int version
+ * @property array cms
+ * @property array database
+ * @property array git
+ * @property array plugins
+ * @property array mail
  */
 class Yaml implements Config
 {

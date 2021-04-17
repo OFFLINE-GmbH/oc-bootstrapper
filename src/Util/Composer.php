@@ -150,4 +150,18 @@ class Composer
             3600
         );
     }
+
+    /**
+     * Runs a create-project command.
+     */
+    public function createProject($name)
+    {
+        $name = escapeshellarg($name);
+
+        return $this->runProcess(
+            $this->composer . sprintf(' create-project october/october %s --no-interaction', $name),
+            'Failed to create Composer project',
+            3600
+        );
+    }
 }

@@ -7,3 +7,4 @@ vendor/
 composer.phar
 .env
 .well-known
+!auth.json

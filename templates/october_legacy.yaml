@@ -1,23 +1,17 @@
-version: 2
+# Legacy example config for October v1
 
 app:
     name: october           # Give this project a unique name
     url: http://october.dev
     locale: en
     debug: true
-    # backendUri: /backend
-    # logChannel: single
 
 cms:
-    theme: october/demo (user@remote.git) # or (user@remote.git#branch-or-version)
-    # lockTheme: true
-    # linkPolicy: detect
-    # routesCache: false
-    # assetCache: false
-    # dbTemplates: false
-    # safeMode: false
-    # enableSafeMode: false
-    # enableAssetMinify: null
+    theme: name (user@remote.git)
+    edgeUpdates: false
+    disableCoreUpdates: false
+    enableSafeMode: false
+    enableAssetMinify: null
 
 database:
     connection: mysql
@@ -50,11 +44,7 @@ plugins:
     # - Vendor.Private (user@remote.git)
 
 mail:
-    mailer: log
     host: smtp.mailgun.org
-    port: null
-    username: null
-    password: null
-    encryption: null
-    from_name: User Name
-    from_address: email@example.com
+    name: User Name
+    address: email@example.com
+    driver: log
