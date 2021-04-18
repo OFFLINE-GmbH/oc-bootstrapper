@@ -9,7 +9,7 @@ app:
     # logChannel: single
 
 cms:
-    theme: october/demo (user@remote.git) # or (user@remote.git#branch-or-version)
+    theme: october/demo # (user@remote.git) or (user@remote.git#branch-or-version)
     # lockTheme: true
     # linkPolicy: detect
     # routesCache: false

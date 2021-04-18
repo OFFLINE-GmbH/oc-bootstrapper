@@ -4,10 +4,8 @@
 namespace OFFLINE\Bootstrapper\October\Installer;
 
 
-use OFFLINE\Bootstrapper\October\Config\Setup;
 use OFFLINE\Bootstrapper\October\Config\Yaml;
 use OFFLINE\Bootstrapper\October\Deployment\DeploymentFactory;
-use OFFLINE\Bootstrapper\October\Downloader\OctoberCms;
 use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
 use OFFLINE\Bootstrapper\October\Util\CliIO;
 use OFFLINE\Bootstrapper\October\Util\Composer;
@@ -19,7 +17,6 @@ use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 use Throwable;
-use function Symfony\Component\VarDumper\Dumper\esc;
 
 class OctoberInstaller
 {
@@ -70,6 +67,8 @@ class OctoberInstaller
         $this->php = $php;
         $this->cwd = getcwd();
         $this->env = $this->path('.env');
+
+        $this->composer->setOutput($this->output);
     }
 
     public function run()
@@ -137,7 +136,9 @@ class OctoberInstaller
 
     /**
      * Uses the license.php registration file to register a license key.
+     *
      * @param string $key
+     *
      * @return bool
      */
     protected function registerLicense(string $key)
@@ -162,7 +163,8 @@ class OctoberInstaller
 
     /**
      * Patches config files and inserts .env variables.
-     * @param $line
+     *
+     * @param        $line
      * @param string $surround
      */
     protected function setupConfig()
@@ -236,6 +238,7 @@ class OctoberInstaller
             $this->output->writeLn(
                 sprintf('<fg=cyan>    - Theme %s is already installed, skipping.', $fullname) . '</>'
             );
+
             return;
         }
 
@@ -265,6 +268,7 @@ class OctoberInstaller
     {
         if (!is_array($this->config->plugins)) {
             $this->write('    -> No plugins to install.', 'comment');
+
             return;
         }
 
@@ -336,6 +340,7 @@ class OctoberInstaller
 
     /**
      * Exists the project with an error code and error message.
+     *
      * @param $message
      */
     protected function exitError($message = '')
@@ -348,20 +353,27 @@ class OctoberInstaller
 
     /**
      * Parses a source declaration like "theme-name (git@remote:repo.git#version)
+     *
      * @param string $source
+     *
      * @return array
      */
     protected function parseThemeSource(string $source): array
     {
-        preg_match("/(?<vendor>[^ \/]+)\/(?<name>[^ ]+) ?\((?<source>[^\)\#]+)\#?(?<version>[^\)]+)?\)/i", $source,
-            $matches);
+        preg_match(
+            "/(?<vendor>[^ \/]+)\/(?<name>[^ ]+) ?(?:\((?<source>[^\)\#]+)\#?(?<version>[^\)]+)?\))?/i",
+            $source,
+            $matches
+        );
 
         return $matches;
     }
 
     /**
      * Parses a source declaration like "Vendor.Plguin (git@remote:repo.git#version)"
+     *
      * @param string $source
+     *
      * @return array
      */
     protected function parsePluginSource(string $source): array
@@ -376,6 +388,7 @@ class OctoberInstaller
      * Safely parses a YAML config input to its string representation.
      *
      * @param $input
+     *
      * @return string
      */
     protected function handleConfigBool($input)
@@ -386,6 +399,7 @@ class OctoberInstaller
         if ($input === 'false') {
             return false;
         }
+
         return (bool)$input === true ? 'true' : 'false';
     }
 
@@ -406,7 +420,7 @@ class OctoberInstaller
         $contents = file_get_contents($file);
 
         $replacements = [
-            'enable_asset_minify' => "env('CMS_ASSET_MINIFY', null)"
+            'enable_asset_minify' => "env('CMS_ASSET_MINIFY', null)",
         ];
 
         foreach ($replacements as $key => $value) {
@@ -451,6 +465,7 @@ class OctoberInstaller
             }
         }
 
+        $this->write("Migrating database...");
         $migrated = $this->runProcess($this->php . ' artisan october:migrate', 'Failed to migrate database');
         if (!$migrated) {
             $this->exitError();
@@ -462,12 +477,14 @@ class OctoberInstaller
      */
     protected function setupGitignore()
     {
-        if (!$this->force) {
+        if (!$this->force && file_exists($this->path('.gitignore'))) {
             return;
         }
 
+        $this->write('Setting up .gitignore...');
+
         // Remove the default .gitignore.
-        $file = $this->cwd . DS . '.gitignore';
+        $file = $this->path('.gitignore');
         if (file_exists($file)) {
             unlink($file);
         }
@@ -520,7 +537,9 @@ class OctoberInstaller
 
     /**
      * Returns a path relative to the cwd.
+     *
      * @param $path
+     *
      * @return string
      */
     protected function path(...$path)

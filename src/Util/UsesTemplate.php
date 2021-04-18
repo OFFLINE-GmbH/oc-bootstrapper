@@ -86,7 +86,7 @@ trait UsesTemplate
      */
     protected function getTemplateOverridePath($file = null)
     {
-        $composerHome = (new Composer())->getHome();
+        $composerHome = (new Composer())->setOutput($this->output)->getHome();
 
         return implode(DS, [$composerHome, 'october', $file]);
     }

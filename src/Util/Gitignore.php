@@ -14,7 +14,9 @@ class Gitignore
     public function __construct($file)
     {
         $this->file     = $file;
-        $this->contents = file($file);
+        if (file_exists($file)) {
+            $this->contents = file($file);
+        }
     }
 
     public function write()
