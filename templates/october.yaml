@@ -1,5 +1,9 @@
 version: 2
 
+# Optional, put your license key here. If not provided, you will be asked during setup.
+# Use the %key% placeholder to have it replaced by the "october init" command.
+# license_key: %key%
+
 app:
     name: october           # Give this project a unique name
     url: http://october.dev

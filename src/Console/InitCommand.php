@@ -10,6 +10,7 @@ use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -24,6 +25,11 @@ class InitCommand extends Command
 
     const OPTION_DEV_BLANK = 'Do not set up an environment';
     const OPTION_DEV_LANDO = 'lando.dev development environment';
+
+    const OPTION_OCTOBER_V2 = 'October Version 2';
+    const OPTION_OCTOBER_LEGACY = 'October Version 1 (Legacy)';
+
+    public $output;
 
     /**
      * Configure the command options.
@@ -42,7 +48,7 @@ class InitCommand extends Command
     /**
      * Execute the command.
      *
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return mixed
@@ -50,7 +56,29 @@ class InitCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $output;
+
+        // What version?
         $helper = $this->getHelper('question');
+        $question = new ChoiceQuestion(
+            'What version of October would you like to install?',
+            [2 => static::OPTION_OCTOBER_V2, 1 => static::OPTION_OCTOBER_LEGACY],
+            2
+        );
+
+        $version = $helper->ask($input, $output, $question);
+
+        $key = '';
+        if ($version === self::OPTION_OCTOBER_V2) {
+            $this->output->writeln('');
+            // License key
+            $question = new Question(
+                'Enter you October License Key: '
+            );
+            $key = $helper->ask($input, $output, $question);
+        }
+
+        // What dev environment?
         $question = new ChoiceQuestion(
             'Please select a dev environment to set up',
             [static::OPTION_DEV_BLANK, static::OPTION_DEV_LANDO],
@@ -67,15 +95,33 @@ class InitCommand extends Command
         $output->writeln('<info>Updating template files...</info>');
         $this->updateTemplateFiles();
 
-        $template = $this->getTemplate('october.yaml');
+        $templateName = $version === self::OPTION_OCTOBER_LEGACY ? 'october_legacy.yaml' : 'october.yaml';
+
+        $template = $this->getTemplate($templateName);
         $targetOctoberYaml = $dir . DS . 'october.yaml';
 
         $output->writeln('<info>Creating default october.yaml...</info>');
 
         if ($this->fileExists($targetOctoberYaml)) {
             $output->writeln('<comment>october.yaml already exists: ' . $targetOctoberYaml . '</comment>');
+            $output->writeln('<info>Please remove it manually if you want to override it.</info>');
         } else {
             $this->copy($template, $targetOctoberYaml);
+            $this->replaceVars($targetOctoberYaml, ['name' => 'your-project']);
+            $licenseFile = $dir . DS . '.license';
+            // Put the license key into a temporary license file.
+            // This will be removed after the first installation attempt.
+            if ($key && !file_exists($licenseFile)) {
+                file_put_contents($licenseFile, $key);
+            }
+            // Make sure the "version: 2" field is in the config file.
+            if ($version === self::OPTION_OCTOBER_V2) {
+                $contents = file_get_contents($targetOctoberYaml);
+                if (!preg_match('/version:\s+2/i', $contents)) {
+                    $output->writeln('<error>"version: 2" field is missing in your october.yaml</error>');
+                    $output->writeln('<info>Make sure you have updated your october.yaml according to the upgrade guide</info>');
+                }
+            }
         }
 
         if ($dev === static::OPTION_DEV_LANDO) {
@@ -88,7 +134,7 @@ class InitCommand extends Command
                 $this->copy($this->getTemplate('lando.yml'), $targetLandoYaml);
             }
             $this->replaceVars($targetLandoYaml, ['name' => $project]);
-            $this->replaceVars($targetOctoberYaml, ['name' => $project]);
+            $this->replaceVars($targetOctoberYaml, ['name' => $project, 'key' => $key]);
             $this->setLandoConfig($targetOctoberYaml, $project);
         }
 
@@ -103,15 +149,16 @@ class InitCommand extends Command
     private function setLandoConfig(string $targetOctoberYaml, string $project)
     {
         $contents = file_get_contents($targetOctoberYaml);
-        $contents = preg_replace_callback('/^app:\n\s+name: (?<name>[^\s]+).*\n\s+url: (?<url>[^\s]+)/m', function ($matches) use ($project) {
-            $app = <<<EOF
+        $contents = preg_replace_callback('/^app:\n\s+name: (?<name>[^\s]+).*\n\s+url: (?<url>[^\s]+)/m',
+            function ($matches) use ($project) {
+                $app = <<<EOF
 app:
     name: %s
     url: %s
 EOF;
 
-            return sprintf($app, $project, 'http://' . $project . '.lndo.site');
-        }, $contents);
+                return sprintf($app, $project, 'http://' . $project . '.lndo.site');
+            }, $contents);
 
 
         $contents = preg_replace_callback('/^database:\n(?:^[ ].*\n?)*$/m', function () {
@@ -128,7 +175,7 @@ EOF;
         }, $contents);
 
         $contents = preg_replace_callback('/^mail:\n(?:^[ ].*\n?)*$/m', function () use ($project) {
-        return <<<EOF
+            return <<<EOF
 mail:
     host: mailhog 
     name: Sender Name

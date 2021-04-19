@@ -3,6 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
 use OFFLINE\Bootstrapper\October\Exceptions\DeploymentExistsException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -24,4 +25,6 @@ interface DeploymentInterface
      * @throws LogicException
      */
     public function install($force = false);
+
+    public function setOutput(OutputInterface $output);
 }

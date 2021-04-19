@@ -6,7 +6,5 @@ composer.phar
 !october.yaml
 !Envoy.blade.php
 !.gitlab-ci.yml
-!themes
-!themes/**/*
 !plugins
 !auth.json

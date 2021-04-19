@@ -28,7 +28,6 @@ trait RunsProcess
 
         $output = $process->getErrorOutput() ?: $process->getOutput();
 
-
         return $this->checkProcessResult($exitCode, $errorMessage, $output);
     }
 

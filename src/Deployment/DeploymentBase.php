@@ -3,6 +3,7 @@
 namespace OFFLINE\Bootstrapper\October\Deployment;
 
 use OFFLINE\Bootstrapper\October\Config\Yaml;
+use OFFLINE\Bootstrapper\October\Util\CliIO;
 use OFFLINE\Bootstrapper\October\Util\ManageDirectory;
 use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
 
@@ -11,7 +12,7 @@ use OFFLINE\Bootstrapper\October\Util\UsesTemplate;
  */
 abstract class DeploymentBase
 {
-    use UsesTemplate, ManageDirectory;
+    use UsesTemplate, CliIO, ManageDirectory;
 
     /**
      * @var Yaml

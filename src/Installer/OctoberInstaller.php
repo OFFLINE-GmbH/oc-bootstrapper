@@ -52,6 +52,10 @@ class OctoberInstaller
      * @var Gitignore
      */
     public $gitignore;
+    /**
+     * @var string
+     */
+    protected $tmpDir = 'install-tmp';
 
     public function __construct(
         OutputInterface $output,
@@ -71,24 +75,33 @@ class OctoberInstaller
         $this->composer->setOutput($this->output);
     }
 
-    public function run()
+    public function run($key = '')
     {
-        $key = 'HFSVD-O7RQD-6TCHL-O0SRO';
+        if (!$key) {
+            $key = $this->resolveKey();
+        }
 
         $this->write('Creating new October project...');
 
-        // Create project using composer
+        // Create project using composer.
         if ($this->force || !is_dir($this->path('bootstrap'))) {
-            $tmpDir = 'install-tmp';
             $this->ensureBlankCwd();
-            $this->composer->createProject($tmpDir);
-            $this->moveUp($tmpDir);
+            $this->composer->createProject($this->tmpDir);
+            $this->moveUp($this->tmpDir);
         }
 
-        // Activate the license key
-        if (!file_exists($this->path('auth.json'))) {
+        // Activate the license key.
+        if (!$this->isRegistered()) {
+            if (!$key) {
+                $this->exitError('Provide a license key in your october.yaml or set up your installation using "php artisan project:set" first.');
+            }
             $this->write('Registering license key...');
-            $this->registerLicense($key);
+            $this->setProject($key);
+        }
+
+        // Require all October modules via Composer.
+        if (!file_exists($this->path('modules', 'editor', 'composer.json'))) {
+            $this->build();
         }
 
         // Patch configuration and .env files, run migraitons.
@@ -107,6 +120,9 @@ class OctoberInstaller
         // Install all plugins.
         $this->write('Installing plugins...');
         $this->setupPlugins();
+
+        // Update the .gitignore with new rules.
+        $this->gitignore->write();
 
         // If a deployment is configured, set it up.
         if (isset($this->config->git['deployment']) && $deployment = $this->config->git['deployment']) {
@@ -132,33 +148,6 @@ class OctoberInstaller
         $this->runProcess($this->php . ' artisan cache:clear', 'Failed to clear cache');
 
         $this->write('Application ready! Build something amazing.', 'comment');
-    }
-
-    /**
-     * Uses the license.php registration file to register a license key.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    protected function registerLicense(string $key)
-    {
-        $copied = $this->copyTemplateToCwd('license.php');
-        if (!$copied) {
-            $this->exitError('Failed to copy license.php to project');
-        }
-
-        $command = sprintf('%s -f %s/license.php %s', $this->php, $this->cwd, $key);
-
-        $activated = $this->runProcess($command, 'Failed to activate license');
-        // Always unlink the helper script.
-        $unlinked = unlink(sprintf('%s/license.php', $this->cwd));
-
-        if (!$activated) {
-            $this->exitError();
-        }
-
-        return $unlinked;
     }
 
     /**
@@ -254,10 +243,28 @@ class OctoberInstaller
             $command .= ' --no-lock';
         }
 
-        $installed = $this->runProcess($this->php . ' artisan ' . $command,
-            sprintf('Failed to install theme %s', $fullname), 120);
+        $installed = $this->runProcess(
+            $this->php . ' artisan ' . $command,
+            sprintf('Failed to install theme %s', $fullname),
+            120
+        );
         if (!$installed) {
             $this->exitError();
+        }
+
+        // If the theme is not locked, add it to the .gitignore. If no
+        // child theme is used, we probably want to track changes in git.
+        if ($lock !== true) {
+            $themeDir = sprintf('themes/%s-%s', strtolower($theme['vendor']), strtolower($theme['name']));
+
+            $this->gitignore->add("\n# Ignore unlocked theme");
+            $this->gitignore->add('!themes/');
+            $this->gitignore->add(sprintf('!%s', $themeDir));
+            $this->gitignore->add(sprintf('!%s/*', $themeDir));
+
+            if (is_dir($this->path($themeDir, '.git'))) {
+                $this->rrmdir($this->path($themeDir, '.git'));
+            }
         }
     }
 
@@ -301,6 +308,16 @@ class OctoberInstaller
             if (!$installed) {
                 $this->exitError();
             }
+
+            // If this plugin should be cloned into the project itself, add it to the .gitignore file.
+            // Also remove any .git folder to prevent git registering this as a sub-module.
+            if (isset($plugin['keep'])) {
+                $this->gitignore->addPlugin($plugin['vendor'], $plugin['name']);
+                $gitDir = strtolower($this->path('plugins', $plugin['vendor'], $plugin['name'], '.git'));
+                if (is_dir($gitDir)) {
+                    $this->rrmdir($gitDir);
+                }
+            }
         }
 
         $this->migrate();
@@ -318,6 +335,36 @@ class OctoberInstaller
         file_put_contents($file, $new);
     }
 
+    /**
+     * Runs set:project
+     *
+     * @throws RuntimeException
+     * @throws LogicException
+     */
+    protected function setProject($key)
+    {
+        $key = escapeshellarg($key);
+
+        $built = $this->runProcess($this->php . ' artisan project:set ' . $key, 'Failed to install license key');
+        if (!$built) {
+            $this->exitError();
+        }
+    }
+
+    /**
+     * Runs october:build
+     *
+     * @throws RuntimeException
+     * @throws LogicException
+     */
+    protected function build()
+    {
+        $built = $this->runProcess($this->php . ' artisan october:build', 'Failed to install October modules');
+        if (!$built) {
+            $this->exitError();
+        }
+    }
+
 
     /**
      * Move all the contents of a folder one level up.
@@ -327,7 +374,7 @@ class OctoberInstaller
      */
     protected function moveUp($dir)
     {
-        $source = $this->cwd . DS . $dir;
+        $source = $this->path($dir);
 
         (new Process(sprintf('mv %s %s', $source . '/*', $this->cwd)))->run();
         (new Process(sprintf('mv %s %s', $source . '/.*', $this->cwd)))->run();
@@ -378,8 +425,11 @@ class OctoberInstaller
      */
     protected function parsePluginSource(string $source): array
     {
-        preg_match("/(?<update>\^)?(?<vendor>[^\.]+)\.(?<name>[^ #]+)(?: ?\((?<source>[^\#)]+)(?:#(?<version>[^\)]+)?)?)?/",
-            $source, $matches);
+        preg_match(
+            "/(?<keep>\+)?(?<vendor>[^\.]+)\.(?<name>[^ #]+)(?: ?\((?<source>[^\#)]+)(?:#(?<version>[^\)]+)?)?)?/",
+            $source,
+            $matches
+        );
 
         return $matches;
     }
@@ -509,6 +559,7 @@ class OctoberInstaller
     {
         try {
             $deploymentObj = DeploymentFactory::createDeployment($deployment, $this->config);
+            $deploymentObj->setOutput($this->output);
             $deploymentObj->install($this->force);
         } catch (DeploymentExistsException $e) {
             $this->output->writeLn('<fg=cyan>    - ' . $e->getMessage() . '</>');
@@ -526,7 +577,7 @@ class OctoberInstaller
             return;
         }
 
-        $remove = ['SECURITY.md', 'CHANGELOG.md'];
+        $remove = ['SECURITY.md', 'CHANGELOG.md', '.license'];
         foreach ($remove as $file) {
             $file = $this->cwd . DS . $file;
             if (file_exists($file)) {
@@ -558,6 +609,7 @@ class OctoberInstaller
         $this->rrmdir($this->path('config'));
         $this->rrmdir($this->path('modules'));
         $this->rrmdir($this->path('vendor'));
+        $this->rrmdir($this->path($this->tmpDir));
     }
 
     /**
@@ -581,5 +633,36 @@ class OctoberInstaller
             reset($objects);
             rmdir($dir);
         }
+    }
+
+    /**
+     * Search the key in different places.
+     */
+    protected function resolveKey()
+    {
+        // If no key was provided via command line, use the key from the config file.
+        $key = $this->config->license_key ?? '';
+
+        // If no key was provided by the config file, use the key from the init command.
+        // This file will only be present if no installation has succeeded before.
+        $keyFile = $this->path('.license');
+        if (!$key && file_exists($keyFile)) {
+            $key = file_get_contents($this->path('.license'));
+            if (!$key) {
+                return '';
+            }
+        }
+        return $key;
+    }
+
+    /**
+     * Check if the installation is already properly registered.
+     */
+    protected function isRegistered()
+    {
+        return !$this->force
+            && file_exists($this->path('auth.json'))
+            && file_exists($this->path('composer.json'))
+            && preg_match('/gateway\.octobercms\.com/i', file_get_contents($this->path('composer.json')));
     }
 }

@@ -146,6 +146,13 @@ class InstallCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Specify from where to fetch template files (git remote)',
                 ''
+            )
+            ->addOption(
+                'key',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Provide a October CMS license key',
+                ''
             );
     }
 
@@ -186,10 +193,14 @@ class InstallCommand extends Command
         $this->makeConfig();
 
         if ((int)$this->config->version === 2) {
-            $installer = new OctoberInstaller($this->output, $this->config, $this->composer, $this->php,
-                $this->firstRun);
-            $installer->run();
-            return;
+            $installer = new OctoberInstaller(
+                $this->output,
+                $this->config,
+                $this->composer,
+                $this->php,
+                $this->firstRun
+            );
+            return $installer->run($input->getOption('key'));
         }
 
         $this->gitignore = new Gitignore($this->getGitignore());
@@ -416,7 +427,7 @@ class InstallCommand extends Command
 
     protected function cleanup()
     {
-        if ( ! $this->firstRun) {
+        if (!$this->firstRun) {
             return;
         }
 
