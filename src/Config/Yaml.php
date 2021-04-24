@@ -11,7 +11,7 @@ use Symfony\Component\Yaml\Parser;
  * @package OFFLINE\Bootstrapper\October\Config
  * @property array app
  * @property ?int version
- * @property ?string license_key
+ * @property ?string key
  * @property array cms
  * @property array database
  * @property array git

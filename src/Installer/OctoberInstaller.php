@@ -93,7 +93,7 @@ class OctoberInstaller
         // Activate the license key.
         if (!$this->isRegistered()) {
             if (!$key) {
-                $this->exitError('Provide a license key in your october.yaml or set up your installation using "php artisan project:set" first.');
+                $this->exitError('Provide a license key in your october.yaml or via --key, or set up your installation using "php artisan project:set" first.');
             }
             $this->write('Registering license key...');
             $this->setProject($key);
@@ -223,7 +223,12 @@ class OctoberInstaller
 
         $fullname = sprintf('%s/%s', $theme['vendor'], $theme['name']);
 
-        if (is_dir($this->path('themes', $theme['name']))) {
+        // Possible installation paths:
+        //   - themes/vendor-theme-name
+        //   - themes/theme-name
+        $themePathSimple = $this->path('themes', str_replace('-theme', '', $theme['name']));
+        $themePathVendor = $this->path('themes', $theme['vendor'] . '-' . str_replace('-theme', '', $theme['name']));
+        if (is_dir($themePathSimple) || is_dir($themePathVendor)) {
             $this->output->writeLn(
                 sprintf('<fg=cyan>    - Theme %s is already installed, skipping.', $fullname) . '</>'
             );
@@ -256,14 +261,21 @@ class OctoberInstaller
         // child theme is used, we probably want to track changes in git.
         if ($lock !== true) {
             $themeDir = sprintf('themes/%s-%s', strtolower($theme['vendor']), strtolower($theme['name']));
+            // For compatibility reasons we also ignore the folder without the vendor name in it.
+            $themeDirWithoutVendor = sprintf('themes/%s', strtolower($theme['name']));
 
             $this->gitignore->add("\n# Ignore unlocked theme");
             $this->gitignore->add('!themes/');
             $this->gitignore->add(sprintf('!%s', $themeDir));
             $this->gitignore->add(sprintf('!%s/*', $themeDir));
+            $this->gitignore->add(sprintf('!%s', $themeDirWithoutVendor));
+            $this->gitignore->add(sprintf('!%s/*', $themeDirWithoutVendor));
 
-            if (is_dir($this->path($themeDir, '.git'))) {
-                $this->rrmdir($this->path($themeDir, '.git'));
+            // Remove the .git directory from the theme dir to prevent git-submodule creation.
+            foreach ([$themeDir, $themeDirWithoutVendor] as $folder)  {
+                if (is_dir($this->path($folder, '.git'))) {
+                    $this->rrmdir($this->path($folder, '.git'));
+                }
             }
         }
     }
@@ -282,6 +294,12 @@ class OctoberInstaller
         foreach ($this->config->plugins as $pluginSource) {
             $plugin = $this->parsePluginSource($pluginSource);
             $fullname = sprintf('%s.%s', $plugin['vendor'], $plugin['name']);
+
+            // If this plugin should be cloned into the project itself, add it to the .gitignore file.
+            // Also remove any .git folder to prevent git registering this as a sub-module.
+            if (isset($plugin['keep']) && $plugin['keep']) {
+                $this->gitignore->addPlugin($plugin['vendor'], $plugin['name']);
+            }
 
             // Check if the plugin is already installed.
             $path = $this->path('plugins', strtolower($plugin['vendor']), strtolower($plugin['name']));
@@ -309,10 +327,8 @@ class OctoberInstaller
                 $this->exitError();
             }
 
-            // If this plugin should be cloned into the project itself, add it to the .gitignore file.
-            // Also remove any .git folder to prevent git registering this as a sub-module.
-            if (isset($plugin['keep'])) {
-                $this->gitignore->addPlugin($plugin['vendor'], $plugin['name']);
+            // If this plugin should be cloned into the project itself, remove any .git folder to prevent git registering this as a sub-module.
+            if (isset($plugin['keep']) && $plugin['keep']) {
                 $gitDir = strtolower($this->path('plugins', $plugin['vendor'], $plugin['name'], '.git'));
                 if (is_dir($gitDir)) {
                     $this->rrmdir($gitDir);
@@ -641,7 +657,7 @@ class OctoberInstaller
     protected function resolveKey()
     {
         // If no key was provided via command line, use the key from the config file.
-        $key = $this->config->license_key ?? '';
+        $key = $this->config->key ?? '';
 
         // If no key was provided by the config file, use the key from the init command.
         // This file will only be present if no installation has succeeded before.
@@ -652,6 +668,7 @@ class OctoberInstaller
                 return '';
             }
         }
+
         return $key;
     }
 
@@ -660,8 +677,7 @@ class OctoberInstaller
      */
     protected function isRegistered()
     {
-        return !$this->force
-            && file_exists($this->path('auth.json'))
+        return file_exists($this->path('auth.json'))
             && file_exists($this->path('composer.json'))
             && preg_match('/gateway\.octobercms\.com/i', file_get_contents($this->path('composer.json')));
     }
