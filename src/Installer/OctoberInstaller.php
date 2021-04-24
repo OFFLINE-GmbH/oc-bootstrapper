@@ -107,7 +107,6 @@ class OctoberInstaller
         // Patch configuration and .env files, run migraitons.
         $this->write('Setting up configuration files...');
         $this->setupConfig();
-        $this->migrate();
 
         // Copy the .gitignore file over from the templates folder.
         $this->setupGitignore();
@@ -129,6 +128,8 @@ class OctoberInstaller
             $this->write("Setting up ${deployment} deployment.");
             $this->setupDeployment($deployment);
         }
+
+        $this->migrate();
 
         // If this is the first run (=force option enabled), remove any demo data.
         if ($this->force) {
@@ -335,8 +336,6 @@ class OctoberInstaller
                 }
             }
         }
-
-        $this->migrate();
     }
 
 
