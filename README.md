@@ -1,5 +1,7 @@
 # Bootstrapper for October CMS
 
+> ℹ️ Since October 2 has native support for Composer, this project is no longer required and therefore unmaintained.
+
 `oc-bootstrapper` is a command line tool that enables you to reconstruct an October CMS installation
 from a single configuration file.
 
